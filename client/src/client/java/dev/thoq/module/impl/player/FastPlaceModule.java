@@ -11,7 +11,7 @@ public class FastPlaceModule extends Module {
     private Field itemUseCooldownField;
 
     public FastPlaceModule() {
-        super("fastplace", "helicopter helicopter");
+        super("FastPlace", "Helicopter helicopter");
         try {
             itemUseCooldownField = MinecraftClient.class.getDeclaredField("itemUseCooldown");
             itemUseCooldownField.setAccessible(true);

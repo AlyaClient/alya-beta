@@ -6,7 +6,7 @@ public class FullbrightModule extends Module {
     private double previousGamma;
 
     public FullbrightModule() {
-        super("fullbright", "light mode for minecraft caves");
+        super("FullBright", "Light mode for minecraft caves");
     }
 
     @Override

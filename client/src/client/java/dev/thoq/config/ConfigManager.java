@@ -17,7 +17,7 @@ import static dev.thoq.RyeClient.LOGGER;
 
 @SuppressWarnings("CallToPrintStackTrace")
 public class ConfigManager {
-    private static final String CONFIG_FOLDER = MinecraftClient.getInstance().runDirectory + "/Meownyx/configs/";
+    private static final String CONFIG_FOLDER = MinecraftClient.getInstance().runDirectory + "/" + RyeClient.getName() + "/configs/";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     static {

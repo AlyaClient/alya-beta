@@ -27,6 +27,11 @@ export interface Setting {
   type: string;
 }
 
+export const getVersion = async (): Promise<string> => {
+  const response = await api.get('/version');
+  return response.data;
+}
+
 export const getModules = async (): Promise<Module[]> => {
   const response = await api.get('/modules');
   return response.data;

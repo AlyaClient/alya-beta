@@ -4,7 +4,7 @@ import dev.thoq.module.Module;
 
 public class VelocityModule extends Module {
     public VelocityModule() {
-        super("velocity", "uses heavy cock and balls to create friction to prevent knockback");
+        super("Velocity", "Uses heavy cock and balls to create friction to prevent knockback");
     }
 
     @Override

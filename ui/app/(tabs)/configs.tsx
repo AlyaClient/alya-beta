@@ -7,12 +7,10 @@ import {
     RefreshControl,
     TextInput,
     Alert,
-    useColorScheme as _useColorScheme
 } from 'react-native';
 import {getConfigs, saveConfig, loadConfig} from '@/services/api';
 import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
-import {IconSymbol} from '@/components/ui/IconSymbol';
 import {Colors} from '@/constants/Colors';
 import {useColorScheme} from '@/hooks/useColorScheme';
 
@@ -52,12 +50,12 @@ export default function ConfigsScreen() {
     };
 
     useEffect(() => {
-        fetchConfigs();
+        fetchConfigs().then();
     }, []);
 
     const handleRefresh = () => {
         setRefreshing(true);
-        fetchConfigs();
+        fetchConfigs().then();
     };
 
     const handleSaveConfig = async () => {
@@ -69,7 +67,7 @@ export default function ConfigsScreen() {
         try {
             await saveConfig(newConfigName);
             setNewConfigName('');
-            fetchConfigs();
+            fetchConfigs().then();
             Alert.alert('Success', `Config "${newConfigName}" saved successfully`);
         } catch (error) {
             console.error('Error saving config:', error);

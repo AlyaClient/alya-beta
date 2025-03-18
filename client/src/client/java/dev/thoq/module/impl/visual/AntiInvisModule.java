@@ -5,7 +5,7 @@ import net.minecraft.entity.Entity;
 
 public class AntiInvisModule extends Module {
     public AntiInvisModule() {
-        super("antiinvis", "Superman's xray vision");
+        super("AntiInvis", "See things you're not supposed to, like your paren-");
     }
 
     @Override

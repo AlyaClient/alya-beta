@@ -6,7 +6,7 @@ import net.minecraft.entity.Entity;
 public class GlowESP extends Module {
 
     public GlowESP() {
-        super("glowesp", "glows entities");
+        super("GlowESP", "Glows entities");
     }
 
     @Override

@@ -4,7 +4,7 @@ import dev.thoq.module.Module;
 
 public class NoJumpDelayModule extends Module {
     public NoJumpDelayModule() {
-        super("nojumpdelay", "makes player a bouncy ball");
+        super("NoJumpDelay", "Makes player a bouncy ball");
     }
 
     @Override

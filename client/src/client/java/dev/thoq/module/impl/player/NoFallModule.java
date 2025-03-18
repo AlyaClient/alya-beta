@@ -5,7 +5,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
 public class NoFallModule extends Module {
     public NoFallModule() {
-        super("nofall", "Prevents fall damage");
+        super("NoFall", "Prevents fall damage");
     }
 
     @Override

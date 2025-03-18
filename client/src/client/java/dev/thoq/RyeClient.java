@@ -123,7 +123,7 @@ public class RyeClient implements ClientModInitializer {
     }
 
     public static String getEdition() {
-        return "v1";
+        return "v1.1";
     }
 
     public static String getType() {

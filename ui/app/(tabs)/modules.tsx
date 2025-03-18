@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {StyleSheet, Switch, TouchableOpacity, ActivityIndicator, ScrollView, RefreshControl} from 'react-native';
-import {getModules, toggleModule, Module, Setting, updateModuleSetting, setModuleKeybind} from '@/services/api';
+import React, {useEffect, useRef, useState} from 'react';
+import {ActivityIndicator, RefreshControl, ScrollView, StyleSheet, Switch, TouchableOpacity} from 'react-native';
+import {getModules, Module, setModuleKeybind, Setting, toggleModule, updateModuleSetting} from '@/services/api';
 import {ThemedText} from '@/components/ThemedText';
 import {ThemedView} from '@/components/ThemedView';
 import {IconSymbol} from '@/components/ui/IconSymbol';
@@ -33,6 +33,19 @@ export default function ModulesScreen() {
     const [currentModule, setCurrentModule] = useState<string>('');
     const [currentKeyCode, setCurrentKeyCode] = useState<number>(-1);
     const colors = useThemeColor();
+    const incrementIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const decrementIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        return () => {
+            if (incrementIntervalRef.current) {
+                clearInterval(incrementIntervalRef.current);
+            }
+            if (decrementIntervalRef.current) {
+                clearInterval(decrementIntervalRef.current);
+            }
+        };
+    }, []);
 
     const fetchModules = async () => {
         try {
@@ -47,18 +60,18 @@ export default function ModulesScreen() {
     };
 
     useEffect(() => {
-        fetchModules();
+        fetchModules().then();
     }, []);
 
     const handleRefresh = () => {
         setRefreshing(true);
-        fetchModules();
+        fetchModules().then();
     };
 
     const handleToggleModule = async (moduleName: string) => {
         try {
             await toggleModule(moduleName);
-            fetchModules();
+            fetchModules().then();
         } catch (error) {
             console.error('Error toggling module:', error);
         }
@@ -67,14 +80,14 @@ export default function ModulesScreen() {
     const handleUpdateSetting = async (moduleName: string, settingName: string, value: any) => {
         try {
             await updateModuleSetting(moduleName, settingName, value);
-            fetchModules();
+            fetchModules().then();
         } catch (error) {
             console.error('Error updating setting:', error);
         }
     };
 
     const renderSettingValue = (setting: Setting, moduleName: string) => {
-        if ((setting.type === 'Integer' || setting.type === 'Float' || setting.type === 'Double') &&
+        if ((setting.type === 'Integer') &&
             (setting.value === 0 || setting.value === 1)) {
             return (
                 <Switch
@@ -103,29 +116,87 @@ export default function ModulesScreen() {
                             onPress={() => {
                                 const newValue = Math.max(
                                     setting.minValue !== null ? setting.minValue : Number.MIN_SAFE_INTEGER,
-                                    setting.value - 1
+                                    setting.value - (setting.type === 'Integer' ? 1 : 0.1)
                                 );
-                                handleUpdateSetting(moduleName, setting.name, newValue);
+                                handleUpdateSetting(moduleName, setting.name, newValue).then();
                             }}
-                            style={[styles.numberButton, {backgroundColor: colors.buttonBackground}]}
+                            onLongPress={() => {
+                                decrementIntervalRef.current = setInterval(() => {
+                                    setModules(prevModules => {
+                                        const updatedModules = [...prevModules];
+                                        const moduleIndex = updatedModules.findIndex(m => m.name === moduleName);
+                                        if (moduleIndex !== -1) {
+                                            const settingIndex = updatedModules[moduleIndex].settings.findIndex(s => s.name === setting.name);
+                                            if (settingIndex !== -1) {
+                                                const currentValue = updatedModules[moduleIndex].settings[settingIndex].value;
+                                                const step = 0.1;
+                                                const newValue = Math.max(
+                                                    setting.minValue !== null ? setting.minValue : Number.MIN_SAFE_INTEGER,
+                                                    currentValue - step
+                                                );
+                                                handleUpdateSetting(moduleName, setting.name, newValue).then();
+                                                updatedModules[moduleIndex].settings[settingIndex].value = newValue;
+                                            }
+                                        }
+                                        return updatedModules;
+                                    });
+                                }, 50);
+                            }}
+                            onPressOut={() => {
+                                if (decrementIntervalRef.current) {
+                                    clearInterval(decrementIntervalRef.current);
+                                }
+                            }}
                         >
                             <ThemedText>-</ThemedText>
                         </TouchableOpacity>
-                        <ThemedText>{setting.value}</ThemedText>
+
+                        <ThemedText>
+                            {typeof setting.value === 'number'
+                                ? setting.value.toFixed(incrementIntervalRef.current || decrementIntervalRef.current ? 1 : (setting.type === 'Integer' ? 0 : 1))
+                                : setting.value}
+                        </ThemedText>
+
                         <TouchableOpacity
                             onPress={() => {
                                 const newValue = Math.min(
                                     setting.maxValue !== null ? setting.maxValue : Number.MAX_SAFE_INTEGER,
-                                    setting.value + 1
+                                    setting.value + (setting.type === 'Integer' ? 1 : 0.1)
                                 );
-                                handleUpdateSetting(moduleName, setting.name, newValue);
+                                handleUpdateSetting(moduleName, setting.name, newValue).then();
                             }}
-                            style={[styles.numberButton, {backgroundColor: colors.buttonBackground}]}
+                            onLongPress={() => {
+                                incrementIntervalRef.current = setInterval(() => {
+                                    setModules(prevModules => {
+                                        const updatedModules = [...prevModules];
+                                        const moduleIndex = updatedModules.findIndex(m => m.name === moduleName);
+                                        if (moduleIndex !== -1) {
+                                            const settingIndex = updatedModules[moduleIndex].settings.findIndex(s => s.name === setting.name);
+                                            if (settingIndex !== -1) {
+                                                const currentValue = updatedModules[moduleIndex].settings[settingIndex].value;
+                                                const step = 0.1;
+                                                const newValue = Math.min(
+                                                    setting.maxValue !== null ? setting.maxValue : Number.MAX_SAFE_INTEGER,
+                                                    currentValue + step
+                                                );
+                                                handleUpdateSetting(moduleName, setting.name, newValue).then();
+                                                updatedModules[moduleIndex].settings[settingIndex].value = newValue;
+                                            }
+                                        }
+                                        return updatedModules;
+                                    });
+                                }, 50);
+                            }}
+                            onPressOut={() => {
+                                if (incrementIntervalRef.current) {
+                                    clearInterval(incrementIntervalRef.current);
+                                }
+                            }}
                         >
                             <ThemedText>+</ThemedText>
                         </TouchableOpacity>
                     </ThemedView>
-                );
+                )
             default:
                 return <ThemedText>{String(setting.value)}</ThemedText>;
         }
@@ -250,8 +321,8 @@ export default function ModulesScreen() {
                 onKeySelected={async (keyCode) => {
                     try {
                         await setModuleKeybind(currentModule, keyCode);
-                        fetchModules();
-                        fetchModules();
+                        fetchModules().then();
+                        fetchModules().then();
                     } catch (error) {
                         console.error('Error setting keybind:', error);
                     }

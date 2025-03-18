@@ -11,10 +11,10 @@ public class SpeedModule extends Module {
     private boolean wasSprinting = false;
 
     public SpeedModule() {
-        super("speed", "faster than the average american");
-        addSetting(new Setting<>("Speed", "Flight speed multiplier", 1.5f, 0.1f, 10.0f));
-        addSetting(new Setting<>("BHop", "Enable BHop = 1", 1f, 0f, 1f));
-        addSetting(new Setting<>("Strafe", "Enable Strafe = 1", 0f, 0f, 1f));
+        super("Speed", "Become faster than the average american");
+        addSetting(new Setting<>("Speed", "Zoom speed multiplier", 1.5f, 0.1f, 10.0f));
+        addSetting(new Setting<>("BHop", "Enable BHop?", 1, 0, 1));
+        addSetting(new Setting<>("Strafe", "Enable Strafe?", 0, 0, 1));
     }
 
     @Override

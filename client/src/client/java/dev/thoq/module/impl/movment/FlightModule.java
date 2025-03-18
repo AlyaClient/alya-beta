@@ -10,7 +10,7 @@ public class FlightModule extends Module {
     private boolean wasSprinting = false;
 
     public FlightModule() {
-        super("flight", "become airplane");
+        super("Flight", "Become airplane");
         addSetting(new Setting<>("speed", "Flight speed multiplier", 1.5f, 0.1f, 10.0f));
     }
 

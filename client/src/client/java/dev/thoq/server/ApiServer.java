@@ -66,6 +66,12 @@ public class ApiServer {
         app.post("/api/configs/{name}/save", this::saveConfig);
         
         app.post("/api/configs/{name}/load", this::loadConfig);
+
+        app.get("/api/version", this::getVersion);
+    }
+
+    private void getVersion(Context ctx) {
+        ctx.result(RyeClient.getEdition());
     }
 
     private void getAllModules(Context ctx) {

@@ -5,7 +5,7 @@ import dev.thoq.module.Module;
 public class SprintModule extends Module {
 
     public SprintModule() {
-        super("sprint", "Makes player less american");
+        super("Sprint", "Makes player less american");
     }
 
     @Override
