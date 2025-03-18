@@ -1,0 +1,15 @@
+{
+	"required": true,
+	"package": "dev.thoq.mixin.client",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"InGameHudMixin",
+		"WatermarkTitleScreenMixin",
+		"MinecraftClientMixin",
+		"ChatScreenMixin",
+		"ChatInputSuggestorMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

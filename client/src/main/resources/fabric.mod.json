@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "rye",
+	"version": "${version}",
+	"name": "rye",
+	"description": "Meow",
+	"authors": [
+		"Thoq"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/rye/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.thoq.Rye"
+		],
+		"client": [
+			"dev.thoq.RyeClient"
+		]
+	},
+	"mixins": [
+		"rye.mixins.json",
+		{
+			"config": "rye.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.16.10",
+		"minecraft": "~1.21.4",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

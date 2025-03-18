@@ -1,0 +1,32 @@
+package dev.thoq.module.impl.visual;
+
+import dev.thoq.module.Module;
+import net.minecraft.entity.Entity;
+
+public class AntiInvisModule extends Module {
+    public AntiInvisModule() {
+        super("antiinvis", "Superman's xray vision");
+    }
+
+    @Override
+    protected void onTick() {
+        if(!isEnabled() || mc.world == null) return;
+
+        Iterable<Entity> entities = mc.world.getEntities();
+
+        for(Entity entity : entities) {
+            if(entity.isInvisible()) {
+                entity.setInvisible(false);
+            }
+        }
+    }
+
+    @Override
+    protected void onEnable() {
+    }
+
+    @Override
+    protected void onDisable() {
+
+    }
+}
