@@ -23,8 +23,8 @@ public class SpeedModule extends Module {
 
         GameOptions options = mc.options;
         float speed = ((Setting<Float>) getSetting("speed")).getValue();
-        float bHop = ((Setting<Float>) getSetting("BHop")).getValue();
-        float strafe = ((Setting<Float>) getSetting("Strafe")).getValue();
+        int bHop = ((Setting<Integer>) getSetting("BHop")).getValue();
+        int strafe = ((Setting<Integer>) getSetting("Strafe")).getValue();
 
         if(options.jumpKey.isPressed()) {
             speed = speed / 2;
