@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="client" options="-AoutRefMapFile=$PROJECT_DIR$/client/build/classes/java/client/client-rye-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=$PROJECT_DIR$/client/build/loom-cache/mixin-map-net.fabricmc.yarn.1_21_4.1.21.4+build.8-v2.client.tiny -AinMapFileNamedIntermediary=$USER_HOME$/.gradle/caches/fabric-loom/1.21.4/net.fabricmc.yarn.1_21_4.1.21.4+build.8-v2/mappings.tiny" />
+      <module name="client.client" options="-AoutRefMapFile=$PROJECT_DIR$/client/build/classes/java/client/client-rye-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=$PROJECT_DIR$/client/build/loom-cache/mixin-map-net.fabricmc.yarn.1_21_4.1.21.4+build.8-v2.client.tiny -AinMapFileNamedIntermediary=$USER_HOME$/.gradle/caches/fabric-loom/1.21.4/net.fabricmc.yarn.1_21_4.1.21.4+build.8-v2/mappings.tiny" />
+      <module name="client.main" options="-AoutRefMapFile=$PROJECT_DIR$/client/build/classes/java/main/rye-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=$PROJECT_DIR$/client/build/loom-cache/mixin-map-net.fabricmc.yarn.1_21_4.1.21.4+build.8-v2.main.tiny -AinMapFileNamedIntermediary=$USER_HOME$/.gradle/caches/fabric-loom/1.21.4/net.fabricmc.yarn.1_21_4.1.21.4+build.8-v2/mappings.tiny" />
+      <module name="client.test" options="-AoutRefMapFile=$PROJECT_DIR$/client/build/classes/java/test/test-rye-refmap.json -AdefaultObfuscationEnv=named:intermediary -Aquiet=true -AoutMapFileNamedIntermediary=$PROJECT_DIR$/client/build/loom-cache/mixin-map-net.fabricmc.yarn.1_21_4.1.21.4+build.8-v2.test.tiny -AinMapFileNamedIntermediary=$USER_HOME$/.gradle/caches/fabric-loom/1.21.4/net.fabricmc.yarn.1_21_4.1.21.4+build.8-v2/mappings.tiny" />
+    </option>
+  </component>
+</project>
