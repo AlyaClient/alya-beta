@@ -17,7 +17,7 @@ public class FullbrightModule extends Module {
     @Override
     protected void onEnable() {
         previousGamma = mc.options.getGamma().getValue();
-        mc.options.getGamma().setValue(10.0D);
+        mc.options.getGamma().setValue(1.0D);
     }
 
     @Override

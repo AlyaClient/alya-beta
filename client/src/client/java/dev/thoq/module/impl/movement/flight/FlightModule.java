@@ -55,7 +55,7 @@ public class FlightModule extends Module {
                 CreativeFlight.creativeFlight(mc, options, speed, verticalEnabled);
                 break;
             case "Verus":
-                VerusFlight.verusFlight(mc);
+                VerusFlight.verusFlight(mc, options);
                 break;
         }
     }

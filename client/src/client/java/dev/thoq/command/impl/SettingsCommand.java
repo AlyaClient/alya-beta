@@ -10,7 +10,6 @@ import dev.thoq.module.Module;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.config.Setting;
 import dev.thoq.utilities.misc.ChatUtility;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Formatting;
@@ -104,11 +103,6 @@ public class SettingsCommand extends AbstractCommand {
     }
 
     private int usage(CommandContext<ServerCommandSource> context) {
-        // Open settings UI if no arguments are provided
-        MinecraftClient.getInstance().execute(() -> {
-            MinecraftClient.getInstance().setScreen(new dev.thoq.ui.SettingsUI());
-        });
-
         ChatUtility.sendPrefixedMessage(
                 "Settings",
                 "Opening settings UI. Usage: /settings <module> [setting] [value]",

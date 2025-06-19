@@ -4,7 +4,8 @@ import dev.thoq.config.ModeSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.movement.longjump.verus.VerusLongJump;
-import dev.thoq.module.impl.movement.longjump.verus.fireball.VerusFireballLongJump;
+import dev.thoq.module.impl.movement.longjump.verus.VerusFireballLongJump;
+import dev.thoq.module.impl.movement.longjump.verus.VerusPacketLongjump;
 import dev.thoq.utilities.player.MovementUtility;
 
 public class LongJumpModule extends Module {
@@ -35,6 +36,12 @@ public class LongJumpModule extends Module {
                     }
                 }
 
+                if ("Packet".equals(kind) && isEnabled()) {
+                    if(VerusPacketLongjump.hasJumped()) {
+                        super.toggle();
+                    }
+                }
+
                 break;
             }
         }
@@ -42,12 +49,12 @@ public class LongJumpModule extends Module {
 
     @Override
     protected void onEnable() {
-        VerusFireballLongJump.reset();
+        VerusLongJump.reset();
     }
 
     @Override
     protected void onDisable() {
-        VerusFireballLongJump.reset();
+        VerusLongJump.reset();
         MovementUtility.setMotionY(0);
     }
 }

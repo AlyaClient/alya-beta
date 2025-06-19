@@ -21,6 +21,7 @@ import dev.thoq.module.impl.visual.AntiInvisModule;
 import dev.thoq.module.impl.visual.ClickGUIModule;
 import dev.thoq.module.impl.visual.FullbrightModule;
 import dev.thoq.module.impl.visual.GlowESP;
+import dev.thoq.module.impl.client.TimerModule;
 import dev.thoq.utilities.misc.IconLoader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -69,7 +70,8 @@ public class RyeClient implements ClientModInitializer {
                         new NoFallModule(),
                         new SpeedModule(),
                         clickGUIModule,
-                        new LongJumpModule()
+                        new LongJumpModule(),
+                        new TimerModule()
                 );
 
         KeybindManager.getInstance().bind(clickGUIModule, GLFW.GLFW_KEY_RIGHT_SHIFT);

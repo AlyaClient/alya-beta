@@ -1,17 +1,18 @@
 {
-	"required": true,
-	"package": "dev.thoq.mixin.client",
-	"compatibilityLevel": "JAVA_21",
-	"client": [
-		"InGameHudMixin",
-		"WatermarkTitleScreenMixin",
-		"MinecraftClientMixin",
-		"ChatScreenMixin",
-		"ChatInputSuggestorMixin",
-		"LivingEntityJumpAccessor",
-		"MinecraftClientAccessor"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "dev.thoq.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ChatInputSuggestorMixin",
+    "ChatScreenMixin",
+    "InGameHudMixin",
+    "LivingEntityJumpAccessor",
+    "MinecraftClientAccessor",
+    "MinecraftClientMixin",
+    "RenderTickCounterMixin",
+    "WatermarkTitleScreenMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }

@@ -1,8 +1,7 @@
 package dev.thoq.module.impl.movement.longjump.verus;
 
 import dev.thoq.config.ModeSetting;
-import dev.thoq.module.impl.movement.longjump.verus.fireball.VerusFireballLongJump;
-import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.TimerUtility;
 import net.minecraft.client.MinecraftClient;
 
 public class VerusLongJump {
@@ -11,18 +10,22 @@ public class VerusLongJump {
 
         switch(verusMode.getValue()) {
             case "Fireball": {
-                if(!VerusFireballLongJump.hasThrown()) VerusFireballLongJump.verusFireballLongJump(mc);
+                if(!VerusFireballLongJump.hasThrown())
+                    VerusFireballLongJump.verusFireballLongJump(mc);
                 break;
             }
 
             case "Packet": {
-                if(mc.player.isOnGround() && MovementUtility.isMoving()) {
-                    mc.player.jump();
-                    MovementUtility.setSpeed(0.5f, false);
-                }
-
+                if(!VerusPacketLongjump.hasJumped())
+                    VerusPacketLongjump.verusPacketLongjump(mc);
+                TimerUtility.resetTimer();
                 break;
             }
         }
+    }
+
+    public static void reset() {
+        VerusFireballLongJump.reset();
+        VerusPacketLongjump.reset();
     }
 }
