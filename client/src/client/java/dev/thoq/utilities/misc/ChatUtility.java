@@ -55,7 +55,7 @@ public class ChatUtility {
      * @param message The info message
      */
     public static void sendInfo(String message) {
-        sendMessage(message, Formatting.AQUA);
+        sendMessage(message, Formatting.LIGHT_PURPLE);
     }
 
     /**

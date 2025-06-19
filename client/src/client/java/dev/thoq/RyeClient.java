@@ -9,15 +9,16 @@ import dev.thoq.command.impl.ToggleCommand;
 import dev.thoq.config.KeybindManager;
 import dev.thoq.module.ModuleBuilder;
 import dev.thoq.module.ModuleRepository;
-import dev.thoq.server.ApiServer;
-import dev.thoq.module.impl.movment.FlightModule;
+import dev.thoq.module.impl.movement.flight.FlightModule;
 import dev.thoq.module.impl.combat.VelocityModule;
-import dev.thoq.module.impl.movment.SpeedModule;
-import dev.thoq.module.impl.player.FastPlaceModule;
-import dev.thoq.module.impl.player.NoFallModule;
-import dev.thoq.module.impl.player.NoJumpDelayModule;
-import dev.thoq.module.impl.player.SprintModule;
+import dev.thoq.module.impl.movement.longjump.LongJumpModule;
+import dev.thoq.module.impl.movement.speed.SpeedModule;
+import dev.thoq.module.impl.player.fastplace.FastPlaceModule;
+import dev.thoq.module.impl.player.nofall.NoFallModule;
+import dev.thoq.module.impl.player.nojumpdelay.NoJumpDelayModule;
+import dev.thoq.module.impl.player.sprint.SprintModule;
 import dev.thoq.module.impl.visual.AntiInvisModule;
+import dev.thoq.module.impl.visual.ClickGUIModule;
 import dev.thoq.module.impl.visual.FullbrightModule;
 import dev.thoq.module.impl.visual.GlowESP;
 import dev.thoq.utilities.misc.IconLoader;
@@ -38,7 +39,6 @@ import java.util.Set;
 
 public class RyeClient implements ClientModInitializer {
     public static final String MOD_ID = "rye";
-    @SuppressWarnings("unused")
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static RyeClient INSTANCE = new RyeClient();
     private static String ryeState = "loading";
@@ -52,13 +52,9 @@ public class RyeClient implements ClientModInitializer {
     public void onInitializeClient() {
         RyeClient.setState("loading");
 
-        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-            IconLoader.setWindowIcon(client.getWindow().getHandle());
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> IconLoader.setWindowIcon(client.getWindow().getHandle()));
 
-            ApiServer.getInstance().start();
-        });
-
-        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> ApiServer.getInstance().stop());
+        ClickGUIModule clickGUIModule = new ClickGUIModule();
 
         ModuleBuilder.create()
                 .putAll(
@@ -71,8 +67,12 @@ public class RyeClient implements ClientModInitializer {
                         new VelocityModule(),
                         new GlowESP(),
                         new NoFallModule(),
-                        new SpeedModule()
+                        new SpeedModule(),
+                        clickGUIModule,
+                        new LongJumpModule()
                 );
+
+        KeybindManager.getInstance().bind(clickGUIModule, GLFW.GLFW_KEY_RIGHT_SHIFT);
 
         CommandBuilder.create()
                 .putAll(
@@ -131,7 +131,7 @@ public class RyeClient implements ClientModInitializer {
     }
 
     public static String getBuildNumber() {
-        return "(31625)";
+        return "(61825)";
     }
 
     public static String getFps() {

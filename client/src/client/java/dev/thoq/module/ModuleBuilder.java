@@ -12,7 +12,7 @@ public class ModuleBuilder {
     }
 
     public void putAll(Module... modules) {
-        for (Module module : modules) {
+        for(Module module : modules) {
             repository.registerModule(module);
         }
     }

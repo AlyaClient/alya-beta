@@ -36,9 +36,9 @@ public class ToggleCommand extends AbstractCommand {
 
     private CompletableFuture<Suggestions> suggestModules(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) {
         String input = builder.getRemaining().toLowerCase();
-        for (Module module : moduleRepository.getModules()) {
+        for(Module module : moduleRepository.getModules()) {
             String moduleName = module.getName().toLowerCase();
-            if (moduleName.startsWith(input)) {
+            if(moduleName.startsWith(input)) {
                 builder.suggest(module.getName());
             }
         }
@@ -50,7 +50,7 @@ public class ToggleCommand extends AbstractCommand {
         String moduleName = StringArgumentType.getString(context, "name");
         Module module = moduleRepository.getModuleByName(moduleName);
 
-        if (module == null) {
+        if(module == null) {
             ChatUtility.sendError("Module '" + moduleName + "' not found!");
             return 0;
         }
@@ -69,7 +69,7 @@ public class ToggleCommand extends AbstractCommand {
         Collection<Module> modules = moduleRepository.getModules();
 
         ChatUtility.sendPrefixedMessage("Modules", "Available modules:", Formatting.GOLD, Formatting.WHITE);
-        for (Module module : modules) {
+        for(Module module : modules) {
             ChatUtility.sendMessage(
                     " - " + module.getName() + ": " +
                             (module.isEnabled() ? "§aEnabled" : "§cDisabled") +

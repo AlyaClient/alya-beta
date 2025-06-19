@@ -9,18 +9,25 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatInputSuggestor;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.server.command.ServerCommandSource;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import java.util.concurrent.CompletableFuture;
 
 @Mixin(ChatInputSuggestor.class)
 public class ChatInputSuggestorMixin {
-    @Shadow private TextFieldWidget textField;
-    @Shadow private CompletableFuture<Suggestions> pendingSuggestions;
+    @Final
+    @Shadow
+    TextFieldWidget textField;
+    @Shadow
+    private CompletableFuture<Suggestions> pendingSuggestions;
 
+    @Unique
     private static final CommandDispatcher<ServerCommandSource> COMMAND_DISPATCHER = new CommandDispatcher<>();
 
     static {
@@ -31,9 +38,9 @@ public class ChatInputSuggestorMixin {
     private void onRefresh(CallbackInfo ci) {
         String text = textField.getText();
 
-        if (text.startsWith(".")) {
+        if(text.startsWith(".")) {
             MinecraftClient client = MinecraftClient.getInstance();
-            if (client.player == null) return;
+            if(client.player == null) return;
 
             ServerCommandSource source = new ServerCommandSource(
                     null,
@@ -49,7 +56,7 @@ public class ChatInputSuggestorMixin {
 
             StringReader stringReader = new StringReader(text.substring(1));
             ParseResults<ServerCommandSource> parseResults;
-            if (stringReader.canRead()) {
+            if(stringReader.canRead()) {
                 parseResults = COMMAND_DISPATCHER.parse(stringReader, source);
             } else {
                 parseResults = COMMAND_DISPATCHER.parse("", source);

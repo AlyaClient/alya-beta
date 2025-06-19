@@ -7,6 +7,7 @@ public class Setting<T> {
     private final T defaultValue;
     private final T minValue;
     private final T maxValue;
+    private VisibilityCondition visibilityCondition = () -> true; // Default to always visible
 
     @SuppressWarnings("unused")
     public Setting(String name, String description, T defaultValue) {
@@ -37,16 +38,16 @@ public class Setting<T> {
 
     @SuppressWarnings("unchecked")
     public void setValue(T value) {
-        if (minValue != null && maxValue != null) {
-            if (value instanceof Number && minValue instanceof Number && maxValue instanceof Number) {
+        if(minValue != null && maxValue != null) {
+            if(value instanceof Number && minValue instanceof Number && maxValue instanceof Number) {
                 double val = ((Number) value).doubleValue();
                 double min = ((Number) minValue).doubleValue();
                 double max = ((Number) maxValue).doubleValue();
-                
-                if (val < min) val = min;
-                if (val > max) val = max;
-                
-                switch (this.value) {
+
+                if(val < min) val = min;
+                if(val > max) val = max;
+
+                switch(this.value) {
                     case Integer ignored -> this.value = (T) Integer.valueOf((int) val);
                     case Float ignored -> this.value = (T) Float.valueOf((float) val);
                     case Double ignored -> this.value = (T) Double.valueOf(val);
@@ -60,12 +61,12 @@ public class Setting<T> {
 
     @SuppressWarnings("unchecked")
     public void setValueFromObject(Object value) {
-        if (value == null) return;
-        
-        if (this.value instanceof Boolean && value instanceof Boolean) {
+        if(value == null) return;
+
+        if(this.value instanceof Boolean && value instanceof Boolean) {
             setValue((T) value);
-        } else if (this.value instanceof Number) {
-            if (value instanceof Number num) {
+        } else if(this.value instanceof Number) {
+            if(value instanceof Number num) {
                 switch(this.value) {
                     case Integer ignored -> setValue((T) Integer.valueOf(num.intValue()));
                     case Float ignored -> setValue((T) Float.valueOf(num.floatValue()));
@@ -73,7 +74,7 @@ public class Setting<T> {
                     default -> throw new IllegalStateException("Unexpected value: " + this.value);
                 }
             }
-        } else if (this.value instanceof String) {
+        } else if(this.value instanceof String) {
             setValue((T) value.toString());
         }
     }
@@ -90,5 +91,33 @@ public class Setting<T> {
     @SuppressWarnings("unused")
     public T getMaxValue() {
         return maxValue;
+    }
+
+    /**
+     * Gets the type of this setting.
+     * @return "generic"
+     */
+    public String getType() {
+        return "generic";
+    }
+
+    /**
+     * Sets the visibility condition for this setting.
+     * 
+     * @param condition The condition that determines whether this setting should be visible
+     * @return This setting instance for method chaining
+     */
+    public Setting<T> setVisibilityCondition(VisibilityCondition condition) {
+        this.visibilityCondition = condition;
+        return this;
+    }
+
+    /**
+     * Checks if this setting should be visible based on its visibility condition.
+     * 
+     * @return true if the setting should be visible, false otherwise
+     */
+    public boolean isVisible() {
+        return visibilityCondition.isVisible();
     }
 }

@@ -17,9 +17,14 @@ import static org.lwjgl.system.MemoryUtil.memAlloc;
 @Environment(EnvType.CLIENT)
 public class IconLoader {
 
+    /**
+     * Sets a custom icon for a GLFW window using specified image resources.
+     *
+     * @param windowHandle The handle of the GLFW window to which the custom icon will be applied.
+     */
     public static void setWindowIcon(long windowHandle) {
-        try (InputStream icon16 = Objects.requireNonNull(IconLoader.class.getResourceAsStream("/assets/rye/icons/icon_16x16.png"));
-             InputStream icon32 = Objects.requireNonNull(IconLoader.class.getResourceAsStream("/assets/rye/icons/icon_32x32.png"))) {
+        try(InputStream icon16 = Objects.requireNonNull(IconLoader.class.getResourceAsStream("/assets/rye/icons/icon_16x16.png"));
+            InputStream icon32 = Objects.requireNonNull(IconLoader.class.getResourceAsStream("/assets/rye/icons/icon_32x32.png"))) {
 
             BufferedImage image16 = ImageIO.read(icon16);
             BufferedImage image32 = ImageIO.read(icon32);
@@ -37,13 +42,20 @@ public class IconLoader {
 
             System.out.println("Custom icons loaded successfully!");
 
-        } catch (IOException e) {
+        } catch(IOException e) {
             System.err.println("Failed to load custom icon: " + e.getMessage());
-        } catch (NullPointerException e) {
+        } catch(NullPointerException e) {
             System.err.println("Icon not found or path incorrect: " + e.getMessage());
         }
     }
 
+    /**
+     * Converts a BufferedImage into a ByteBuffer, encoding its pixel data in RGBA format.
+     *
+     * @param image The BufferedImage to be converted into a ByteBuffer. The image's width, height,
+     *              and pixel data are used to perform the conversion.
+     * @return A ByteBuffer containing the RGBA representation of the image's pixel data.
+     */
     private static ByteBuffer convertImageToByteBuffer(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
@@ -51,7 +63,7 @@ public class IconLoader {
         image.getRGB(0, 0, width, height, pixels, 0, width);
 
         ByteBuffer buffer = memAlloc(width * height * 4);
-        for (int pixel : pixels) {
+        for(int pixel : pixels) {
             buffer.put((byte) ((pixel >> 16) & 0xFF)); // Red
             buffer.put((byte) ((pixel >> 8) & 0xFF));  // Green
             buffer.put((byte) (pixel & 0xFF));         // Blue

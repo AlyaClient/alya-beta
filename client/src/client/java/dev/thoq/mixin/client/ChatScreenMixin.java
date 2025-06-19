@@ -27,18 +27,18 @@ public class ChatScreenMixin {
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
-        if (this.chatInputSuggestor != null) {
+        if(this.chatInputSuggestor != null) {
             this.chatInputSuggestor.refresh();
         }
     }
 
     @Inject(method = "sendMessage", at = @At("HEAD"), cancellable = true)
     private void onSendMessage(String chatText, boolean addToHistory, CallbackInfo ci) {
-        if (chatText.startsWith(".")) {
+        if(chatText.startsWith(".")) {
             MinecraftClient client = MinecraftClient.getInstance();
 
             try {
-                if (addToHistory) {
+                if(addToHistory) {
                     client.inGameHud.getChatHud().addToMessageHistory(chatText);
                 }
 
@@ -57,8 +57,8 @@ public class ChatScreenMixin {
                 );
 
                 COMMAND_DISPATCHER.execute(command, source);
-            } catch (CommandSyntaxException e) {
-                if (client.player != null) {
+            } catch(CommandSyntaxException e) {
+                if(client.player != null) {
                     client.player.sendMessage(Text.literal(e.getMessage()), false);
                 }
             }

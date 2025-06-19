@@ -1,6 +1,25 @@
 package dev.thoq.utilities.render;
 
 public class ColorUtility {
+    /**
+     * Enum representing a collection of predefined colors. These colors can be used
+     * in various contexts, such as rendering text or graphics, and are associated
+     * with specific ARGB values.
+     * Each enum value corresponds to a specific color:
+     * - WHITE
+     * - RED
+     * - GREEN
+     * - BLUE
+     * - YELLOW
+     * - CYAN
+     * - MAGENTA
+     * - PURPLE
+     * - LAVENDER
+     * - DARK_PURPLE
+     * - BLACK
+     * - GRAY
+     * - LIGHT_GRAY
+     */
     public enum Colors {
         WHITE,
         RED,
@@ -17,6 +36,12 @@ public class ColorUtility {
         LIGHT_GRAY,
     }
 
+    /**
+     * Returns the ARGB color value corresponding to the specified color.
+     *
+     * @param color The color for which the ARGB value is to be returned, specified as an enum value of {@code Colors}.
+     * @return The ARGB color value as an integer.
+     */
     public static int getColor(Colors color) {
         return switch(color) {
             case WHITE -> 0xFFFFFFFF;

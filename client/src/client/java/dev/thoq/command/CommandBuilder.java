@@ -6,7 +6,7 @@ public class CommandBuilder {
     }
 
     public void putAll(AbstractCommand... commands) {
-        for (AbstractCommand command : commands) {
+        for(AbstractCommand command : commands) {
             CommandRepository.registerCommand(command);
         }
     }

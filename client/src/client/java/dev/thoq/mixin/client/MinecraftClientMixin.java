@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Environment(EnvType.CLIENT)
 public abstract class MinecraftClientMixin {
 
-    @Shadow public abstract Window getWindow();
+    @Shadow
+    public abstract Window getWindow();
 
     @Inject(at = @At("HEAD"), method = "render")
     public void getWindowTitle(boolean tick, CallbackInfo ci) {

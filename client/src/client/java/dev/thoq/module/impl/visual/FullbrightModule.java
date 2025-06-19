@@ -1,12 +1,13 @@
 package dev.thoq.module.impl.visual;
 
 import dev.thoq.module.Module;
+import dev.thoq.module.ModuleCategory;
 
 public class FullbrightModule extends Module {
     private double previousGamma;
 
     public FullbrightModule() {
-        super("FullBright", "Light mode for minecraft caves");
+        super("FullBright", "Light mode for minecraft caves", ModuleCategory.VISUAL);
     }
 
     @Override
@@ -16,7 +17,7 @@ public class FullbrightModule extends Module {
     @Override
     protected void onEnable() {
         previousGamma = mc.options.getGamma().getValue();
-        mc.options.getGamma().setValue(1.0D);
+        mc.options.getGamma().setValue(10.0D);
     }
 
     @Override

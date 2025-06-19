@@ -36,26 +36,26 @@ public class MovementUtility {
         MinecraftClient mc = MinecraftClient.getInstance();
         ClientPlayerEntity player = mc.player;
 
-        if (player == null) return;
+        if(player == null) return;
 
-        if ((!airStrafeOverride && !player.isOnGround()) || player.isTouchingWater() || player.isInLava()) {
+        if((!airStrafeOverride && !player.isOnGround()) || player.isTouchingWater() || player.isInLava()) {
             return;
         }
 
-        float forward = player.input.movementForward;
-        float strafe = player.input.movementSideways;
+        float forward = player.input.getMovementInput().y;
+        float strafe = player.input.getMovementInput().x;
         float yaw = player.getYaw();
 
-        if (forward == 0.0f && strafe == 0.0f) {
+        if(forward == 0.0f && strafe == 0.0f) {
             player.setVelocity(0, player.getVelocity().y, 0);
             return;
         }
 
-        if (forward != 0.0f) {
-            if (strafe >= 1.0f) {
+        if(forward != 0.0f) {
+            if(strafe >= 1.0f) {
                 yaw += (forward > 0.0f ? -45 : 45);
                 strafe = 0.0f;
-            } else if (strafe <= -1.0f) {
+            } else if(strafe <= -1.0f) {
                 yaw += (forward > 0.0f ? 45 : -45);
                 strafe = 0.0f;
             }
@@ -70,5 +70,47 @@ public class MovementUtility {
         double zVelocity = forward * speed * sin - strafe * speed * cos;
 
         player.setVelocity(xVelocity, player.getVelocity().y, zVelocity);
+    }
+
+    /**
+     * Sets the player's motion in the X direction.
+     *
+     * @param x The motion value to set for the X axis.
+     */
+    public static void setMotionX(double x) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if(mc.player == null) return;
+
+        ClientPlayerEntity player = mc.player;
+
+        player.setVelocity(x, player.getVelocity().y, player.getVelocity().z);
+    }
+
+    /**
+     * Sets the player's motion in the Y direction.
+     *
+     * @param y The motion value to set for the Y axis.
+     */
+    public static void setMotionY(double y) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if(mc.player == null) return;
+
+        ClientPlayerEntity player = mc.player;
+
+        player.setVelocity(player.getVelocity().x, y, player.getVelocity().z);
+    }
+
+    /**
+     * Sets the player's motion in the Z direction.
+     *
+     * @param z The motion value to set for the Z axis.
+     */
+    public static void setMotionZ(double z) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if(mc.player == null) return;
+
+        ClientPlayerEntity player = mc.player;
+
+        player.setVelocity(player.getVelocity().x, player.getVelocity().y,z);
     }
 }

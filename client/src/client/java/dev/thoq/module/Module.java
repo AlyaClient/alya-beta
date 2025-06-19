@@ -12,13 +12,15 @@ import java.util.Map;
 public abstract class Module {
     private final String name;
     private final String description;
+    private final ModuleCategory category;
     private boolean enabled;
     protected final Map<String, Setting<?>> settings = new HashMap<>();
     protected final MinecraftClient mc = MinecraftClient.getInstance();
 
-    protected Module(String name, String description) {
+    protected Module(String name, String description, ModuleCategory category) {
         this.name = name;
         this.description = description;
+        this.category = category;
     }
 
     public Map<String, Object> saveState() {
@@ -39,6 +41,10 @@ public abstract class Module {
 
     public String getDescription() {
         return description;
+    }
+
+    public ModuleCategory getCategory() {
+        return category;
     }
 
     public boolean isEnabled() {

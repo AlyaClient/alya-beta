@@ -43,13 +43,13 @@ public class SettingsCommand extends AbstractCommand {
         String valueStr = StringArgumentType.getString(context, "value");
 
         Module module = moduleRepository.getModuleByName(moduleName);
-        if (module == null) {
+        if(module == null) {
             ChatUtility.sendError("Module '" + moduleName + "' not found!");
             return 0;
         }
 
         Setting<?> setting = module.getSetting(settingName);
-        if (setting == null) {
+        if(setting == null) {
             ChatUtility.sendError("Setting '" + settingName + "' not found in module '" + moduleName + "'!");
             return 0;
         }
@@ -70,7 +70,7 @@ public class SettingsCommand extends AbstractCommand {
                     Formatting.GREEN
             );
             return 1;
-        } catch (Exception e) {
+        } catch(Exception e) {
             ChatUtility.sendError("Invalid value format!");
             return 0;
         }
@@ -80,7 +80,7 @@ public class SettingsCommand extends AbstractCommand {
         String moduleName = StringArgumentType.getString(context, "module");
         Module module = moduleRepository.getModuleByName(moduleName);
 
-        if (module == null) {
+        if(module == null) {
             ChatUtility.sendError("Module '" + moduleName + "' not found!");
             return 0;
         }
@@ -92,7 +92,7 @@ public class SettingsCommand extends AbstractCommand {
                 Formatting.WHITE
         );
 
-        for (Setting<?> setting : module.getSettings()) {
+        for(Setting<?> setting : module.getSettings()) {
             ChatUtility.sendMessage(String.format(" - %s: %s (default: %s)",
                     setting.getName(),
                     setting.getValue(),
@@ -114,8 +114,8 @@ public class SettingsCommand extends AbstractCommand {
 
     private CompletableFuture<Suggestions> suggestModules(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) {
         String input = builder.getRemaining().toLowerCase();
-        for (Module module : moduleRepository.getModules()) {
-            if (module.getName().toLowerCase().startsWith(input)) {
+        for(Module module : moduleRepository.getModules()) {
+            if(module.getName().toLowerCase().startsWith(input)) {
                 builder.suggest(module.getName());
             }
         }
@@ -126,10 +126,10 @@ public class SettingsCommand extends AbstractCommand {
         String moduleName = StringArgumentType.getString(context, "module");
         Module module = moduleRepository.getModuleByName(moduleName);
 
-        if (module != null) {
+        if(module != null) {
             String input = builder.getRemaining().toLowerCase();
-            for (Setting<?> setting : module.getSettings()) {
-                if (setting.getName().toLowerCase().startsWith(input)) {
+            for(Setting<?> setting : module.getSettings()) {
+                if(setting.getName().toLowerCase().startsWith(input)) {
                     builder.suggest(setting.getName());
                 }
             }

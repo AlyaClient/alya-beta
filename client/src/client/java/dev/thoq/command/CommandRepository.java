@@ -14,7 +14,7 @@ public class CommandRepository {
     }
 
     public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
-        for (AbstractCommand command : commands) {
+        for(AbstractCommand command : commands) {
             command.register(dispatcher);
         }
     }

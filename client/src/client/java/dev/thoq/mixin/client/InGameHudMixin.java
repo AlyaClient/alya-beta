@@ -1,6 +1,8 @@
 package dev.thoq.mixin.client;
 
 import dev.thoq.RyeClient;
+import dev.thoq.module.ModuleRepository;
+import dev.thoq.module.impl.visual.ClickGUIModule;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
 import net.minecraft.client.gui.DrawContext;
@@ -40,5 +42,11 @@ public class InGameHudMixin {
                 2,
                 true
         );
+
+        ModuleRepository repository = ModuleRepository.getInstance();
+        ClickGUIModule clickGUI = (ClickGUIModule) repository.getModuleByName("ClickGUI");
+        if(clickGUI != null) {
+            clickGUI.render(context);
+        }
     }
 }

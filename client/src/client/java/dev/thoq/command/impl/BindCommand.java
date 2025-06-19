@@ -39,8 +39,8 @@ public class BindCommand extends AbstractCommand {
 
     private CompletableFuture<Suggestions> suggestModules(CommandContext<ServerCommandSource> context, SuggestionsBuilder builder) {
         String input = builder.getRemaining().toLowerCase();
-        for (Module module : moduleRepository.getModules()) {
-            if (module.getName().toLowerCase().startsWith(input)) {
+        for(Module module : moduleRepository.getModules()) {
+            if(module.getName().toLowerCase().startsWith(input)) {
                 builder.suggest(module.getName());
             }
         }
@@ -52,7 +52,7 @@ public class BindCommand extends AbstractCommand {
         String keyName = StringArgumentType.getString(context, "key").toLowerCase();
 
         Module module = moduleRepository.getModuleByName(moduleName);
-        if (module == null) {
+        if(module == null) {
             ChatUtility.sendError("Module '" + moduleName + "' not found!");
             return 0;
         }
@@ -77,7 +77,7 @@ public class BindCommand extends AbstractCommand {
                     Formatting.GREEN
             );
             return 1;
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch(NoSuchFieldException | IllegalAccessException e) {
             ChatUtility.sendError("Invalid key name: " + keyName);
             return 0;
         }
@@ -85,9 +85,9 @@ public class BindCommand extends AbstractCommand {
 
     private int listBinds(CommandContext<ServerCommandSource> context) {
         ChatUtility.sendPrefixedMessage("Binds", "Current keybindings:", Formatting.GOLD, Formatting.WHITE);
-        for (Module module : moduleRepository.getModules()) {
+        for(Module module : moduleRepository.getModules()) {
             Integer key = keybindManager.getKeyForModule(module);
-            if (key != null) {
+            if(key != null) {
                 String keyName = net.minecraft.client.util.InputUtil.fromKeyCode(key, 0).getTranslationKey();
                 ChatUtility.sendMessage(" - " + module.getName() + ": " + keyName.replace("key.keyboard.", "").toUpperCase());
             }
