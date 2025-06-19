@@ -1,0 +1,53 @@
+package dev.thoq.module.impl.movement.longjump;
+
+import dev.thoq.config.ModeSetting;
+import dev.thoq.module.Module;
+import dev.thoq.module.ModuleCategory;
+import dev.thoq.module.impl.movement.longjump.verus.VerusLongJump;
+import dev.thoq.module.impl.movement.longjump.verus.fireball.VerusFireballLongJump;
+import dev.thoq.utilities.player.MovementUtility;
+
+public class LongJumpModule extends Module {
+    public LongJumpModule() {
+        super("LongJump", "Makes you jump further", ModuleCategory.MOVEMENT);
+
+        ModeSetting mode = new ModeSetting("Mode", "Speed mode", "Verus", "Verus");
+        ModeSetting verusMode = new ModeSetting("Kind", "Kind of LongJump to use", "Fireball", "Fireball", "Packet");
+
+        verusMode.setVisibilityCondition(() -> "Verus".equals(((ModeSetting) getSetting("Mode")).getValue()));
+
+        addSetting(mode);
+        addSetting(verusMode);
+    }
+
+    @Override
+    protected void onTick() {
+        if(!isEnabled() || mc.player == null) return;
+
+        switch(((ModeSetting) getSetting("Mode")).getValue()) {
+            case "Verus": {
+                String kind = ((ModeSetting) getSetting("Kind")).getValue();
+                VerusLongJump.verusLongJump(mc, (ModeSetting) getSetting("Kind"));
+                
+                if ("Fireball".equals(kind) && isEnabled()) {
+                    if(VerusFireballLongJump.hasThrown()) {
+                        super.toggle();
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    @Override
+    protected void onEnable() {
+        VerusFireballLongJump.reset();
+    }
+
+    @Override
+    protected void onDisable() {
+        VerusFireballLongJump.reset();
+        MovementUtility.setMotionY(0);
+    }
+}

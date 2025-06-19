@@ -26,9 +26,9 @@ public class TextRendererUtility {
             int posY,
             boolean shadow
     ) {
-        TextRenderer renderer = client.textRenderer;
-        context.drawText(
-                renderer,
+        // Use our custom font renderer
+        FontRenderer.getInstance().drawText(
+                context,
                 text,
                 posX,
                 posY,
@@ -44,7 +44,7 @@ public class TextRendererUtility {
      * @return The width of the text in pixels
      */
     public static int getTextWidth(String text) {
-        TextRenderer renderer = client.textRenderer;
-        return renderer.getWidth(text);
+        // Use our custom font renderer
+        return FontRenderer.getInstance().getWidth(text);
     }
 }

@@ -43,10 +43,9 @@ public class InGameHudMixin {
                 true
         );
 
-        ModuleRepository repository = ModuleRepository.getInstance();
-        ClickGUIModule clickGUI = (ClickGUIModule) repository.getModuleByName("ClickGUI");
-        if(clickGUI != null) {
-            clickGUI.render(context);
+        ClickGUIModule clickGUIModule = ModuleRepository.getInstance().getModule(ClickGUIModule.class);
+        if(clickGUIModule.isVisible()) {
+            clickGUIModule.render(context);
         }
     }
 }
