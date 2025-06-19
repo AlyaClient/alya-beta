@@ -11,10 +11,11 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 public class VerusFlight {
-
     public static void verusFlight(MinecraftClient mc, GameOptions options) {
         if(mc.player == null) return;
         if(mc.getNetworkHandler() == null) return;
+
+        mc.player.setPitch(90f);
 
         Vec3d playerPos = mc.player.getPos().add(0, -1, 0);
         BlockPos blockPos = new BlockPos((int) playerPos.x, (int) playerPos.y, (int) playerPos.z);
