@@ -1,35 +1,67 @@
 package dev.thoq.module.impl.movement.longjump.verus;
 
 import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.PlayerUtility;
 import dev.thoq.utilities.player.TimerUtility;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
 public class VerusPacketLongjump {
     static boolean jumped = false;
+    static boolean damaged = false;
+    static boolean waitingForGround = false;
 
     public static void verusPacketLongjump(MinecraftClient mc) {
         if(mc.player == null) return;
 
-        if(mc.player.isOnGround() && MovementUtility.isMoving()) {
-            double timerSpeed = 0.1f;
-            TimerUtility.setTimerSpeed(timerSpeed);
+        if(!damaged && !waitingForGround) {
+            PlayerUtility.applyDamage(mc, 3);
+            damaged = true;
+            waitingForGround = true;
+        }
 
-            MovementUtility.setMotionY(0.55);
-            MovementUtility.setSpeed(1.2f, true);
+        if(damaged && waitingForGround && mc.player.isOnGround()) {
+            waitingForGround = false;
+
+            float yaw = mc.player.getYaw();
+            double motionX = -Math.sin(Math.toRadians(yaw)) * 0.3;
+            double motionZ = Math.cos(Math.toRadians(yaw)) * 0.3;
+            mc.player.setVelocity(motionX, mc.player.getVelocity().y, motionZ);
+
+            double timerSpeed = 0.2f;
+
+            TimerUtility.setTimerSpeed(timerSpeed);
+            MovementUtility.setMotionY(0.42);
+
+            MovementUtility.setSpeed(0.7f, true);
 
             new Thread(() -> {
                 try {
-                    Thread.sleep(Math.round(150 / timerSpeed));
+                    Thread.sleep(Math.round(50 / timerSpeed));
                 } catch(InterruptedException ignored) {
                 }
 
                 jumped = true;
             }).start();
         }
+
+        if(jumped && mc.player.fallDistance > 2.5) {
+            double x = mc.player.getX();
+            double y = mc.player.getY();
+            double z = mc.player.getZ();
+            float yaw = mc.player.getYaw();
+            float pitch = mc.player.getPitch();
+
+            PlayerMoveC2SPacket packet = new PlayerMoveC2SPacket.Full(x, y, z, yaw, pitch, true, mc.player.horizontalCollision);
+            mc.player.networkHandler.sendPacket(packet);
+            mc.player.fallDistance = 0;
+        }
     }
 
     public static void reset() {
         jumped = false;
+        damaged = false;
+        waitingForGround = false;
     }
 
     public static boolean hasJumped() {

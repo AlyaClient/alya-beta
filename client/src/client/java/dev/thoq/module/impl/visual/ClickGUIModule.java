@@ -1,10 +1,10 @@
 package dev.thoq.module.impl.visual;
 
-import dev.thoq.config.BooleanSetting;
-import dev.thoq.config.ModeSetting;
-import dev.thoq.config.NumberSetting;
-import dev.thoq.config.Setting;
-import dev.thoq.config.SliderSetting;
+import dev.thoq.config.setting.impl.BooleanSetting;
+import dev.thoq.config.setting.impl.ModeSetting;
+import dev.thoq.config.setting.impl.NumberSetting;
+import dev.thoq.config.setting.Setting;
+import dev.thoq.config.setting.impl.SliderSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.ModuleRepository;
@@ -21,21 +21,22 @@ import java.util.Map;
 
 @SuppressWarnings({"SameParameterValue", "rawtypes", "FieldCanBeLocal"})
 public class ClickGUIModule extends Module {
+
     private boolean visible = false;
     private final Map<ModuleCategory, List<Module>> categorizedModules = new EnumMap<>(ModuleCategory.class);
     private final Map<ModuleCategory, Boolean> expandedCategories = new EnumMap<>(ModuleCategory.class);
     private final Map<Module, Boolean> expandedModules = new HashMap<>();
     private static final int SETTING_HEIGHT = 16;
-    private static final int SETTING_INDENT = 10;
+    private static final int SETTING_INDENT = 15;
     private static final int CATEGORY_HEIGHT = 20;
     private static final int MODULE_HEIGHT = 16;
-    private static final int PANEL_WIDTH = 120;
-    private static final int PANEL_X = 10;
-    private static final int PANEL_Y = 30;
+    private static final int PANEL_WIDTH = 140;
+    private static final int PANEL_X = 70;
+    private static final int PANEL_Y = 20;
     private static final int PANEL_SPACING = 10;
     private static final int PADDING = 2;
-    private static final int BACKGROUND_COLOR = 0x98000000;
-    private static final int CATEGORY_COLOR = 0x99000000;
+    private static final int BACKGROUND_COLOR = 0xCC000000;
+    private static final int CATEGORY_COLOR = 0xDD000000;
     private static final int HOVER_COLOR = 0x10FFFFFF;
     private int mouseX;
     private int mouseY;
@@ -100,7 +101,8 @@ public class ClickGUIModule extends Module {
         rightMouseDown = GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_RIGHT) == GLFW.GLFW_PRESS;
     }
 
-    public void render(DrawContext context) {
+    @Override
+    protected void onRender(DrawContext context) {
         if(!visible) return;
 
         int categoryIndex = 0;
@@ -191,10 +193,6 @@ public class ClickGUIModule extends Module {
         }
     }
 
-    public boolean isVisible() {
-        return visible;
-    }
-
     private void handleLeftClick() {
         int categoryIndex = 0;
 
@@ -227,11 +225,8 @@ public class ClickGUIModule extends Module {
                                     case ModeSetting modeSetting -> modeSetting.cycle();
 
                                     case NumberSetting numberSetting -> {
-                                        if(mouseX < categoryX + PANEL_WIDTH / 2) {
-                                            numberSetting.decrement();
-                                        } else {
-                                            numberSetting.increment();
-                                        }
+                                        boolean fastIncrement = mouseDown && wasMouseDown;
+                                        numberSetting.increment(fastIncrement);
                                     }
 
                                     case SliderSetting sliderSetting -> {
@@ -287,13 +282,22 @@ public class ClickGUIModule extends Module {
 
                     for(Setting<?> setting : module.getSettings()) {
                         if(!setting.isVisible()) continue;
-                        y += SETTING_HEIGHT;
+                    
+                    if(isMouseOver(categoryX, y, PANEL_WIDTH, SETTING_HEIGHT)) {
+                        if(setting instanceof NumberSetting numberSetting) {
+                            boolean fastDecrement = rightMouseDown && wasRightMouseDown;
+                            numberSetting.decrement(fastDecrement);
+                            return;
+                        }
                     }
+                    
+                    y += SETTING_HEIGHT;
                 }
             }
-            categoryIndex++;
         }
+        categoryIndex++;
     }
+}
 
     private boolean isMouseOver(int x, int y, int width, int height) {
         double scaleFactor = mc.getWindow().getScaleFactor();

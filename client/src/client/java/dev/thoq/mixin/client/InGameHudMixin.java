@@ -1,6 +1,7 @@
 package dev.thoq.mixin.client;
 
 import dev.thoq.RyeClient;
+import dev.thoq.module.Module;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.module.impl.visual.ClickGUIModule;
 import dev.thoq.utilities.render.ColorUtility;
@@ -19,33 +20,6 @@ public class InGameHudMixin {
     public void onHudRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         RyeClient.setState("inGame");
 
-        String name = RyeClient.getName();
-        String edition = RyeClient.getEdition();
-        String type = RyeClient.getType();
-        String buildNumber = RyeClient.getBuildNumber();
-        String fps = RyeClient.getFps();
-        String bps = RyeClient.getBps();
-
-        TextRendererUtility.renderText(
-                context,
-                String.format(
-                        "%s %s %s %s (FPS: %s, BPS: %s)",
-                        name,
-                        edition,
-                        type,
-                        buildNumber,
-                        fps,
-                        bps
-                ),
-                ColorUtility.Colors.LAVENDER,
-                1,
-                2,
-                true
-        );
-
-        ClickGUIModule clickGUIModule = ModuleRepository.getInstance().getModule(ClickGUIModule.class);
-        if(clickGUIModule.isVisible()) {
-            clickGUIModule.render(context);
-        }
+        ModuleRepository.getInstance().getEnabledModules().forEach(module -> module.render(context));
     }
 }

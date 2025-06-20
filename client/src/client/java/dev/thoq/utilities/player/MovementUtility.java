@@ -4,6 +4,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 
 public class MovementUtility {
+    private static final double VANILLA_PLAYER_FALL_MOTION = -0.0784000015258789;
+
     /**
      * Sets the player's movement speed
      *
@@ -112,5 +114,14 @@ public class MovementUtility {
         ClientPlayerEntity player = mc.player;
 
         player.setVelocity(player.getVelocity().x, player.getVelocity().y,z);
+    }
+
+    /**
+     * Retrieves the default falling speed value used for players.
+     *
+     * @return The standard falling motion value defined for vanilla player mechanics.
+     */
+    public static double getVanillaFallingSpeed() {
+        return VANILLA_PLAYER_FALL_MOTION;
     }
 }

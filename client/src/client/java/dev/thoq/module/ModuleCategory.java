@@ -15,8 +15,8 @@ public enum ModuleCategory {
     COMBAT("Combat"),
     MOVEMENT("Movement"),
     PLAYER("Player"),
-    VISUAL("Visual"),
-    CLIENT("Client");
+    WORLD("World"),
+    VISUAL("Visual");
 
     private final String displayName;
 

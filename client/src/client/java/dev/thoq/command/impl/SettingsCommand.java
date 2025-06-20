@@ -8,7 +8,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import dev.thoq.command.AbstractCommand;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleRepository;
-import dev.thoq.config.Setting;
+import dev.thoq.config.setting.Setting;
 import dev.thoq.utilities.misc.ChatUtility;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;

@@ -1,4 +1,6 @@
-package dev.thoq.config;
+package dev.thoq.config.setting.impl;
+
+import dev.thoq.config.setting.Setting;
 
 /**
  * A setting that allows adjusting a value using a slider.

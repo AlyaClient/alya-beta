@@ -11,7 +11,7 @@ public class GlowESP extends Module {
     }
 
     @Override
-    protected void onTick() {
+    protected void onPreTick() {
         if(!isEnabled() || mc.world == null) return;
 
         for(Entity entity : mc.world.getEntities()) {
@@ -19,10 +19,6 @@ public class GlowESP extends Module {
                 entity.setGlowing(true);
             }
         }
-    }
-
-    @Override
-    protected void onEnable() {
     }
 
     @Override

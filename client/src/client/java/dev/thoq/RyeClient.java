@@ -9,6 +9,7 @@ import dev.thoq.command.impl.ToggleCommand;
 import dev.thoq.config.KeybindManager;
 import dev.thoq.module.ModuleBuilder;
 import dev.thoq.module.ModuleRepository;
+import dev.thoq.module.impl.combat.killaura.KillauraModule;
 import dev.thoq.module.impl.movement.flight.FlightModule;
 import dev.thoq.module.impl.combat.VelocityModule;
 import dev.thoq.module.impl.movement.longjump.LongJumpModule;
@@ -17,11 +18,8 @@ import dev.thoq.module.impl.player.fastplace.FastPlaceModule;
 import dev.thoq.module.impl.player.nofall.NoFallModule;
 import dev.thoq.module.impl.player.nojumpdelay.NoJumpDelayModule;
 import dev.thoq.module.impl.player.sprint.SprintModule;
-import dev.thoq.module.impl.visual.AntiInvisModule;
-import dev.thoq.module.impl.visual.ClickGUIModule;
-import dev.thoq.module.impl.visual.FullbrightModule;
-import dev.thoq.module.impl.visual.GlowESP;
-import dev.thoq.module.impl.client.TimerModule;
+import dev.thoq.module.impl.visual.*;
+import dev.thoq.module.impl.world.TimerModule;
 import dev.thoq.utilities.misc.IconLoader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -59,6 +57,7 @@ public class RyeClient implements ClientModInitializer {
 
         ModuleBuilder.create()
                 .putAll(
+                        clickGUIModule,
                         new SprintModule(),
                         new NoJumpDelayModule(),
                         new FastPlaceModule(),
@@ -69,9 +68,11 @@ public class RyeClient implements ClientModInitializer {
                         new GlowESP(),
                         new NoFallModule(),
                         new SpeedModule(),
-                        clickGUIModule,
                         new LongJumpModule(),
-                        new TimerModule()
+                        new TimerModule(),
+                        new KillauraModule(),
+                        new HUDModule(),
+                        new ArraylistModule()
                 );
 
         KeybindManager.getInstance().bind(clickGUIModule, GLFW.GLFW_KEY_RIGHT_SHIFT);

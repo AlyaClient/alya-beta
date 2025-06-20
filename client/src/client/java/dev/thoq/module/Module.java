@@ -1,8 +1,9 @@
 package dev.thoq.module;
 
-import dev.thoq.config.Setting;
+import dev.thoq.config.setting.Setting;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -79,9 +80,60 @@ public abstract class Module {
         return settings.values();
     }
 
-    protected abstract void onEnable();
+    protected void onEnable() {
+    }
 
-    protected abstract void onDisable();
+    protected void onDisable() {
+    }
 
-    protected abstract void onTick();
+    protected void onTick() {
+    }
+
+    /**
+     * Called at the start of a world tick, before any game processing occurs.
+     * Override this method for operations that need to be performed before the main game tick.
+     * Ideal for setting up states or performing actions that should happen before the game processes the tick.
+     */
+    protected void onPreTick() {
+    }
+
+    /**
+     * Called after the main tick processing is complete.
+     * Override this method for operations that need to be performed after all other tick processing.
+     * Useful for cleanup operations or for finalizing state changes that should happen at the end of a tick.
+     */
+    protected void onPostTick() {
+    }
+
+    /**
+     * Called during the rendering process of the In-Game HUD.
+     * This method is invoked for each enabled module when the HUD is rendered.
+     * Override this method to implement custom rendering logic for the module,
+     * such as drawing visual elements or custom overlays.
+     */
+    protected void onRender(DrawContext context) {
+    }
+
+    /**
+     * Public accessor for onPreTick - used by mixins
+     */
+    public void preTick() {
+        onPreTick();
+    }
+
+    /**
+     * Public accessor for onPostTick - used by mixins
+     */
+    public void postTick() {
+        onPostTick();
+    }
+
+    /**
+     * Triggers the rendering process for the module by calling the {@code onRender} method.
+     * This method is responsible for invoking rendering-specific logic that is implemented
+     * in the module's {@code onRender} method.
+     */
+    public void render(DrawContext context) {
+        onRender(context);
+    }
 }

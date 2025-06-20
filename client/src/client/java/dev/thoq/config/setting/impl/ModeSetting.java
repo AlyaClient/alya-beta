@@ -1,4 +1,6 @@
-package dev.thoq.config;
+package dev.thoq.config.setting.impl;
+
+import dev.thoq.config.setting.Setting;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,4 +1,6 @@
-package dev.thoq.config;
+package dev.thoq.config.setting;
+
+import dev.thoq.config.VisibilityCondition;
 
 public class Setting<T> {
     private final String name;

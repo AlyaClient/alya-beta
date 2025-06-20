@@ -1,11 +1,10 @@
 package dev.thoq.module.impl.player.nofall;
 
-import dev.thoq.config.ModeSetting;
+import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.player.nofall.vanilla.VanillaNoFall;
 import dev.thoq.module.impl.player.nofall.verus.VerusNoFall;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
 public class NoFallModule extends Module {
     public NoFallModule() {

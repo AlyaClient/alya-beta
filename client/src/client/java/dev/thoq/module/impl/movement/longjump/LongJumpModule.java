@@ -1,6 +1,6 @@
 package dev.thoq.module.impl.movement.longjump;
 
-import dev.thoq.config.ModeSetting;
+import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.movement.longjump.verus.VerusLongJump;

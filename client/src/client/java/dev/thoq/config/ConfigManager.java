@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import dev.thoq.RyeClient;
+import dev.thoq.config.setting.Setting;
 import dev.thoq.module.Module;
 import dev.thoq.utilities.misc.ChatUtility;
 import net.minecraft.client.MinecraftClient;

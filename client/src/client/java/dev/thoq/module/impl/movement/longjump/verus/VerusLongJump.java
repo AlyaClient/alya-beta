@@ -1,6 +1,6 @@
 package dev.thoq.module.impl.movement.longjump.verus;
 
-import dev.thoq.config.ModeSetting;
+import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.utilities.player.TimerUtility;
 import net.minecraft.client.MinecraftClient;
 
