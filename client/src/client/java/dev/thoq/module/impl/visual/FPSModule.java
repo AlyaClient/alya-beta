@@ -28,7 +28,7 @@ public class FPSModule extends Module {
     @Override
     protected void onRender(DrawContext context) {
         String fps = String.format(
-                "[%sFPS%s]: %s",
+                "[%sFPS%s] %s",
                 "§d",
                 "§r",
                 RyeClient.getFps()

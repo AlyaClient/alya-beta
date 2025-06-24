@@ -33,7 +33,7 @@ public class BPSModule extends Module {
         if(RyeClient.INSTANCE.getModuleRepository().getModuleByName("FPS").isEnabled()) y = 27;
 
         String fps = String.format(
-                "[%sBPS%s]: %s",
+                "[%sBPS%s] %s",
                 "§d",
                 "§r",
                 RyeClient.getBps()
