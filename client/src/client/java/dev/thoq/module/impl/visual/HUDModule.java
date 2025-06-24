@@ -28,7 +28,7 @@ import java.util.Date;
 public class HUDModule extends Module {
 
     public HUDModule() {
-        super("HUD", "Show world Heads Up Display", ModuleCategory.VISUAL);
+        super("HUD", "Shows Heads Up Display", ModuleCategory.VISUAL);
         this.setEnabled(true);
     }
 
@@ -86,14 +86,14 @@ public class HUDModule extends Module {
         if(mc.player != null) {
             String userName = mc.player.getName().getString();
             return String.format(
-                    "%s | %s | %s",
+                    " %s | %s | %s",
                     name,
                     userName,
                     time
             );
         } else {
             return String.format(
-                    "%s | %s",
+                    " %s | %s",
                     name,
                     time
             );

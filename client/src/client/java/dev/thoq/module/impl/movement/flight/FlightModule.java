@@ -13,6 +13,7 @@
 
 package dev.thoq.module.impl.movement.flight;
 
+import dev.thoq.config.setting.Setting;
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.module.Module;
 import dev.thoq.config.setting.impl.BooleanSetting;
@@ -22,6 +23,9 @@ import dev.thoq.module.impl.movement.flight.vanilla.CreativeFlight;
 import dev.thoq.module.impl.movement.flight.vanilla.NormalFlight;
 import dev.thoq.module.impl.movement.flight.verus.VerusFlight;
 import net.minecraft.client.option.GameOptions;
+import net.minecraft.network.PacketCallbacks;
+import net.minecraft.network.packet.Packet;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("unchecked")
 public class FlightModule extends Module {
@@ -61,7 +65,22 @@ public class FlightModule extends Module {
                 break;
             case "Verus":
                 VerusFlight.verusFlight(mc, options);
+                VerusFlight.sendVerusPackets(mc);
                 break;
+        }
+    }
+
+    @Override
+    protected void onPacket(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo callbackInfo) {
+        if (!isEnabled() || mc.player == null) return;
+
+        Setting<?> modeSetting = settings.get("mode");
+        if (modeSetting == null) return;
+
+        String mode = ((ModeSetting) modeSetting).getValue();
+
+        if ("Verus".equals(mode)) {
+            VerusFlight.cancelPackets(packet, callbackInfo);
         }
     }
 

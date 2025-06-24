@@ -106,7 +106,7 @@ public abstract class Module {
     }
 
     /**
-     * Called at the start of a world tick, before any game processing occurs.
+     * Called at the start of a exploit tick, before any game processing occurs.
      * Override this method for operations that need to be performed before the main game tick.
      * Ideal for setting up states or performing actions that should happen before the game processes the tick.
      */

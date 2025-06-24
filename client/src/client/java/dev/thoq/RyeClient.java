@@ -23,6 +23,8 @@ import dev.thoq.config.KeybindManager;
 import dev.thoq.module.ModuleBuilder;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.module.impl.combat.killaura.KillauraModule;
+import dev.thoq.module.impl.exploit.CPUExploitModule;
+import dev.thoq.module.impl.exploit.TickBaseModule;
 import dev.thoq.module.impl.movement.flight.FlightModule;
 import dev.thoq.module.impl.combat.VelocityModule;
 import dev.thoq.module.impl.movement.longjump.LongJumpModule;
@@ -33,7 +35,9 @@ import dev.thoq.module.impl.player.nofall.NoFallModule;
 import dev.thoq.module.impl.player.nojumpdelay.NoJumpDelayModule;
 import dev.thoq.module.impl.player.sprint.SprintModule;
 import dev.thoq.module.impl.visual.*;
-import dev.thoq.module.impl.world.TimerModule;
+import dev.thoq.module.impl.player.TimerModule;
+import dev.thoq.module.impl.visual.clickgui.ClickGUIModule;
+import dev.thoq.module.impl.visual.esp.ESPModule;
 import dev.thoq.utilities.misc.IconLoader;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -46,7 +50,6 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import org.apache.logging.log4j.LogManager;
 
-import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -80,7 +83,7 @@ public class RyeClient implements ClientModInitializer {
                         new FullbrightModule(),
                         new AntiInvisModule(),
                         new VelocityModule(),
-                        new GlowESP(),
+                        new ESPModule(),
                         new NoFallModule(),
                         new SpeedModule(),
                         new LongJumpModule(),
@@ -90,7 +93,10 @@ public class RyeClient implements ClientModInitializer {
                         new ArraylistModule(),
                         new ScaffoldModule(),
                         new FPSModule(),
-                        new BPSModule()
+                        new BPSModule(),
+                        new DebugModule(),
+                        new TickBaseModule(),
+                        new CPUExploitModule()
                 );
 
         KeybindManager.getInstance().bind(clickGUIModule, GLFW.GLFW_KEY_RIGHT_SHIFT);

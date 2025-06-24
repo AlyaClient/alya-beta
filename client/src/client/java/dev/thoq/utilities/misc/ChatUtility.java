@@ -35,6 +35,14 @@ public class ChatUtility {
         }
     }
 
+
+    public static void sendDebug(String message) {
+        if(mc.player != null) {
+            MutableText text = Text.literal("DEBUG >> " + message);
+            mc.player.sendMessage(text, false);
+        }
+    }
+
     /**
      * Sends a regular message to chat
      *

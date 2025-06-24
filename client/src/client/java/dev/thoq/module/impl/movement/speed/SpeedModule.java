@@ -19,8 +19,10 @@ import dev.thoq.config.setting.Setting;
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
+import dev.thoq.module.impl.movement.speed.ncp.NCPSpeed;
 import dev.thoq.module.impl.movement.speed.normal.NormalSpeed;
 import dev.thoq.module.impl.movement.speed.verus.VerusSpeed;
+import dev.thoq.utilities.player.TimerUtility;
 import net.minecraft.client.option.GameOptions;
 
 @SuppressWarnings("unchecked")
@@ -31,18 +33,19 @@ public class SpeedModule extends Module {
     public SpeedModule() {
         super("Speed", "Become faster than the average American", ModuleCategory.MOVEMENT);
 
-        ModeSetting mode = new ModeSetting("Mode", "Speed mode", "Normal", "Normal", "Verus");
+        ModeSetting mode = new ModeSetting("Mode", "Speed mode", "Normal", "Normal", "Verus", "NCP");
         NumberSetting<Float> speed = new NumberSetting<>("Speed", "Zoom speed multiplier", 1.5f, 0.1f, 10.0f);
         BooleanSetting bHop = new BooleanSetting("BHop", "Enable BHop?", true);
         BooleanSetting strafe = new BooleanSetting("Strafe", "Enable Strafe?", true);
         BooleanSetting verusDamageBoost = new BooleanSetting("Damage boost", "Boost speed when damaged", true);
-
+        BooleanSetting ncpDamageBoost = new BooleanSetting("Damage boost", "Boost speed when damaged", true);
 
         addSetting(mode);
         addSetting(speed.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
         addSetting(bHop.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
         addSetting(strafe.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
         addSetting(verusDamageBoost.setVisibilityCondition(() -> "Verus".equals(mode.getValue())));
+        addSetting(ncpDamageBoost.setVisibilityCondition(() -> "NCP".equals(mode.getValue())));
     }
 
     @Override
@@ -66,6 +69,13 @@ public class SpeedModule extends Module {
                 VerusSpeed.verusSpeed(mc, options, verusDamageBoost);
                 break;
             }
+
+            case "NCP": {
+                boolean ncpDamageBoost = ((BooleanSetting) getSetting("Damage boost")).getValue();
+
+                NCPSpeed.ncpSpeed(mc, options, ncpDamageBoost);
+                break;
+            }
         }
     }
 
@@ -77,5 +87,6 @@ public class SpeedModule extends Module {
     @Override
     protected void onDisable() {
         if(mc.player != null) mc.player.setSprinting(wasSprinting);
+        TimerUtility.resetTimer();
     }
 }

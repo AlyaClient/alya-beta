@@ -11,7 +11,7 @@
  * MIT License: https://opensource.org/license/mit
  */
 
-package dev.thoq.module.impl.world;
+package dev.thoq.module.impl.player;
 
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.module.Module;
@@ -22,7 +22,7 @@ public class TimerModule extends Module {
     private final NumberSetting<Float> timerSpeed = new NumberSetting<>("Speed", "Game speed multiplier", 1.0f, 0.1f, 10.0f);
 
     public TimerModule() {
-        super("Timer", "Allows you to change the game speed", ModuleCategory.WORLD);
+        super("Timer", "Allows you to change the game speed", ModuleCategory.EXPLOIT);
 
         addSetting(timerSpeed);
     }

@@ -63,10 +63,6 @@ public class ArraylistModule extends Module {
         return activeModules;
     }
 
-    private int colorToArgb(Color color) {
-        return (color.getAlpha() << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
-    }
-
     @Override
     protected void onRender(DrawContext context) {
         Collection<Module> allModules = ModuleRepository.getInstance().getModules();
@@ -83,11 +79,10 @@ public class ArraylistModule extends Module {
         int screenWidth = mc.getWindow().getScaledWidth();
         boolean isLeftPosition = Objects.equals(position.getValue(), "Left");
 
-        int startY = isLeftPosition ? leftTopMargin : rightTopMargin;
-        int currentY = startY;
+        int currentY = isLeftPosition ? leftTopMargin : rightTopMargin;
 
         Color themeColor = ThemeUtility.getThemeColorFirst();
-        int themeColorArgb = colorToArgb(themeColor);
+        int themeColorArgb = ColorUtility.getIntFromColor(themeColor);
 
         List<Integer> moduleWidths = new ArrayList<>();
         for(Module module : activeModules) {

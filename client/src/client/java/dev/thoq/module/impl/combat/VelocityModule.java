@@ -13,23 +13,69 @@
 
 package dev.thoq.module.impl.combat;
 
+import dev.thoq.config.setting.impl.ModeSetting;
+import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
+import dev.thoq.module.ModuleRepository;
+import dev.thoq.module.impl.visual.DebugModule;
+import dev.thoq.utilities.misc.ChatUtility;
 
+@SuppressWarnings({"rawtypes", "unchecked", "FieldCanBeLocal"})
 public class VelocityModule extends Module {
+    private final ModeSetting mode = new ModeSetting("Mode", "Different modes", "Standard", "Standard", "Jump Reset", "Hurt Time");
+    private final NumberSetting horizontalVelocity = new NumberSetting("Horizontal", "X + Z velocity multiplier", 1.0f, 0f, 1.0f);
+    private final NumberSetting verticalVelocity = new NumberSetting("Vertical", "Y velocity multiplier", 1.0f, 0f, 1.0f);
+
     public VelocityModule() {
-        super("Velocity", "Uses heavy cock and balls to create friction to prevent knockback", ModuleCategory.COMBAT);
+        super("Velocity", "Makes you variably American", ModuleCategory.COMBAT);
+
+        addSetting(mode);
+        addSetting(horizontalVelocity.setVisibilityCondition(() -> "Standard".equals(mode.getValue())));
+        addSetting(verticalVelocity.setVisibilityCondition(() -> "Standard".equals(mode.getValue())));
     }
 
     @Override
-    protected void onTick() {
-    }
+    protected void onPreTick() {
+        if(!isEnabled() || mc.player == null) return;
 
-    @Override
-    protected void onEnable() {
-    }
+        String mode = ((ModeSetting) getSetting("Mode")).getValue();
+        boolean debug = ModuleRepository.getInstance().getModule(DebugModule.class).isEnabled();
 
-    @Override
-    protected void onDisable() {
+        switch(mode) {
+            case "Standard": {
+                float xz = ((NumberSetting<Float>) getSetting("Horizontal")).getValue();
+                float y = ((NumberSetting<Float>) getSetting("Vertical")).getValue();
+
+                if(mc.player.hurtTime > 0) {
+                    if(debug) ChatUtility.sendDebug("player velocity >modified<");
+                    mc.player.setVelocity(
+                            mc.player.getVelocity().x * xz,
+                            mc.player.getVelocity().y * y,
+                            mc.player.getVelocity().z * xz
+                    );
+                }
+                break;
+            }
+
+            case "Jump Reset": {
+                if(mc.player.hurtTime > 0 && mc.player.isOnGround()) {
+                    mc.player.jump();
+                }
+
+                break;
+            }
+
+            case "Hurt Time": {
+                double multiplierX = 0.6 / mc.player.hurtTime;
+                double multiplierY = 0.9 / mc.player.hurtTime;
+
+                if(mc.player.hurtTime > 0) {
+                    mc.player.setVelocity(mc.player.getVelocity().multiply(multiplierX, multiplierY, 1.0f));
+                }
+
+                break;
+            }
+        }
     }
 }

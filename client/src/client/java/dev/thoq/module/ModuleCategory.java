@@ -14,21 +14,21 @@
 package dev.thoq.module;
 
 /**
- * Represents a category for different types of modules. Each category groups
- * modules based on their functionality, such as combat-related modules,
- * movement-related modules, and so on.
- * The available categories are:
- * - COMBAT: Modules related to combat functionalities.
- * - MOVEMENT: Modules focused on movement enhancements or modifications.
- * - PLAYER: Modules that enhance or modify player-specific behaviors.
- * - VISUAL: Modules related to visuals and rendering.
- * Each category is associated with a display name for user-friendly identification.
+ * Enum representing the categorization of modules within a system.
+ * Each category corresponds to a specific functional area or grouping of modules.
+ * <p>
+ * Categories include:
+ * - COMBAT: Modules related to combat functionality.
+ * - MOVEMENT: Modules that enhance or modify player movement.
+ * - PLAYER: Modules that handle player-specific adjustments or behaviors.
+ * - EXPLOIT: Modules that focus on exploiting the game or its mechanics.
+ * - VISUAL: Modules that modify or enhance the visual elements of the game.
  */
 public enum ModuleCategory {
     COMBAT("Combat"),
     MOVEMENT("Movement"),
     PLAYER("Player"),
-    WORLD("World"),
+    EXPLOIT("Exploit"),
     VISUAL("Visual");
 
     private final String displayName;

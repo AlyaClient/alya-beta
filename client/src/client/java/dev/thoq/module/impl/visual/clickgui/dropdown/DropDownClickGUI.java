@@ -11,7 +11,7 @@
  * MIT License: https://opensource.org/license/mit
  */
 
-package dev.thoq.module.impl.visual;
+package dev.thoq.module.impl.visual.clickgui.dropdown;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
@@ -23,6 +23,7 @@ import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 
@@ -33,8 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings({"SameParameterValue", "rawtypes", "FieldCanBeLocal"})
-public class ClickGUIModule extends Module {
-
+public class DropDownClickGUI {
     private boolean visible = false;
     private final Map<ModuleCategory, List<Module>> categorizedModules = new EnumMap<>(ModuleCategory.class);
     private final Map<ModuleCategory, Boolean> expandedCategories = new EnumMap<>(ModuleCategory.class);
@@ -57,17 +57,16 @@ public class ClickGUIModule extends Module {
     private boolean wasMouseDown;
     private boolean rightMouseDown;
     private boolean wasRightMouseDown;
+    private final MinecraftClient mc = MinecraftClient.getInstance();
 
-    public ClickGUIModule() {
-        super("ClickGUI", "Toggle modules with a graphical interface", ModuleCategory.VISUAL);
+    public DropDownClickGUI() {
         for(ModuleCategory category : ModuleCategory.values()) {
             categorizedModules.put(category, new ArrayList<>());
             expandedCategories.put(category, true);
         }
     }
 
-    @Override
-    protected void onEnable() {
+    public void show() {
         for(List<Module> modules : categorizedModules.values())
             modules.clear();
 
@@ -81,13 +80,11 @@ public class ClickGUIModule extends Module {
         visible = true;
     }
 
-    @Override
-    protected void onDisable() {
+    public void hide() {
         visible = false;
     }
 
-    @Override
-    protected void onTick() {
+    public void tick() {
         if(!visible) return;
 
         updateMouseInput();
@@ -106,10 +103,8 @@ public class ClickGUIModule extends Module {
 
         GLFW.glfwGetCursorPos(handle, xPos, yPos);
 
-        double scaleFactor = mc.getWindow().getScaleFactor();
-
-        mouseX = (int) (xPos[0] / scaleFactor);
-        mouseY = (int) (yPos[0] / scaleFactor);
+        mouseX = (int) xPos[0];
+        mouseY = (int) yPos[0];
 
         wasMouseDown = mouseDown;
         mouseDown = GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
@@ -117,8 +112,7 @@ public class ClickGUIModule extends Module {
         rightMouseDown = GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_RIGHT) == GLFW.GLFW_PRESS;
     }
 
-    @Override
-    protected void onRender(DrawContext context) {
+    public void render(DrawContext context) {
         if(!visible) return;
 
         int categoryIndex = 0;
@@ -220,7 +214,6 @@ public class ClickGUIModule extends Module {
             int y = PANEL_Y;
 
             if(isMouseOver(categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT)) {
-
                 expandedCategories.put(category, !expandedCategories.get(category));
                 return;
             }
@@ -250,7 +243,6 @@ public class ClickGUIModule extends Module {
                                     }
 
                                     case SliderSetting sliderSetting -> {
-
                                         double normalizedPos = Math.max(0.0, Math.min(1.0,
                                                 (double) (mouseX - categoryX) / PANEL_WIDTH));
                                         sliderSetting.setFromNormalizedValue(normalizedPos);
@@ -321,7 +313,6 @@ public class ClickGUIModule extends Module {
     }
 
     private boolean isMouseOver(int x, int y, int width, int height) {
-
         return mouseX >= x && mouseX <= x + width &&
                 mouseY >= y && mouseY <= y + height;
     }

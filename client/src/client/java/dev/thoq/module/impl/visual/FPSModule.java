@@ -23,6 +23,7 @@ import net.minecraft.client.gui.DrawContext;
 public class FPSModule extends Module {
     public FPSModule() {
         super("FPS", "Shows current game fps", ModuleCategory.VISUAL);
+        this.setEnabled(true);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class FPSModule extends Module {
         TextRendererUtility.renderText(
                 context,
                 fps,
-                ColorUtility.Colors.WHITE,
+                ColorUtility.Colors.LIGHT_GRAY,
                 1,
                 17,
                 true

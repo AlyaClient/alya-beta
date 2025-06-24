@@ -13,6 +13,8 @@
 
 package dev.thoq.module.impl.combat.killaura;
 
+// Add this import at the top with your other imports
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
@@ -201,6 +203,7 @@ public class KillauraModule extends Module {
         return sensitivity * 0.6F + 0.2F;
     }
 
+    // Update the handleRotations method
     private void handleRotations() {
         if(currentTarget == null) return;
 
@@ -249,8 +252,25 @@ public class KillauraModule extends Module {
         lastYaw = correctedRotations[0];
         lastPitch = correctedRotations[1];
 
-        mc.player.setYaw(lastYaw);
-        mc.player.setPitch(lastPitch);
+        if (serverSideRotations.getValue()) {
+            sendRotationPacket(lastYaw, lastPitch);
+        } else {
+            mc.player.setYaw(lastYaw);
+            mc.player.setPitch(lastPitch);
+        }
+    }
+
+    private void sendRotationPacket(float yaw, float pitch) {
+        if (mc.player == null || mc.getNetworkHandler() == null) return;
+        
+        PlayerMoveC2SPacket rotationPacket = new PlayerMoveC2SPacket.LookAndOnGround(
+            yaw,
+            pitch,
+            mc.player.isOnGround(),
+            mc.player.horizontalCollision
+        );
+        
+        mc.getNetworkHandler().sendPacket(rotationPacket);
     }
 
     private Vec3d getTargetPosition(Entity target) {

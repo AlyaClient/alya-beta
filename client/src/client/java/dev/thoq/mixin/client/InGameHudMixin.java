@@ -14,11 +14,7 @@
 package dev.thoq.mixin.client;
 
 import dev.thoq.RyeClient;
-import dev.thoq.module.Module;
 import dev.thoq.module.ModuleRepository;
-import dev.thoq.module.impl.visual.ClickGUIModule;
-import dev.thoq.utilities.render.ColorUtility;
-import dev.thoq.utilities.render.TextRendererUtility;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
