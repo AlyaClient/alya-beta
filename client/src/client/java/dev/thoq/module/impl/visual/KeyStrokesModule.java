@@ -6,7 +6,6 @@ import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.render.ColorUtility;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.entity.boss.BossBar;
 
 public class KeyStrokesModule extends Module {
     private final BooleanSetting spaceBar = new BooleanSetting("Spacebar", "Draw Spacebar?", true);
