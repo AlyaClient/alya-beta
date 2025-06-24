@@ -1,4 +1,19 @@
+/*
+ * Copyright (c) Rye 2025-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric Injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * This project (and subsequently, its files) are all licensed under the MIT License.
+ * This project should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ */
+
 package dev.thoq.utilities.render;
+
+import java.awt.*;
 
 public class ColorUtility {
     /**
@@ -58,5 +73,14 @@ public class ColorUtility {
             case GRAY -> 0xFF808080;
             case LIGHT_GRAY -> 0xFFD3D3D3;
         };
+    }
+
+    public static int getIntFromColor(Color color) {
+        int red = color.getRed();
+        int green = color.getGreen();
+        int blue = color.getBlue();
+        int alpha = color.getAlpha();
+
+        return (alpha << 24) | (red << 16) | (green << 8) | blue;
     }
 }

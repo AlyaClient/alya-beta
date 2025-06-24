@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) Rye 2025-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric Injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * This project (and subsequently, its files) are all licensed under the MIT License.
+ * This project should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ */
+
 package dev.thoq.utilities.player;
 
 import net.minecraft.client.MinecraftClient;
@@ -28,6 +41,18 @@ public class MovementUtility {
         return mc.player.forwardSpeed != 0 || mc.player.sidewaysSpeed != 0;
     }
 
+    public static float getForward(MinecraftClient mc) {
+        if(mc.player == null) return 0.0f;
+
+        return mc.player.input.getMovementInput().y;
+    }
+
+    public static float getStrafe(MinecraftClient mc) {
+        if(mc.player == null) return 0.0f;
+
+        return mc.player.input.getMovementInput().x;
+    }
+
     /**
      * Sets the player's movement speed
      *
@@ -44,8 +69,8 @@ public class MovementUtility {
             return;
         }
 
-        float forward = player.input.getMovementInput().y;
-        float strafe = player.input.getMovementInput().x;
+        float forward = getForward(mc);
+        float strafe = getStrafe(mc);
         float yaw = player.getYaw();
 
         if(forward == 0.0f && strafe == 0.0f) {

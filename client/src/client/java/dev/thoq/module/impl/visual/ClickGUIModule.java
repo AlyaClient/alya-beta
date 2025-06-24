@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) Rye 2025-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric Injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * This project (and subsequently, its files) are all licensed under the MIT License.
+ * This project should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ */
+
 package dev.thoq.module.impl.visual;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
@@ -93,8 +106,11 @@ public class ClickGUIModule extends Module {
 
         GLFW.glfwGetCursorPos(handle, xPos, yPos);
 
-        mouseX = (int) xPos[0];
-        mouseY = (int) yPos[0];
+        double scaleFactor = mc.getWindow().getScaleFactor();
+
+        mouseX = (int) (xPos[0] / scaleFactor);
+        mouseY = (int) (yPos[0] / scaleFactor);
+
         wasMouseDown = mouseDown;
         mouseDown = GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
         wasRightMouseDown = rightMouseDown;
@@ -203,7 +219,11 @@ public class ClickGUIModule extends Module {
             int categoryX = PANEL_X + (PANEL_WIDTH + PANEL_SPACING) * categoryIndex;
             int y = PANEL_Y;
 
-            if(isMouseOver(categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT)) return;
+            if(isMouseOver(categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT)) {
+
+                expandedCategories.put(category, !expandedCategories.get(category));
+                return;
+            }
 
             y += CATEGORY_HEIGHT;
 
@@ -230,7 +250,9 @@ public class ClickGUIModule extends Module {
                                     }
 
                                     case SliderSetting sliderSetting -> {
-                                        double normalizedPos = (double) (mouseX - categoryX) / PANEL_WIDTH;
+
+                                        double normalizedPos = Math.max(0.0, Math.min(1.0,
+                                                (double) (mouseX - categoryX) / PANEL_WIDTH));
                                         sliderSetting.setFromNormalizedValue(normalizedPos);
                                     }
 
@@ -277,35 +299,31 @@ public class ClickGUIModule extends Module {
 
                     y += MODULE_HEIGHT;
 
-                    if(!expandedModules.getOrDefault(module, false))
-                        continue;
+                    if(expandedModules.getOrDefault(module, false)) {
+                        for(Setting<?> setting : module.getSettings()) {
+                            if(!setting.isVisible()) continue;
 
-                    for(Setting<?> setting : module.getSettings()) {
-                        if(!setting.isVisible()) continue;
-                    
-                    if(isMouseOver(categoryX, y, PANEL_WIDTH, SETTING_HEIGHT)) {
-                        if(setting instanceof NumberSetting numberSetting) {
-                            boolean fastDecrement = rightMouseDown && wasRightMouseDown;
-                            numberSetting.decrement(fastDecrement);
-                            return;
+                            if(isMouseOver(categoryX, y, PANEL_WIDTH, SETTING_HEIGHT)) {
+                                if(setting instanceof NumberSetting numberSetting) {
+                                    boolean fastDecrement = rightMouseDown && wasRightMouseDown;
+                                    numberSetting.decrement(fastDecrement);
+                                    return;
+                                }
+                            }
+
+                            y += SETTING_HEIGHT;
                         }
                     }
-                    
-                    y += SETTING_HEIGHT;
                 }
             }
+            categoryIndex++;
         }
-        categoryIndex++;
     }
-}
 
     private boolean isMouseOver(int x, int y, int width, int height) {
-        double scaleFactor = mc.getWindow().getScaleFactor();
-        int adjustedMouseX = (int) (mouseX / scaleFactor);
-        int adjustedMouseY = (int) (mouseY / scaleFactor);
 
-        return adjustedMouseX >= x && adjustedMouseX <= x + width &&
-                adjustedMouseY >= y && adjustedMouseY <= y + height;
+        return mouseX >= x && mouseX <= x + width &&
+                mouseY >= y && mouseY <= y + height;
     }
 
     private void renderRect(DrawContext context, int x, int y, int width, int height, int color) {

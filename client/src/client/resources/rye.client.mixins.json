@@ -5,6 +5,8 @@
   "client": [
     "ChatInputSuggestorMixin",
     "ChatScreenMixin",
+    "ClientPlayerEntityMixin",
+    "ClientPlayNetworkHandlerMixin",
     "InGameHudMixin",
     "LivingEntityJumpAccessor",
     "MinecraftClientAccessor",

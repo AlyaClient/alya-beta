@@ -1,9 +1,25 @@
+/*
+ * Copyright (c) Rye 2025-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric Injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * This project (and subsequently, its files) are all licensed under the MIT License.
+ * This project should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ */
+
 package dev.thoq.module;
 
 import dev.thoq.config.setting.Setting;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.network.PacketCallbacks;
+import net.minecraft.network.packet.Packet;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -115,6 +131,23 @@ public abstract class Module {
     }
 
     /**
+     * Handles motion-related logic or behavior for the module.
+     * This method is typically invoked through the {@link #motion()} public entry point
+     * and can be overridden in subclasses to customize motion behavior.
+     */
+    protected void onMotion() {
+    }
+
+    /**
+     * Handles incoming network packets for the module.
+     * This method is intended to be overridden by subclasses that require specific
+     * behavior when a network packet is received. The implementation of this method
+     * can be used to intercept or process packets relevant to the module's functionality.
+     */
+    protected void onPacket(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo callbackInfo) {
+    }
+
+    /**
      * Public accessor for onPreTick - used by mixins
      */
     public void preTick() {
@@ -136,4 +169,19 @@ public abstract class Module {
     public void render(DrawContext context) {
         onRender(context);
     }
+
+    /**
+     * Triggers the motion logic of the module by invoking the {@code onMotion} method.
+     * This method serves as a public entry point for motion-related processing,
+     * which is implemented in the {@code onMotion} method.
+     * Override {@code onMotion} in subclasses to define custom motion functionality.
+     */
+    public void motion() {
+        onMotion();
+    }
+
+    public void packet(Packet<?> packet, PacketCallbacks callbacks, boolean flush, CallbackInfo callbackInfo) {
+        onPacket(packet, callbacks, flush, callbackInfo);
+    }
+
 }

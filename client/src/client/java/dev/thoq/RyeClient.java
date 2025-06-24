@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) Rye 2025-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric Injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * This project (and subsequently, its files) are all licensed under the MIT License.
+ * This project should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ */
+
 package dev.thoq;
 
 import dev.thoq.command.CommandBuilder;
@@ -13,6 +26,7 @@ import dev.thoq.module.impl.combat.killaura.KillauraModule;
 import dev.thoq.module.impl.movement.flight.FlightModule;
 import dev.thoq.module.impl.combat.VelocityModule;
 import dev.thoq.module.impl.movement.longjump.LongJumpModule;
+import dev.thoq.module.impl.movement.scaffold.ScaffoldModule;
 import dev.thoq.module.impl.movement.speed.SpeedModule;
 import dev.thoq.module.impl.player.fastplace.FastPlaceModule;
 import dev.thoq.module.impl.player.nofall.NoFallModule;
@@ -32,6 +46,7 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import org.apache.logging.log4j.LogManager;
 
+import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Set;
@@ -72,7 +87,10 @@ public class RyeClient implements ClientModInitializer {
                         new TimerModule(),
                         new KillauraModule(),
                         new HUDModule(),
-                        new ArraylistModule()
+                        new ArraylistModule(),
+                        new ScaffoldModule(),
+                        new FPSModule(),
+                        new BPSModule()
                 );
 
         KeybindManager.getInstance().bind(clickGUIModule, GLFW.GLFW_KEY_RIGHT_SHIFT);

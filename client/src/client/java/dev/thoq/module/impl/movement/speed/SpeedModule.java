@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) Rye 2025-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric Injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * This project (and subsequently, its files) are all licensed under the MIT License.
+ * This project should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ */
+
 package dev.thoq.module.impl.movement.speed;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
@@ -24,16 +37,12 @@ public class SpeedModule extends Module {
         BooleanSetting strafe = new BooleanSetting("Strafe", "Enable Strafe?", true);
         BooleanSetting verusDamageBoost = new BooleanSetting("Damage boost", "Boost speed when damaged", true);
 
-        speed.setVisibilityCondition(() -> "Normal".equals(mode.getValue()));
-        bHop.setVisibilityCondition(() -> "Normal".equals(mode.getValue()));
-        strafe.setVisibilityCondition(() -> "Normal".equals(mode.getValue()));
-        verusDamageBoost.setVisibilityCondition(() -> "Verus".equals(mode.getValue()));
 
         addSetting(mode);
-        addSetting(speed);
-        addSetting(bHop);
-        addSetting(strafe);
-        addSetting(verusDamageBoost);
+        addSetting(speed.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
+        addSetting(bHop.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
+        addSetting(strafe.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
+        addSetting(verusDamageBoost.setVisibilityCondition(() -> "Verus".equals(mode.getValue())));
     }
 
     @Override

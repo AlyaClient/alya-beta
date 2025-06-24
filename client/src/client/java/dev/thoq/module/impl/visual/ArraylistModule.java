@@ -1,3 +1,16 @@
+/*
+ * Copyright (c) Rye 2025-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric Injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * This project (and subsequently, its files) are all licensed under the MIT License.
+ * This project should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ */
+
 package dev.thoq.module.impl.visual;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
@@ -7,8 +20,10 @@ import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
+import dev.thoq.utilities.render.ThemeUtility;
 import net.minecraft.client.gui.DrawContext;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,13 +32,15 @@ import java.util.Objects;
 @SuppressWarnings("ConstantValue")
 public class ArraylistModule extends Module {
     private static final BooleanSetting showVisualModules = new BooleanSetting("Show Visual", "Should Arraylist show visual modules?", true);
-    private static final ModeSetting position = new ModeSetting("Position", "Arraylist Position", "Left", "Left", "Right");
+    private static final ModeSetting position = new ModeSetting("Position", "Arraylist Position", "Right", "Left", "Right");
 
     public ArraylistModule() {
         super("Arraylist", "Render all active modules", ModuleCategory.VISUAL);
 
         addSetting(showVisualModules);
         addSetting(position);
+
+        this.setEnabled(true);
     }
 
     private static List<Module> sortModulesByLength(Collection<Module> modules) {
@@ -46,6 +63,10 @@ public class ArraylistModule extends Module {
         return activeModules;
     }
 
+    private int colorToArgb(Color color) {
+        return (color.getAlpha() << 24) | (color.getRed() << 16) | (color.getGreen() << 8) | color.getBlue();
+    }
+
     @Override
     protected void onRender(DrawContext context) {
         Collection<Module> allModules = ModuleRepository.getInstance().getModules();
@@ -57,37 +78,73 @@ public class ArraylistModule extends Module {
         final int leftTopMargin = 15;
         final int rightTopMargin = 2;
         final int sidePadding = 2;
+        final int outlineWidth = 1;
 
         int screenWidth = mc.getWindow().getScaledWidth();
         boolean isLeftPosition = Objects.equals(position.getValue(), "Left");
-        
-        int y = isLeftPosition ? leftTopMargin : rightTopMargin;
 
+        int startY = isLeftPosition ? leftTopMargin : rightTopMargin;
+        int currentY = startY;
+
+        Color themeColor = ThemeUtility.getThemeColorFirst();
+        int themeColorArgb = colorToArgb(themeColor);
+
+        List<Integer> moduleWidths = new ArrayList<>();
         for(Module module : activeModules) {
+            moduleWidths.add(TextRendererUtility.getTextWidth(module.getName()));
+        }
+
+        for(int i = 0; i < activeModules.size(); i++) {
+            Module module = activeModules.get(i);
             String name = module.getName();
-            int textWidth = TextRendererUtility.getTextWidth(name);
+            int textWidth = moduleWidths.get(i);
             int x;
-            
+
+            int moduleLeft, moduleRight, moduleTop, moduleBottom;
+
             if(isLeftPosition) {
                 x = sidePadding;
-                
-                context.fill(
-                    x - padding, 
-                    y - padding,
-                    x + textWidth + padding,
-                    y + mc.textRenderer.fontHeight + padding,
-                    0x90000000
-                );
+                moduleLeft = x - padding;
+                moduleRight = x + textWidth + padding;
             } else {
                 x = screenWidth - textWidth - sidePadding;
-                
-                context.fill(
-                    x - padding, 
-                    y - padding,
-                    screenWidth - sidePadding + padding,
-                    y + mc.textRenderer.fontHeight + padding,
-                    0x90000000
-                );
+                moduleLeft = x - padding;
+                moduleRight = screenWidth - sidePadding + padding;
+            }
+
+            moduleTop = currentY - padding;
+            moduleBottom = currentY + mc.textRenderer.fontHeight + padding;
+
+            context.fill(moduleLeft, moduleTop, moduleRight, moduleBottom, 0x90000000);
+
+            if(i == 0) {
+                context.fill(moduleLeft - outlineWidth, moduleTop - outlineWidth, moduleRight + outlineWidth, moduleTop, themeColorArgb);
+            }
+
+            if(i == activeModules.size() - 1) {
+                context.fill(moduleLeft - outlineWidth, moduleBottom, moduleRight + outlineWidth, moduleBottom + outlineWidth, themeColorArgb);
+            }
+
+            context.fill(moduleLeft - outlineWidth, moduleTop, moduleLeft, moduleBottom, themeColorArgb);
+            context.fill(moduleRight, moduleTop, moduleRight + outlineWidth, moduleBottom, themeColorArgb);
+
+            if(isLeftPosition) {
+                if(i < activeModules.size() - 1) {
+                    int nextWidth = moduleWidths.get(i + 1);
+                    int nextModuleRight = sidePadding + nextWidth + padding;
+                    if(moduleRight > nextModuleRight) {
+                        context.fill(nextModuleRight, moduleBottom, moduleRight + outlineWidth, moduleBottom + outlineWidth, themeColorArgb);
+                    }
+                }
+            } else {
+
+                if(i < activeModules.size() - 1) {
+                    int nextWidth = moduleWidths.get(i + 1);
+                    int nextModuleLeft = screenWidth - nextWidth - sidePadding - padding;
+                    if(moduleLeft < nextModuleLeft) {
+                        context.fill(moduleLeft - outlineWidth, moduleBottom, nextModuleLeft, moduleBottom + outlineWidth, themeColorArgb);
+                    }
+                }
             }
 
             TextRendererUtility.renderText(
@@ -95,11 +152,11 @@ public class ArraylistModule extends Module {
                     name,
                     ColorUtility.Colors.WHITE,
                     x,
-                    y,
+                    currentY,
                     true
             );
 
-            y += mc.textRenderer.fontHeight + padding * 2;
+            currentY += mc.textRenderer.fontHeight + padding * 2;
         }
     }
 }
