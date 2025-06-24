@@ -27,6 +27,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -48,7 +49,7 @@ public class DropDownClickGUI {
     private static final int PANEL_Y = 20;
     private static final int PANEL_SPACING = 10;
     private static final int PADDING = 2;
-    private static final int BACKGROUND_COLOR = 0xCC000000;
+    private static final int BACKGROUND_COLOR = ColorUtility.getColor(ColorUtility.Colors.PANEL);
     private static final int CATEGORY_COLOR = 0xDD000000;
     private static final int HOVER_COLOR = 0x10FFFFFF;
     private int mouseX;

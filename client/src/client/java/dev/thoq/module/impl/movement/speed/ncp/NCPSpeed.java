@@ -23,15 +23,20 @@ import net.minecraft.client.option.GameOptions;
 
 public class NCPSpeed {
     private static float timeRunning = 0;
+    private static int accumulatedTicks = 0;
+    private static boolean isAccumulating = false;
+    private static boolean isReleasing = false;
+    private static int autoTriggerTimer = 0;
+    private static int releaseTicks = 0;
 
     public static void ncpSpeed(MinecraftClient mc, GameOptions options, boolean damageBoost) {
         if(mc.player == null) return;
         boolean debug = RyeClient.INSTANCE.getModuleRepository().getModule(DebugModule.class).isEnabled();
 
         if(options.jumpKey.isPressed())
-            MovementUtility.setSpeed(0.2f, false);
+            return;
 
-        MovementUtility.setSpeed(0.26f, false);
+        MovementUtility.setSpeed(0.28f, false);
 
         if(MovementUtility.isMoving() && mc.player.isOnGround())
             mc.player.jump();
@@ -41,21 +46,53 @@ public class NCPSpeed {
         }
 
         if(MovementUtility.isMoving()) {
-            if(debug) ChatUtility.sendDebug("ticking: " + timeRunning + "...");
-            timeRunning++;
-
-            if(timeRunning > 10) {
-                TimerUtility.setTimerSpeed(1.1f);
+            autoTriggerTimer++;
+            if(autoTriggerTimer >= 10 && !isAccumulating && !isReleasing) {
+                startAccumulation();
+                autoTriggerTimer = 0;
             }
 
-            if(timeRunning > 20) {
-                TimerUtility.setTimerSpeed(timeRunning / 40.0f);
+            if(isAccumulating) {
+                if(debug) ChatUtility.sendDebug("accumulating...");
+                handleAccumulation();
+            } else if(isReleasing) {
+                handleRelease();
+                if(debug) ChatUtility.sendDebug("teleported");
             }
 
-            if(timeRunning > 50) timeRunning = 0;
+            if(TimerUtility.getTimerSpeed() > 2) {
+                TimerUtility.setTimerSpeed(0.5);
+            }
         } else {
-            timeRunning = 0;
             TimerUtility.resetTimer();
+        }
+    }
+
+    private static void startAccumulation() {
+        isAccumulating = true;
+        accumulatedTicks = 0;
+        TimerUtility.setTimerSpeed(0.6f);
+    }
+
+    private static void handleAccumulation() {
+        accumulatedTicks++;
+
+        if(accumulatedTicks >= 5) {
+            isAccumulating = false;
+            isReleasing = true;
+            releaseTicks = 0;
+            TimerUtility.setTimerSpeed(1.6f);
+        }
+    }
+
+    private static void handleRelease() {
+        releaseTicks++;
+
+        if(releaseTicks >= accumulatedTicks) {
+            isReleasing = false;
+            TimerUtility.resetTimer();
+            accumulatedTicks = 0;
+            releaseTicks = 0;
         }
     }
 }

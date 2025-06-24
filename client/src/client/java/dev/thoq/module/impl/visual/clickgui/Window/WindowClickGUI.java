@@ -48,7 +48,7 @@ public class WindowClickGUI {
     private static final int SETTING_HEIGHT = 20;
     private static final int PADDING = 10;
     private static final int DESCRIPTION_HEIGHT = 16;
-    private static final int WINDOW_COLOR = 0xDD1A1A1A;
+    private static final int WINDOW_COLOR = ColorUtility.getColor(ColorUtility.Colors.PANEL);
     private static final int CATEGORY_COLOR = 0xFF2D2D30;
     private static final int SELECTED_CATEGORY_COLOR = 0xFF404040;
     private static final int MODULE_COLOR = 0xFF2D2D30;

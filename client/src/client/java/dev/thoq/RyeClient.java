@@ -96,7 +96,8 @@ public class RyeClient implements ClientModInitializer {
                         new BPSModule(),
                         new DebugModule(),
                         new TickBaseModule(),
-                        new CPUExploitModule()
+                        new CPUExploitModule(),
+                        new KeyStrokesModule()
                 );
 
         KeybindManager.getInstance().bind(clickGUIModule, GLFW.GLFW_KEY_RIGHT_SHIFT);

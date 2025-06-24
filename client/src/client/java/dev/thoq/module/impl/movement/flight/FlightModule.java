@@ -35,15 +35,14 @@ public class FlightModule extends Module {
         super("Flight", "Become airplane", ModuleCategory.MOVEMENT);
 
         ModeSetting modeSetting = new ModeSetting("Mode", "Flight mode type", "Normal", "Normal", "Creative", "Verus");
+        BooleanSetting preventVanillaKick = new BooleanSetting("Anti-Kick", "Prevent Vanilla kick when flying", true);
         BooleanSetting verticalSetting = new BooleanSetting("Vertical", "Enable Vertical movement", true);
         NumberSetting<Float> speedSetting = new NumberSetting<>("Speed", "Flight speed multiplier", 1.5f, 0.1f, 10.0f);
 
-        speedSetting.setVisibilityCondition(() -> "Normal".equals(modeSetting.getValue()));
-        verticalSetting.setVisibilityCondition(() -> "Normal".equals(modeSetting.getValue()));
-
         addSetting(modeSetting);
-        addSetting(speedSetting);
-        addSetting(verticalSetting);
+        addSetting(preventVanillaKick.setVisibilityCondition(() -> "Normal".equals(modeSetting.getValue())));
+        addSetting(speedSetting.setVisibilityCondition(() -> "Normal".equals(modeSetting.getValue())));
+        addSetting(verticalSetting.setVisibilityCondition(() -> "Normal".equals(modeSetting.getValue())));
     }
 
     @Override
@@ -55,10 +54,11 @@ public class FlightModule extends Module {
 
         float speed = ((NumberSetting<Float>) getSetting("Speed")).getValue();
         boolean verticalEnabled = ((BooleanSetting) getSetting("Vertical")).getValue();
+        boolean preventVanillaKick = ((BooleanSetting) getSetting("Anti-Kick")).getValue();
 
         switch(mode) {
             case "Normal":
-                NormalFlight.normalFlight(mc, options, speed, verticalEnabled);
+                NormalFlight.normalFlight(mc, options, speed, verticalEnabled, preventVanillaKick);
                 break;
             case "Creative":
                 CreativeFlight.creativeFlight(mc, options, speed, verticalEnabled);

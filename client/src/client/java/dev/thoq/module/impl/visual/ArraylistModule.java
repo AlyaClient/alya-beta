@@ -110,7 +110,7 @@ public class ArraylistModule extends Module {
             moduleTop = currentY - padding;
             moduleBottom = currentY + mc.textRenderer.fontHeight + padding;
 
-            context.fill(moduleLeft, moduleTop, moduleRight, moduleBottom, 0x90000000);
+            context.fill(moduleLeft, moduleTop, moduleRight, moduleBottom, ColorUtility.getColor(ColorUtility.Colors.PANEL));
 
             if(i == 0) {
                 context.fill(moduleLeft - outlineWidth, moduleTop - outlineWidth, moduleRight + outlineWidth, moduleTop, themeColorArgb);

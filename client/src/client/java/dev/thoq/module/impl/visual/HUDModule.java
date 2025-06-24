@@ -39,7 +39,7 @@ public class HUDModule extends Module {
         final int padding = 4;
         final int xPosition = 1;
         final int yPosition = 2;
-        final int backgroundColor = 0x90000000;
+        final int backgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
         final int borderWidth = 2;
         final int textWidth = TextRendererUtility.getTextWidth(displayText);
         final int textHeight = mc.textRenderer.fontHeight;
