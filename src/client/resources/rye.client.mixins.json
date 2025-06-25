@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "package": "dev.thoq.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ChatInputSuggestorMixin",
+    "ChatScreenMixin",
+    "ClientPlayerEntityMixin",
+    "InGameHudMixin",
+    "LivingEntityJumpAccessor",
+    "MinecraftClientMixin",
+    "RenderTickCounterMixin",
+    "WatermarkTitleScreenMixin",
+    "ClientConnectionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,6 +1,0 @@
-<component name="CopyrightManager">
-  <copyright>
-    <option name="notice" value="Copyright (c) Rye 2025-&amp;#36;originalComment.match(&quot;Copyright \(c\) (\d+)&quot;, 1, &quot;-&quot;, &quot;&amp;#36;today.year&quot;)&amp;#36;today.year.&#10;&#10;This file belongs to Rye Client,&#10;an open-source Fabric Injection client.&#10;Rye GitHub: https://github.com/RyeClient/rye-v1.git&#10;&#10;This project (and subsequently, its files) are all licensed under the MIT License.&#10;This project should have come with a copy of the MIT License.&#10;If it did not, you may obtain a copy here:&#10;MIT License: https://opensource.org/license/mit" />
-    <option name="myName" value="Rye" />
-  </copyright>
-</component>
