@@ -16,19 +16,17 @@ package dev.thoq.module.impl.movement.speed.ncp;
 import dev.thoq.RyeClient;
 import dev.thoq.module.impl.visual.DebugModule;
 import dev.thoq.utilities.misc.ChatUtility;
+import dev.thoq.utilities.module.speed.TickbaseUtility;
 import dev.thoq.utilities.player.MovementUtility;
 import dev.thoq.utilities.player.TimerUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 
 public class NCPSpeed {
-    private static int accumulatedTicks = 0;
-    private static boolean isAccumulating = false;
-    private static boolean isReleasing = false;
+    private final TickbaseUtility tickbaseUtility = new TickbaseUtility();
     private static int autoTriggerTimer = 0;
-    private static int releaseTicks = 0;
 
-    public static void ncpSpeed(MinecraftClient mc, GameOptions options, boolean damageBoost) {
+    public void ncpSpeed(MinecraftClient mc, GameOptions options, boolean damageBoost) {
         if(mc.player == null) return;
         boolean debug = RyeClient.INSTANCE.getModuleRepository().getModule(DebugModule.class).isEnabled();
 
@@ -46,16 +44,16 @@ public class NCPSpeed {
 
         if(MovementUtility.isMoving()) {
             autoTriggerTimer++;
-            if(autoTriggerTimer >= 10 && !isAccumulating && !isReleasing) {
-                startAccumulation();
+            if(autoTriggerTimer >= 10 && !TickbaseUtility.isAccumulating && !TickbaseUtility.isReleasing ) {
+                tickbaseUtility.startAccumulation();
                 autoTriggerTimer = 0;
             }
 
-            if(isAccumulating) {
+            if(TickbaseUtility.isAccumulating) {
                 if(debug) ChatUtility.sendDebug("accumulating...");
-                handleAccumulation();
-            } else if(isReleasing) {
-                handleRelease();
+                tickbaseUtility.handleAccumulation(5);
+            } else if(TickbaseUtility.isReleasing) {
+                tickbaseUtility.handleRelease();
                 if(debug) ChatUtility.sendDebug("teleported");
             }
 
@@ -64,34 +62,6 @@ public class NCPSpeed {
             }
         } else {
             TimerUtility.resetTimer();
-        }
-    }
-
-    private static void startAccumulation() {
-        isAccumulating = true;
-        accumulatedTicks = 0;
-        TimerUtility.setTimerSpeed(0.6f);
-    }
-
-    private static void handleAccumulation() {
-        accumulatedTicks++;
-
-        if(accumulatedTicks >= 5) {
-            isAccumulating = false;
-            isReleasing = true;
-            releaseTicks = 0;
-            TimerUtility.setTimerSpeed(1.6f);
-        }
-    }
-
-    private static void handleRelease() {
-        releaseTicks++;
-
-        if(releaseTicks >= accumulatedTicks) {
-            isReleasing = false;
-            TimerUtility.resetTimer();
-            accumulatedTicks = 0;
-            releaseTicks = 0;
         }
     }
 }

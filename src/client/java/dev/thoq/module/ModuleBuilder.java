@@ -13,6 +13,9 @@
 
 package dev.thoq.module;
 
+import dev.thoq.config.KeybindManager;
+import org.lwjgl.glfw.GLFW;
+
 public class ModuleBuilder {
     private final ModuleRepository repository;
 
@@ -26,6 +29,8 @@ public class ModuleBuilder {
 
     public void putAll(Module... modules) {
         for(Module module : modules) {
+            if(module.getName().equals("ClickGUI"))
+                KeybindManager.getInstance().bind(module, GLFW.GLFW_KEY_RIGHT_SHIFT);
             repository.registerModule(module);
         }
     }

@@ -179,6 +179,14 @@ public abstract class Module {
         onMotion();
     }
 
+    /**
+     * Handles an incoming network packet by delegating the processing to the {@code onPacket} method.
+     * This method serves as a public entry point for network packet processing, allowing subclasses
+     * to define custom behavior for handling specific types of packets or events.
+     *
+     * @param packet       the incoming network packet to process
+     * @param callbackInfo additional information related to the callback, such as cancellation or modification
+     */
     public void packet(Packet<?> packet, CallbackInfo callbackInfo) {
         onPacket(packet, callbackInfo);
     }

@@ -11,7 +11,7 @@
  * MIT License: https://opensource.org/license/mit
  */
 
-package dev.thoq.module.impl.visual.clickgui.Window;
+package dev.thoq.module.impl.visual.clickgui.window;
 
 import dev.thoq.RyeClient;
 import dev.thoq.config.setting.impl.BooleanSetting;
@@ -40,7 +40,6 @@ public class WindowClickGUI {
     private final Map<ModuleCategory, List<Module>> categorizedModules = new EnumMap<>(ModuleCategory.class);
     private final Map<Module, Boolean> expandedModules = new HashMap<>();
     private ModuleCategory selectedCategory = ModuleCategory.COMBAT;
-
     private static final int WINDOW_WIDTH = 600;
     private static final int WINDOW_HEIGHT = 400;
     private static final int CATEGORY_BUTTON_HEIGHT = 30;
@@ -104,11 +103,12 @@ public class WindowClickGUI {
         long handle = mc.getWindow().getHandle();
         double[] xPos = new double[1];
         double[] yPos = new double[1];
+        int scaleFactor = mc.getWindow().getScaleFactor();
 
         GLFW.glfwGetCursorPos(handle, xPos, yPos);
 
-        mouseX = (int) xPos[0];
-        mouseY = (int) yPos[0];
+        mouseX = (int) xPos[0] / scaleFactor;
+        mouseY = (int) yPos[0] / scaleFactor;
 
         wasMouseDown = mouseDown;
         mouseDown = GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;

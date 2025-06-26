@@ -27,7 +27,9 @@ import net.minecraft.client.option.GameOptions;
 
 @SuppressWarnings("unchecked")
 public class SpeedModule extends Module {
-
+    private final NormalSpeed normalSpeed = new NormalSpeed();
+    private final VerusSpeed verusSpeed = new VerusSpeed();
+    private final NCPSpeed ncpSpeed = new NCPSpeed();
     private boolean wasSprinting = false;
 
     public SpeedModule() {
@@ -59,21 +61,21 @@ public class SpeedModule extends Module {
                 boolean bHop = ((BooleanSetting) getSetting("BHop")).getValue();
                 boolean strafe = ((BooleanSetting) getSetting("Strafe")).getValue();
 
-                NormalSpeed.normalSpeed(mc, options, speed, bHop, strafe);
+                normalSpeed.normalSpeed(mc, options, speed, bHop, strafe);
                 break;
             }
 
             case "Verus": {
                 boolean verusDamageBoost = ((BooleanSetting) getSetting("Damage boost")).getValue();
 
-                VerusSpeed.verusSpeed(mc, options, verusDamageBoost);
+                verusSpeed.verusSpeed(mc, options, verusDamageBoost);
                 break;
             }
 
             case "NCP": {
                 boolean ncpDamageBoost = ((BooleanSetting) getSetting("Damage boost")).getValue();
 
-                NCPSpeed.ncpSpeed(mc, options, ncpDamageBoost);
+                ncpSpeed.ncpSpeed(mc, options, ncpDamageBoost);
                 break;
             }
         }

@@ -27,7 +27,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -101,11 +100,12 @@ public class DropDownClickGUI {
         long handle = mc.getWindow().getHandle();
         double[] xPos = new double[1];
         double[] yPos = new double[1];
+        int scaleFactor = mc.getWindow().getScaleFactor();
 
         GLFW.glfwGetCursorPos(handle, xPos, yPos);
 
-        mouseX = (int) xPos[0];
-        mouseY = (int) yPos[0];
+        mouseX = (int) xPos[0] / scaleFactor;
+        mouseY = (int) yPos[0] / scaleFactor;
 
         wasMouseDown = mouseDown;
         mouseDown = GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;

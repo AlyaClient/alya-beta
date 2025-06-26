@@ -13,23 +13,59 @@
 
 package dev.thoq.module.impl.movement.speed.verus;
 
+import dev.thoq.RyeClient;
+import dev.thoq.module.impl.visual.DebugModule;
+import dev.thoq.utilities.misc.ChatUtility;
+import dev.thoq.utilities.module.speed.TickbaseUtility;
 import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.TimerUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 
 public class VerusSpeed {
-    public static void verusSpeed(MinecraftClient mc, GameOptions options, boolean verusDamageBoost) {
+    private final TickbaseUtility tickbaseUtility = new TickbaseUtility();
+    private static int autoTriggerTimer = 0;
+
+    public void verusSpeed(MinecraftClient mc, GameOptions options, boolean verusDamageBoost) {
         if(mc.player == null) return;
+        boolean debug = RyeClient.INSTANCE.getModuleRepository().getModule(DebugModule.class).isEnabled();
+        boolean forwardOnly = options.forwardKey.isPressed() && !options.backKey.isPressed() && !options.leftKey.isPressed() && !options.rightKey.isPressed();
 
         if(options.jumpKey.isPressed())
-            MovementUtility.setSpeed(0.3f, true);
+            return;
 
-        if(mc.player.isOnGround() && MovementUtility.isMoving())
+        if(forwardOnly)
+            MovementUtility.setSpeed(0.34f, true);
+        else
+            MovementUtility.setSpeed(0.26f, false);
+
+        if(MovementUtility.isMoving() && mc.player.isOnGround())
             mc.player.jump();
 
-        if(verusDamageBoost && mc.player.hurtTime > 0)
-            MovementUtility.setSpeed((double) mc.player.hurtTime / 2, true);
+        if(verusDamageBoost && mc.player.hurtTime > 0) {
+            MovementUtility.setSpeed((double) mc.player.hurtTime / 2, false);
+        }
 
-        MovementUtility.setSpeed(0.26f, true);
+        if(MovementUtility.isMoving()) {
+            autoTriggerTimer++;
+            if(autoTriggerTimer >= 5 && !TickbaseUtility.isAccumulating && !TickbaseUtility.isReleasing) {
+                tickbaseUtility.startAccumulation();
+                autoTriggerTimer = 0;
+            }
+
+            if(TickbaseUtility.isAccumulating) {
+                if(debug) ChatUtility.sendDebug("accumulating...");
+                tickbaseUtility.handleAccumulation(2);
+            } else if(TickbaseUtility.isReleasing) {
+                tickbaseUtility.handleRelease();
+                if(debug) ChatUtility.sendDebug("teleported");
+            }
+
+            if(TimerUtility.getTimerSpeed() > 3) {
+                TimerUtility.setTimerSpeed(0.9);
+            }
+        } else {
+            TimerUtility.resetTimer();
+        }
     }
 }

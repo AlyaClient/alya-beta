@@ -23,6 +23,10 @@ import dev.thoq.utilities.player.MovementUtility;
 
 @SuppressWarnings("SwitchStatementWithTooFewBranches")
 public class LongJumpModule extends Module {
+    private final VerusFireballLongJump verusFireballLongJump = new VerusFireballLongJump();
+    private final VerusPacketLongjump verusPacketLongjump = new VerusPacketLongjump();
+    private final VerusLongJump verusLongJump = new VerusLongJump();
+
     public LongJumpModule() {
         super("LongJump", "Makes you jump further", ModuleCategory.MOVEMENT);
 
@@ -42,16 +46,16 @@ public class LongJumpModule extends Module {
         switch(((ModeSetting) getSetting("Mode")).getValue()) {
             case "Verus": {
                 String kind = ((ModeSetting) getSetting("Kind")).getValue();
-                VerusLongJump.verusLongJump(mc, (ModeSetting) getSetting("Kind"));
+                verusLongJump.verusLongJump(mc, (ModeSetting) getSetting("Kind"));
                 
                 if ("Fireball".equals(kind) && isEnabled()) {
-                    if(VerusFireballLongJump.hasThrown()) {
+                    if(verusFireballLongJump.hasThrown()) {
                         super.toggle();
                     }
                 }
 
                 if ("Packet".equals(kind) && isEnabled()) {
-                    if(VerusPacketLongjump.hasJumped()) {
+                    if(verusPacketLongjump.hasJumped()) {
                         super.toggle();
                     }
                 }
@@ -63,12 +67,12 @@ public class LongJumpModule extends Module {
 
     @Override
     protected void onEnable() {
-        VerusLongJump.reset();
+        verusLongJump.reset();
     }
 
     @Override
     protected void onDisable() {
-        VerusLongJump.reset();
+        verusPacketLongjump.reset();
         MovementUtility.setMotionY(0);
     }
 }

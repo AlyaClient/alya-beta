@@ -35,7 +35,7 @@ import dev.thoq.module.impl.player.nofall.NoFallModule;
 import dev.thoq.module.impl.player.nojumpdelay.NoJumpDelayModule;
 import dev.thoq.module.impl.player.sprint.SprintModule;
 import dev.thoq.module.impl.visual.*;
-import dev.thoq.module.impl.player.TimerModule;
+import dev.thoq.module.impl.exploit.TimerModule;
 import dev.thoq.module.impl.visual.clickgui.ClickGUIModule;
 import dev.thoq.module.impl.visual.esp.ESPModule;
 import dev.thoq.utilities.misc.IconLoader;
@@ -71,11 +71,9 @@ public class RyeClient implements ClientModInitializer {
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> IconLoader.setWindowIcon(client.getWindow().getHandle()));
 
-        ClickGUIModule clickGUIModule = new ClickGUIModule();
-
         ModuleBuilder.create()
                 .putAll(
-                        clickGUIModule,
+                        new ClickGUIModule(),
                         new SprintModule(),
                         new NoJumpDelayModule(),
                         new FastPlaceModule(),
@@ -99,8 +97,6 @@ public class RyeClient implements ClientModInitializer {
                         new CPUExploitModule(),
                         new KeyStrokesModule()
                 );
-
-        KeybindManager.getInstance().bind(clickGUIModule, GLFW.GLFW_KEY_RIGHT_SHIFT);
 
         CommandBuilder.create()
                 .putAll(

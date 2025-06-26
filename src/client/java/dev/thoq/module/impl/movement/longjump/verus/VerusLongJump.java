@@ -18,27 +18,30 @@ import dev.thoq.utilities.player.TimerUtility;
 import net.minecraft.client.MinecraftClient;
 
 public class VerusLongJump {
-    public static void verusLongJump(MinecraftClient mc, ModeSetting verusMode) {
+    private final VerusFireballLongJump fireballLongJump = new VerusFireballLongJump();
+    private final VerusPacketLongjump packetLongJump = new VerusPacketLongjump();
+
+    public void verusLongJump(MinecraftClient mc, ModeSetting verusMode) {
         if(mc.player == null) return;
 
         switch(verusMode.getValue()) {
             case "Fireball": {
-                if(!VerusFireballLongJump.hasThrown())
-                    VerusFireballLongJump.verusFireballLongJump(mc);
+                if(!fireballLongJump.hasThrown())
+                    fireballLongJump.verusFireballLongJump(mc);
                 break;
             }
 
             case "Packet": {
-                if(!VerusPacketLongjump.hasJumped())
-                    VerusPacketLongjump.verusPacketLongjump(mc);
+                if(!packetLongJump.hasJumped())
+                    packetLongJump.verusPacketLongjump(mc);
                 TimerUtility.resetTimer();
                 break;
             }
         }
     }
 
-    public static void reset() {
-        VerusFireballLongJump.reset();
-        VerusPacketLongjump.reset();
+    public void reset() {
+        fireballLongJump.reset();
+        packetLongJump.reset();
     }
 }

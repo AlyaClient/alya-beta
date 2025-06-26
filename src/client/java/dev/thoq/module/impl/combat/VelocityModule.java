@@ -67,11 +67,17 @@ public class VelocityModule extends Module {
             }
 
             case "Hurt Time": {
-                double multiplierX = 0.6 / mc.player.hurtTime;
+                double multiplierXZ = 0.6 / mc.player.hurtTime;
                 double multiplierY = 0.9 / mc.player.hurtTime;
 
                 if(mc.player.hurtTime > 0) {
-                    mc.player.setVelocity(mc.player.getVelocity().multiply(multiplierX, multiplierY, 1.0f));
+                    if(debug) ChatUtility.sendDebug("player velocity >modified<");
+                    if(debug) ChatUtility.sendDebug(String.format("[multiplierXZ: %f], [multiplierY: %f]", multiplierXZ, multiplierY));
+                    mc.player.setVelocity(
+                            mc.player.getVelocity().y * multiplierXZ,
+                            mc.player.getVelocity().y * multiplierY,
+                            mc.player.getVelocity().z * multiplierXZ
+                    );
                 }
 
                 break;

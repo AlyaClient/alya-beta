@@ -18,7 +18,7 @@ import net.minecraft.client.option.GameOptions;
 import net.minecraft.util.math.Vec3d;
 
 public class CreativeFlight {
-    public static void creativeFlight(MinecraftClient mc, GameOptions options, float speed, boolean verticalEnabled) {
+    public void creativeFlight(MinecraftClient mc, GameOptions options, float speed, boolean verticalEnabled) {
         if(mc.player == null) return;
 
         mc.player.getAbilities().flying = true;

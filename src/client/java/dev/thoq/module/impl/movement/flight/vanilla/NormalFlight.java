@@ -18,7 +18,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 
 public class NormalFlight {
-    public static void normalFlight(
+    public void normalFlight(
             MinecraftClient mc,
             GameOptions options,
             float speed,

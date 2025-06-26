@@ -25,7 +25,7 @@ public class VerusFireballLongJump {
     private static boolean hasThrown = false;
     private static int originalSlot = -1;
 
-    public static void verusFireballLongJump(MinecraftClient mc) {
+    public void verusFireballLongJump(MinecraftClient mc) {
         if (mc.player == null || mc.getNetworkHandler() == null) return;
 
         int fireballSlot = findFireballSlot(mc);
@@ -53,7 +53,7 @@ public class VerusFireballLongJump {
         }
     }
 
-    private static int findFireballSlot(MinecraftClient mc) {
+    private int findFireballSlot(MinecraftClient mc) {
         if (mc.player == null) return -1;
 
         for (int i = 0; i < 9; i++) {
@@ -64,12 +64,13 @@ public class VerusFireballLongJump {
         return -1;
     }
 
-    public static void reset() {
+    public void reset() {
         hasThrown = false;
         originalSlot = -1;
     }
 
-    public static boolean hasThrown() {
+    public boolean hasThrown() {
         return hasThrown;
     }
+
 }

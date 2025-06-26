@@ -24,7 +24,7 @@ public class VerusPacketLongjump {
     static boolean damaged = false;
     static boolean waitingForGround = false;
 
-    public static void verusPacketLongjump(MinecraftClient mc) {
+    public void verusPacketLongjump(MinecraftClient mc) {
         if(mc.player == null) return;
 
         if(!damaged && !waitingForGround) {
@@ -71,13 +71,13 @@ public class VerusPacketLongjump {
         }
     }
 
-    public static void reset() {
+    public void reset() {
         jumped = false;
         damaged = false;
         waitingForGround = false;
     }
 
-    public static boolean hasJumped() {
+    public boolean hasJumped() {
         return jumped;
     }
 }

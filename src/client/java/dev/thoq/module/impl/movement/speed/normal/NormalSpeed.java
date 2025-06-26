@@ -18,7 +18,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 
 public class NormalSpeed {
-    public static void normalSpeed(MinecraftClient mc, GameOptions options, float speed, boolean bHop, boolean strafe) {
+    public void normalSpeed(MinecraftClient mc, GameOptions options, float speed, boolean bHop, boolean strafe) {
         if(mc.player == null) return;
 
         if(options.jumpKey.isPressed())

@@ -61,6 +61,9 @@ public class ConfigManager {
         Map<String, Integer> keybinds = new LinkedHashMap<>();
 
         for(Module module : RyeClient.INSTANCE.getModuleRepository().getModules()) {
+            // clickgui settings are based on user preference and should not be saved
+            if(module.getName().equals("ClickGUI")) return;
+
             Map<String, Object> moduleConfig = new LinkedHashMap<>();
 
             moduleConfig.put("enabled", module.isEnabled());

@@ -17,13 +17,12 @@ import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.visual.clickgui.dropdown.DropDownClickGUI;
-import dev.thoq.module.impl.visual.clickgui.Window.WindowClickGUI;
+import dev.thoq.module.impl.visual.clickgui.window.WindowClickGUI;
 import net.minecraft.client.gui.DrawContext;
 
 public class ClickGUIModule extends Module {
 
-    private final ModeSetting guiMode = new ModeSetting("GUI Mode", "Choose between dropdown and window GUI", "Window", "Dropdown", "Window");
-
+    private final ModeSetting guiMode = new ModeSetting("GUI Mode", "Choose between dropdown and window GUI", "Dropdown", "Dropdown", "Window");
     private final DropDownClickGUI dropDownGUI;
     private final WindowClickGUI windowGUI;
 

@@ -29,19 +29,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @SuppressWarnings("unchecked")
 public class FlightModule extends Module {
     private boolean wasSprinting = false;
+    private final VerusFlight verusFlight = new VerusFlight();
+    private final CreativeFlight creativeFlight = new CreativeFlight();
+    private final NormalFlight normalFlight = new NormalFlight();
 
     public FlightModule() {
         super("Flight", "Become airplane", ModuleCategory.MOVEMENT);
 
         ModeSetting modeSetting = new ModeSetting("Mode", "Flight mode type", "Normal", "Normal", "Creative", "Verus");
+        ModeSetting verusModeSetting = new ModeSetting("Verus Mode", "Type", "Infinite", "Infinite", "Damage", "Glide");
         BooleanSetting preventVanillaKick = new BooleanSetting("Anti-Kick", "Prevent Vanilla kick when flying", true);
         BooleanSetting verticalSetting = new BooleanSetting("Vertical", "Enable Vertical movement", true);
+        BooleanSetting verusGlideClip = new BooleanSetting("Clip", "Clip up every 4s (80 ticks)", true);
         NumberSetting<Float> speedSetting = new NumberSetting<>("Speed", "Flight speed multiplier", 1.5f, 0.1f, 10.0f);
 
         addSetting(modeSetting);
         addSetting(preventVanillaKick.setVisibilityCondition(() -> "Normal".equals(modeSetting.getValue())));
         addSetting(speedSetting.setVisibilityCondition(() -> "Normal".equals(modeSetting.getValue())));
         addSetting(verticalSetting.setVisibilityCondition(() -> "Normal".equals(modeSetting.getValue())));
+        addSetting(verusModeSetting.setVisibilityCondition(() -> "Verus".equals(modeSetting.getValue())));
+        addSetting(verusGlideClip.setVisibilityCondition(() -> "Glide".equals(verusModeSetting.getValue())));
     }
 
     @Override
@@ -56,30 +63,42 @@ public class FlightModule extends Module {
         boolean preventVanillaKick = ((BooleanSetting) getSetting("Anti-Kick")).getValue();
 
         switch(mode) {
-            case "Normal":
-                NormalFlight.normalFlight(mc, options, speed, verticalEnabled, preventVanillaKick);
+            case "Normal": {
+                normalFlight.normalFlight(mc, options, speed, verticalEnabled, preventVanillaKick);
+
                 break;
-            case "Creative":
-                CreativeFlight.creativeFlight(mc, options, speed, verticalEnabled);
+            }
+
+            case "Creative": {
+                creativeFlight.creativeFlight(mc, options, speed, verticalEnabled);
+
                 break;
-            case "Verus":
-                VerusFlight.verusFlight(mc, options);
-                VerusFlight.sendVerusPackets(mc);
+            }
+
+            case "Verus": {
+                String verusMode = ((ModeSetting) getSetting("Verus Mode")).getValue();
+                boolean clip = ((BooleanSetting) getSetting("Clip")).getValue();
+
+                verusFlight.verusFlight(mc, options, verusMode, clip);
+
                 break;
+            }
         }
     }
 
     @Override
     protected void onPacket(Packet<?> packet, CallbackInfo callbackInfo) {
-        if (!isEnabled() || mc.player == null) return;
+        if(!isEnabled() || mc.player == null) return;
 
         Setting<?> modeSetting = settings.get("mode");
-        if (modeSetting == null) return;
+        if(modeSetting == null) return;
 
         String mode = ((ModeSetting) modeSetting).getValue();
 
-        if ("Verus".equals(mode)) {
-            VerusFlight.cancelPackets(packet, callbackInfo);
+        if("Verus".equals(mode)) {
+            String verusMode = ((ModeSetting) getSetting("Verus Mode")).getValue();
+
+            verusFlight.verusPacket(packet, callbackInfo, verusMode);
         }
     }
 
@@ -99,5 +118,7 @@ public class FlightModule extends Module {
             mc.player.getAbilities().flying = false;
             mc.player.getAbilities().setFlySpeed(0.05f);
         }
+
+        verusFlight.reset();
     }
 }

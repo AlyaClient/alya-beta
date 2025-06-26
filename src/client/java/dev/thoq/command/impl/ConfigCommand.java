@@ -66,10 +66,15 @@ public class ConfigCommand extends AbstractCommand {
     }
 
     private static LiteralArgumentBuilder<ServerCommandSource> literal(String name) {
+        if(name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty!");
+
         return LiteralArgumentBuilder.literal(name);
     }
 
     private static RequiredArgumentBuilder<ServerCommandSource, String> argument(String name, StringArgumentType type) {
+        if(name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty!");
+        if(type == null) throw new IllegalArgumentException("Type cannot be null!");
+
         return com.mojang.brigadier.builder.RequiredArgumentBuilder.argument(name, type);
     }
 }
