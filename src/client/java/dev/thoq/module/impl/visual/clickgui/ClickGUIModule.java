@@ -50,7 +50,7 @@ public class ClickGUIModule extends Module {
     }
 
     @Override
-    protected void onTick() {
+    protected void onPreTick() {
         if(guiMode.getValue().equals("Dropdown")) {
             dropDownGUI.tick();
         } else {

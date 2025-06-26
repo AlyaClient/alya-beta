@@ -1,6 +1,6 @@
 package dev.thoq.module.impl.movement.flight.verus;
 
-import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import dev.thoq.utilities.misc.ChatUtility;
 import net.minecraft.client.option.GameOptions;
@@ -27,17 +27,17 @@ public class VerusDamageFly {
         float pitch = mc.player.getPitch();
 
         if(damage) {
-            MovementUtility.setSpeed(8f, true);
+            MoveUtility.setSpeed(8f, true);
         } else {
-            MovementUtility.setSpeed(0f, true);
+            MoveUtility.setSpeed(0f, true);
         }
 
         if(!up && damage) {
-            MovementUtility.setMotionY(-0.02);
+            MoveUtility.setMotionY(-0.02);
         }
 
         if(up && damage) {
-            MovementUtility.setMotionY(1.5);
+            MoveUtility.setMotionY(1.5);
         }
 
         if(mc.player.fallDistance > 3.5) {

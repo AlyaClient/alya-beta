@@ -17,7 +17,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 
 @SuppressWarnings("unused")
-public class MovementUtility {
+public class MoveUtility {
     private static final double VANILLA_PLAYER_FALL_MOTION = -0.0784000015258789;
 
     /**

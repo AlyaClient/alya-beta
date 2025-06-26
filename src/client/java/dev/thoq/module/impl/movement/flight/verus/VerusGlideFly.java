@@ -1,7 +1,7 @@
 package dev.thoq.module.impl.movement.flight.verus;
 
 import dev.thoq.utilities.misc.ChatUtility;
-import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 
 public class VerusGlideFly {
@@ -26,8 +26,8 @@ public class VerusGlideFly {
             timeRunning = 0;
         }
 
-        MovementUtility.setMotionY(-0.02);
-        MovementUtility.setSpeed(0.1);
+        MoveUtility.setMotionY(-0.02);
+        MoveUtility.setSpeed(0.1);
     }
 
     public void reset() {

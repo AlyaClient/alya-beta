@@ -13,7 +13,7 @@
 
 package dev.thoq.module.impl.movement.longjump.verus;
 
-import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.MoveUtility;
 import dev.thoq.utilities.player.PlayerUtility;
 import dev.thoq.utilities.player.TimerUtility;
 import net.minecraft.client.MinecraftClient;
@@ -44,9 +44,9 @@ public class VerusPacketLongjump {
             double timerSpeed = 0.2f;
 
             TimerUtility.setTimerSpeed(timerSpeed);
-            MovementUtility.setMotionY(0.42);
+            MoveUtility.setMotionY(0.42);
 
-            MovementUtility.setSpeed(0.7f, true);
+            MoveUtility.setSpeed(0.7f, true);
 
             new Thread(() -> {
                 try {

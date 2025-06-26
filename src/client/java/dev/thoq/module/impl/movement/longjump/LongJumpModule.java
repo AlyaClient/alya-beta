@@ -19,7 +19,7 @@ import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.movement.longjump.verus.VerusLongJump;
 import dev.thoq.module.impl.movement.longjump.verus.VerusFireballLongJump;
 import dev.thoq.module.impl.movement.longjump.verus.VerusPacketLongjump;
-import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.MoveUtility;
 
 @SuppressWarnings("SwitchStatementWithTooFewBranches")
 public class LongJumpModule extends Module {
@@ -40,7 +40,7 @@ public class LongJumpModule extends Module {
     }
 
     @Override
-    protected void onTick() {
+    protected void onPreTick() {
         if(!isEnabled() || mc.player == null) return;
 
         switch(((ModeSetting) getSetting("Mode")).getValue()) {
@@ -73,6 +73,6 @@ public class LongJumpModule extends Module {
     @Override
     protected void onDisable() {
         verusPacketLongjump.reset();
-        MovementUtility.setMotionY(0);
+        MoveUtility.setMotionY(0);
     }
 }

@@ -11,7 +11,7 @@ public class TickbaseUtility {
     public void startAccumulation() {
         isAccumulating = true;
         accumulatedTicks = 0;
-        TimerUtility.setTimerSpeed(0.6f);
+        TimerUtility.setTimerSpeed(0.65f);
     }
 
     public void handleAccumulation(int releaseSpeed) {

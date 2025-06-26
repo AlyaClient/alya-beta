@@ -13,7 +13,7 @@
 
 package dev.thoq.module.impl.movement.flight.vanilla;
 
-import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 
@@ -33,16 +33,16 @@ public class NormalFlight {
 
         if(verticalEnabled) {
             if(up)
-                MovementUtility.setMotionY(speed / 2);
+                MoveUtility.setMotionY(speed / 2);
             else if(down)
-                MovementUtility.setMotionY(-speed / 2);
+                MoveUtility.setMotionY(-speed / 2);
         }
 
         if(preventVanillaKick && !verticalMovement)
-            MovementUtility.setMotionY(MovementUtility.getVanillaFallingSpeed());
+            MoveUtility.setMotionY(MoveUtility.getVanillaFallingSpeed());
         else if(!verticalMovement)
-            MovementUtility.setMotionY(0);
+            MoveUtility.setMotionY(0);
 
-        MovementUtility.setSpeed(speed * 2);
+        MoveUtility.setSpeed(speed * 2);
     }
 }

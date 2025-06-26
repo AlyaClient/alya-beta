@@ -13,7 +13,7 @@
 
 package dev.thoq.module.impl.movement.speed.normal;
 
-import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 
@@ -24,12 +24,12 @@ public class NormalSpeed {
         if(options.jumpKey.isPressed())
             speed = speed / 2;
 
-        if(bHop && mc.player.isOnGround() && MovementUtility.isMoving())
+        if(bHop && mc.player.isOnGround() && MoveUtility.isMoving())
             mc.player.jump();
 
         if(strafe)
-            MovementUtility.setSpeed(speed, true);
+            MoveUtility.setSpeed(speed, true);
         else
-            MovementUtility.setSpeed(speed);
+            MoveUtility.setSpeed(speed);
     }
 }

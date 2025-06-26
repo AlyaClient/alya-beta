@@ -18,7 +18,7 @@ import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
-import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.BlockItem;
@@ -90,8 +90,8 @@ public class ScaffoldModule extends Module {
 
         mc.player.getInventory().setSelectedSlot(blockSlot);
         
-        if (sprint.getValue() && MovementUtility.isMoving()) {
-            MovementUtility.setSpeed(0.215);
+        if (sprint.getValue() && MoveUtility.isMoving()) {
+            MoveUtility.setSpeed(0.215);
         }
         
         placeInfo = findPlacePosition();
@@ -179,9 +179,9 @@ public class ScaffoldModule extends Module {
         if (placeInfo == null || mc.player == null) return;
         
         float moveYaw = mc.player.getYaw();
-        if (MovementUtility.isMoving()) {
-            float forward = MovementUtility.getForward(mc);
-            float strafe = MovementUtility.getStrafe(mc);
+        if (MoveUtility.isMoving()) {
+            float forward = MoveUtility.getForward(mc);
+            float strafe = MoveUtility.getStrafe(mc);
             
             float yawOffset = 0;
             if (forward > 0) {
@@ -225,7 +225,7 @@ public class ScaffoldModule extends Module {
                     mc.player.jump();
                 }
             }
-            case "Motion" -> MovementUtility.setMotionY(towerSpeed.getValue());
+            case "Motion" -> MoveUtility.setMotionY(towerSpeed.getValue());
         }
     }
     

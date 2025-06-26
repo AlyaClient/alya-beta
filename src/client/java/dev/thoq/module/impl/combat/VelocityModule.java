@@ -17,8 +17,6 @@ import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
-import dev.thoq.module.ModuleRepository;
-import dev.thoq.module.impl.visual.DebugModule;
 import dev.thoq.utilities.misc.ChatUtility;
 
 @SuppressWarnings({"rawtypes", "unchecked", "FieldCanBeLocal"})
@@ -40,7 +38,6 @@ public class VelocityModule extends Module {
         if(!isEnabled() || mc.player == null) return;
 
         String mode = ((ModeSetting) getSetting("Mode")).getValue();
-        boolean debug = ModuleRepository.getInstance().getModule(DebugModule.class).isEnabled();
 
         switch(mode) {
             case "Standard": {
@@ -48,7 +45,7 @@ public class VelocityModule extends Module {
                 float y = ((NumberSetting<Float>) getSetting("Vertical")).getValue();
 
                 if(mc.player.hurtTime > 0) {
-                    if(debug) ChatUtility.sendDebug("player velocity >modified<");
+                    ChatUtility.sendDebug("player velocity >modified<");
                     mc.player.setVelocity(
                             mc.player.getVelocity().x * xz,
                             mc.player.getVelocity().y * y,
@@ -71,8 +68,8 @@ public class VelocityModule extends Module {
                 double multiplierY = 0.9 / mc.player.hurtTime;
 
                 if(mc.player.hurtTime > 0) {
-                    if(debug) ChatUtility.sendDebug("player velocity >modified<");
-                    if(debug) ChatUtility.sendDebug(String.format("[multiplierXZ: %f], [multiplierY: %f]", multiplierXZ, multiplierY));
+                    ChatUtility.sendDebug("player velocity >modified<");
+                    ChatUtility.sendDebug(String.format("[multiplierXZ: %f], [multiplierY: %f]", multiplierXZ, multiplierY));
                     mc.player.setVelocity(
                             mc.player.getVelocity().y * multiplierXZ,
                             mc.player.getVelocity().y * multiplierY,

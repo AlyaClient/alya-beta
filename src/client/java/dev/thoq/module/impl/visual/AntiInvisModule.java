@@ -23,7 +23,7 @@ public class AntiInvisModule extends Module {
     }
 
     @Override
-    protected void onTick() {
+    protected void onPreTick() {
         if(!isEnabled() || mc.world == null) return;
 
         Iterable<Entity> entities = mc.world.getEntities();

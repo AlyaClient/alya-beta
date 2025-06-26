@@ -40,18 +40,16 @@ public class SpeedModule extends Module {
         BooleanSetting bHop = new BooleanSetting("BHop", "Enable BHop?", true);
         BooleanSetting strafe = new BooleanSetting("Strafe", "Enable Strafe?", true);
         BooleanSetting verusDamageBoost = new BooleanSetting("Damage boost", "Boost speed when damaged", true);
-        BooleanSetting ncpDamageBoost = new BooleanSetting("Damage boost", "Boost speed when damaged", true);
 
         addSetting(mode);
         addSetting(speed.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
         addSetting(bHop.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
         addSetting(strafe.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
         addSetting(verusDamageBoost.setVisibilityCondition(() -> "Verus".equals(mode.getValue())));
-        addSetting(ncpDamageBoost.setVisibilityCondition(() -> "NCP".equals(mode.getValue())));
     }
 
     @Override
-    protected void onTick() {
+    protected void onPreTick() {
         if(!isEnabled()) return;
         GameOptions options = mc.options;
 
@@ -62,6 +60,7 @@ public class SpeedModule extends Module {
                 boolean strafe = ((BooleanSetting) getSetting("Strafe")).getValue();
 
                 normalSpeed.normalSpeed(mc, options, speed, bHop, strafe);
+
                 break;
             }
 
@@ -73,9 +72,8 @@ public class SpeedModule extends Module {
             }
 
             case "NCP": {
-                boolean ncpDamageBoost = ((BooleanSetting) getSetting("Damage boost")).getValue();
+                ncpSpeed.ncpSpeed(mc, options);
 
-                ncpSpeed.ncpSpeed(mc, options, ncpDamageBoost);
                 break;
             }
         }
@@ -90,5 +88,6 @@ public class SpeedModule extends Module {
     protected void onDisable() {
         if(mc.player != null) mc.player.setSprinting(wasSprinting);
         TimerUtility.resetTimer();
+        ncpSpeed.reset();
     }
 }

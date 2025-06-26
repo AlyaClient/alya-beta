@@ -14,7 +14,6 @@
 package dev.thoq.module;
 
 import dev.thoq.config.setting.Setting;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.network.packet.Packet;
@@ -71,9 +70,6 @@ public abstract class Module {
         this.enabled = enabled;
         if(enabled) {
             onEnable();
-            ClientTickEvents.END_CLIENT_TICK.register(client -> {
-                if(isEnabled()) onTick();
-            });
         } else {
             onDisable();
         }
@@ -101,11 +97,8 @@ public abstract class Module {
     protected void onDisable() {
     }
 
-    protected void onTick() {
-    }
-
     /**
-     * Called at the start of a exploit tick, before any game processing occurs.
+     * Called at the start of a tick, before any game processing occurs.
      * Override this method for operations that need to be performed before the main game tick.
      * Ideal for setting up states or performing actions that should happen before the game processes the tick.
      */

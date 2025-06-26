@@ -35,7 +35,7 @@ public class FastPlaceModule extends Module {
     }
 
     @Override
-    protected void onTick() {
+    protected void onPreTick() {
         if(!isEnabled() || mc.player == null || itemUseCooldownField == null) return;
 
         try {

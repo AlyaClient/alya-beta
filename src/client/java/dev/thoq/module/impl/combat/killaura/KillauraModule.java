@@ -101,6 +101,7 @@ public class KillauraModule extends Module {
 
         findTargets();
         selectTarget();
+        handleAutoBlock();
 
         if(currentTarget == null) {
             if(isBlocking) stopBlocking();
@@ -114,13 +115,6 @@ public class KillauraModule extends Module {
         if(canAttack()) {
             performAttack();
         }
-    }
-
-    @Override
-    protected void onTick() {
-        if(mc.player == null || mc.world == null) return;
-
-        handleAutoBlock();
     }
 
     private void findTargets() {

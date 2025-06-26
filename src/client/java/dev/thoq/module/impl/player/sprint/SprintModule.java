@@ -13,19 +13,33 @@
 
 package dev.thoq.module.impl.player.sprint;
 
+import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
+import dev.thoq.utilities.player.MoveUtility;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class SprintModule extends Module {
+    private final BooleanSetting omniSprint = new BooleanSetting("OmniSprint", "Sprint in all directions", false);
 
     public SprintModule() {
         super("Sprint", "Makes player less american", ModuleCategory.PLAYER);
+        addSetting(omniSprint);
     }
 
     @Override
-    protected void onTick() {
-        if(isEnabled() && mc.player != null) {
-            mc.player.setSprinting(mc.player.forwardSpeed > 0);
+    protected void onPreTick() {
+        if(!isEnabled() || mc.player == null || mc.options == null) return;
+
+        boolean omniSprintEnabled = ((BooleanSetting) getSetting("OmniSprint")).getValue();
+        boolean movingForwards = mc.options.forwardKey.isPressed() || !mc.options.backKey.isPressed();
+
+        if(MoveUtility.isMoving()) {
+            if(omniSprintEnabled) {
+                mc.player.setSprinting(true);
+            } else if(movingForwards) {
+                mc.player.setSprinting(true);
+            }
         }
     }
 

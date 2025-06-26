@@ -13,7 +13,7 @@
 
 package dev.thoq.module.impl.movement.longjump.verus;
 
-import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
@@ -47,7 +47,7 @@ public class VerusFireballLongJump {
                     new PlayerInteractItemC2SPacket(Hand.MAIN_HAND, 0, mc.player.getYaw(), mc.player.getPitch())
             );
 
-            MovementUtility.setSpeed(4f, true);
+            MoveUtility.setSpeed(4f, true);
 
             hasThrown = true;
         }

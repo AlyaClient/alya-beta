@@ -23,7 +23,7 @@ public class NoJumpDelayModule extends Module {
     }
 
     @Override
-    protected void onTick() {
+    protected void onPreTick() {
         if(!isEnabled() || mc.player == null) return;
 
         if(mc.player.isOnGround()) {

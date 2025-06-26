@@ -13,55 +13,52 @@
 
 package dev.thoq.module.impl.movement.speed.ncp;
 
-import dev.thoq.RyeClient;
-import dev.thoq.module.impl.visual.DebugModule;
+import dev.thoq.mixin.client.LivingEntityJumpAccessor;
 import dev.thoq.utilities.misc.ChatUtility;
-import dev.thoq.utilities.module.speed.TickbaseUtility;
-import dev.thoq.utilities.player.MovementUtility;
-import dev.thoq.utilities.player.TimerUtility;
+import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 
 public class NCPSpeed {
-    private final TickbaseUtility tickbaseUtility = new TickbaseUtility();
-    private static int autoTriggerTimer = 0;
+    static int ticksRunning = 0;
 
-    public void ncpSpeed(MinecraftClient mc, GameOptions options, boolean damageBoost) {
+    public void ncpSpeed(MinecraftClient mc, GameOptions options) {
         if(mc.player == null) return;
-        boolean debug = RyeClient.INSTANCE.getModuleRepository().getModule(DebugModule.class).isEnabled();
+
+        boolean damaged = mc.player.hurtTime > 0;
+        boolean isOnGround = mc.player.isOnGround();
+        LivingEntityJumpAccessor livingEntityJumpAccessor = (LivingEntityJumpAccessor) mc.player;
+
+        livingEntityJumpAccessor.setJumpingCooldown(0);
 
         if(options.jumpKey.isPressed())
             return;
 
-        MovementUtility.setSpeed(0.28f, false);
+        if(!MoveUtility.isMoving())
+            reset();
 
-        if(MovementUtility.isMoving() && mc.player.isOnGround())
-            mc.player.jump();
+        if(MoveUtility.isMoving()) {
+            ticksRunning++;
 
-        if(damageBoost && mc.player.hurtTime > 0) {
-            MovementUtility.setSpeed((double) mc.player.hurtTime / 2, false);
+            ChatUtility.sendDebug(">ticksRunning<: " + ticksRunning);
+
+            if(isOnGround) {
+                MoveUtility.setSpeed(0.28335f, false);
+            } else {
+                MoveUtility.setSpeed(0.28f, false);
+            }
+
+            if(isOnGround) {
+                mc.player.jump();
+                reset();
+            } else if(MoveUtility.isMoving() && ticksRunning == 6 && !damaged) {
+                MoveUtility.setMotionY(-0.186567865);
+                ChatUtility.sendDebug("PULLED");
+            }
         }
+    }
 
-        if(MovementUtility.isMoving()) {
-            autoTriggerTimer++;
-            if(autoTriggerTimer >= 10 && !TickbaseUtility.isAccumulating && !TickbaseUtility.isReleasing ) {
-                tickbaseUtility.startAccumulation();
-                autoTriggerTimer = 0;
-            }
-
-            if(TickbaseUtility.isAccumulating) {
-                if(debug) ChatUtility.sendDebug("accumulating...");
-                tickbaseUtility.handleAccumulation(5);
-            } else if(TickbaseUtility.isReleasing) {
-                tickbaseUtility.handleRelease();
-                if(debug) ChatUtility.sendDebug("teleported");
-            }
-
-            if(TimerUtility.getTimerSpeed() > 2) {
-                TimerUtility.setTimerSpeed(0.5);
-            }
-        } else {
-            TimerUtility.resetTimer();
-        }
+    public void reset() {
+        ticksRunning = 0;
     }
 }

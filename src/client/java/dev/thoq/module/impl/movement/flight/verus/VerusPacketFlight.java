@@ -13,10 +13,8 @@
 
 package dev.thoq.module.impl.movement.flight.verus;
 
-import dev.thoq.RyeClient;
-import dev.thoq.module.impl.visual.DebugModule;
 import dev.thoq.utilities.misc.ChatUtility;
-import dev.thoq.utilities.player.MovementUtility;
+import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.network.packet.Packet;
@@ -42,14 +40,13 @@ public class VerusPacketFlight {
 
     public void sendVerusPackets(MinecraftClient mc) {
         if(mc.player == null || mc.getNetworkHandler() == null) return;
-        boolean debug = RyeClient.INSTANCE.getModuleRepository().getModule(DebugModule.class).isEnabled();
 
-        if(debug) ChatUtility.sendDebug("Sending funny packets...");
+        ChatUtility.sendDebug("Sending funny packets...");
         Vec3d playerPos = mc.player.getPos().add(0, -1, 0);
         BlockPos blockPos = new BlockPos((int) playerPos.x, (int) playerPos.y, (int) playerPos.z);
         BlockHitResult hitResult = new BlockHitResult(playerPos, Direction.UP, blockPos, false);
 
-        if(debug) ChatUtility.sendDebug("RESULT: " + hitResult);
+        ChatUtility.sendDebug("RESULT: " + hitResult);
 
         float yaw = mc.player.getYaw();
         boolean onGround = true;
@@ -71,12 +68,12 @@ public class VerusPacketFlight {
     public void verusFlight(MinecraftClient mc, GameOptions options) {
         if(mc.player == null) return;
 
-        MovementUtility.setMotionY(0);
+        MoveUtility.setMotionY(0);
 
         if(options.forwardKey.isPressed()) {
-            MovementUtility.setSpeed(0.33);
+            MoveUtility.setSpeed(0.33);
         } else {
-            MovementUtility.setSpeed(0);
+            MoveUtility.setSpeed(0);
         }
     }
 }

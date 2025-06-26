@@ -13,6 +13,8 @@
 
 package dev.thoq.utilities.misc;
 
+import dev.thoq.RyeClient;
+import dev.thoq.module.impl.visual.DebugModule;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
@@ -38,7 +40,9 @@ public class ChatUtility {
 
 
     public static void sendDebug(String message) {
-        if(mc.player != null) {
+        boolean debug = RyeClient.INSTANCE.getModuleRepository().getModule(DebugModule.class).isEnabled();
+
+        if(mc.player != null && debug) {
             MutableText text = Text.literal("DEBUG >> " + message);
             mc.player.sendMessage(text, false);
         }
