@@ -26,7 +26,7 @@ public class NoJumpDelayModule extends Module {
     }
 
     private final IEventListener<MotionEvent> motionEvent = event -> {
-        if(!isEnabled() || mc.player == null) return;
+        if(!isEnabled() || mc.player == null || !event.isPre()) return;
 
         if(mc.player.isOnGround()) {
             LivingEntityJumpAccessor livingEntityJumpAccessor = (LivingEntityJumpAccessor) mc.player;

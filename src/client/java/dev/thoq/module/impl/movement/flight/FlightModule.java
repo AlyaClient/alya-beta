@@ -52,7 +52,7 @@ public class FlightModule extends Module {
     }
 
     private final IEventListener<MotionEvent> motionEvent = event -> {
-        if(!isEnabled() || mc.player == null) return;
+        if(!isEnabled() || mc.player == null || !event.isPre()) return;
 
         GameOptions options = mc.options;
         String mode = ((ModeSetting) getSetting("Mode")).getValue();

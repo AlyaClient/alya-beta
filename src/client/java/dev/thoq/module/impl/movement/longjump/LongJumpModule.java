@@ -43,7 +43,7 @@ public class LongJumpModule extends Module {
     }
 
     private final IEventListener<TickEvent> tickEvent = event -> {
-        if(!isEnabled() || mc.player == null) return;
+        if(!isEnabled() || mc.player == null || !event.isPre()) return;
 
         switch(((ModeSetting) getSetting("Mode")).getValue()) {
             case "Verus": {

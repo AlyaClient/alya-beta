@@ -38,7 +38,7 @@ public abstract class MinecraftClientMixin {
         String ryeState = RyeClient.getState();
 
         String title = String.format(
-                "%s %s %s %s",
+                "%s %s %s (%s)",
                 RyeClient.getName(),
                 RyeClient.getEdition(),
                 RyeClient.getType(),

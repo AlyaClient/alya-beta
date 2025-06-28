@@ -102,7 +102,7 @@ public class KillauraModule extends Module {
     }
 
     private final IEventListener<MotionEvent> motionEvent = event -> {
-        if(mc.player == null || mc.world == null) return;
+        if(mc.player == null || mc.world == null || !event.isPre()) return;
 
         findTargets();
         selectTarget();

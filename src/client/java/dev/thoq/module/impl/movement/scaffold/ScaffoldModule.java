@@ -85,7 +85,7 @@ public class ScaffoldModule extends Module {
     }
 
     private final IEventListener<MotionEvent> motionEvent = event -> {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.world == null || !event.isPre()) return;
         
         blockSlot = findBlockSlot();
         if (blockSlot == -1) return;

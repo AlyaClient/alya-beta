@@ -31,7 +31,7 @@ public class SprintModule extends Module {
     }
 
     private final IEventListener<TickEvent> tickEvent = event -> {
-        if(!isEnabled() || mc.player == null || mc.options == null) return;
+        if(!isEnabled() || mc.player == null || mc.options == null || !event.isPre()) return;
 
         boolean omniSprintEnabled = ((BooleanSetting) getSetting("OmniSprint")).getValue();
         boolean movingForwards = mc.options.forwardKey.isPressed() || !mc.options.backKey.isPressed();

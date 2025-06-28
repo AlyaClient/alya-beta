@@ -52,7 +52,7 @@ public class SpeedModule extends Module {
     }
 
     private final IEventListener<MotionEvent> motionEvent = event -> {
-        if(!isEnabled()) return;
+        if(!isEnabled() || !event.isPre()) return;
         GameOptions options = mc.options;
 
         switch(((ModeSetting) getSetting("Mode")).getValue()) {

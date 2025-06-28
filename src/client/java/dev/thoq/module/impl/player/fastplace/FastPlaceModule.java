@@ -39,7 +39,7 @@ public class FastPlaceModule extends Module {
     }
 
     private final IEventListener<TickEvent> tickEvent = event -> {
-        if(!isEnabled() || mc.player == null || itemUseCooldownField == null) return;
+        if(!isEnabled() || mc.player == null || itemUseCooldownField == null || !event.isPre()) return;
 
         try {
             itemUseCooldownField.set(mc, 0);

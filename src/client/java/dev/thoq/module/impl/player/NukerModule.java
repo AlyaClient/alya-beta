@@ -19,6 +19,7 @@ import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
+import dev.thoq.utilities.misc.ChatUtility;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -26,19 +27,25 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
+@SuppressWarnings("unused")
 public class NukerModule extends Module {
-    private final BooleanSetting americanMode = new BooleanSetting("American", "Eat everything", true);
+    private final BooleanSetting instaBreak = new BooleanSetting("InstaBreak", "kachow", true);
+    private final BooleanSetting americanMode = new BooleanSetting("American", "Eat the map whilst being teleported", false);
+    private final BooleanSetting teleportToPlayerOverride = new BooleanSetting("PlayerPort", "Teleport to players instead of blocks", false);
+    private int teleportCooldown = 0;
 
     public NukerModule() {
         super("Nuker", "Destroy blocks automatically", ModuleCategory.PLAYER);
 
+        addSetting(instaBreak.setVisibilityCondition(() -> !americanMode.getValue()));
         addSetting(americanMode);
+        addSetting(teleportToPlayerOverride.setVisibilityCondition(americanMode::getValue));
     }
 
     // TODO: Make it more then just boom world gone
     private final IEventListener<TickEvent> tickEvent = event -> {
-        if(americanMode.getValue()) {
-            if(mc.player == null || mc.world == null || mc.getNetworkHandler() == null) return;
+        if(instaBreak.getValue()) {
+            if(mc.player == null || mc.world == null || mc.getNetworkHandler() == null || !event.isPre()) return;
 
             World world = mc.world;
             BlockPos playerPos = mc.player.getBlockPos();
@@ -57,7 +64,7 @@ public class NukerModule extends Module {
                                 PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
                                 blockPos,
                                 Direction.UP
-                                );
+                        );
 
                         PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
                                 PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
@@ -70,6 +77,160 @@ public class NukerModule extends Module {
                     }
                 }
             }
+        } else if(americanMode.getValue()) {
+            final int teleportDelay = 5; // ticks
+
+            if(mc.player == null || mc.player.getGameMode() == null || mc.world == null || mc.getNetworkHandler() == null || !event.isPre())
+                return;
+
+            World world = mc.world;
+            BlockPos playerPos = mc.player.getBlockPos();
+            int radius = 1;
+
+            // eat all blocks around the player
+            boolean foundBlocks = false;
+            for(int x = -radius; x <= radius; x++) {
+                for(int y = -radius; y <= radius; y++) {
+                    for(int z = -radius; z <= radius; z++) {
+                        BlockPos blockPos = playerPos.add(x, y, z);
+                        Block block = world.getBlockState(blockPos).getBlock();
+
+                        if(block == Blocks.AIR) continue;
+                        if(!mc.player.getGameMode().isCreative() && block == Blocks.BEDROCK) continue;
+
+                        foundBlocks = true;
+
+                        PlayerActionC2SPacket startBreaking = new PlayerActionC2SPacket(
+                                PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
+                                blockPos,
+                                Direction.UP
+                        );
+
+                        PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
+                                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
+                                blockPos,
+                                Direction.UP
+                        );
+
+                        mc.getNetworkHandler().sendPacket(startBreaking);
+                        mc.getNetworkHandler().sendPacket(stopBreaking);
+                    }
+                }
+            }
+
+            if(!foundBlocks && teleportCooldown <= 0) {
+                BlockPos bestLocation = findLocationWithMostBlocks(world, playerPos);
+                if(bestLocation != null) {
+                    ChatUtility.sendDebug("teleported");
+                    mc.player.setPosition(bestLocation.getX() + 0.5, bestLocation.getY() + 1, bestLocation.getZ() + 0.5);
+                    teleportCooldown = teleportDelay;
+                }
+            }
+
+            if(teleportCooldown > 0) {
+                teleportCooldown--;
+            }
         }
     };
+
+    private BlockPos findLocationWithMostBlocks(World world, BlockPos currentPos) {
+        if(teleportToPlayerOverride.getValue()) {
+            return findNearestPlayer(world, currentPos);
+        }
+        
+        BlockPos bestLocation = null;
+        int maxBlocks = 0;
+        int searchRadius = 50;
+        int checkRadius = 3;
+
+        // check every 10 blocks for optimization, it crashed a LOT
+        for(int x = -searchRadius; x <= searchRadius; x += 10) {
+            for(int y = 0; y <= 20; y += 5) { // y - only above ground
+                for(int z = -searchRadius; z <= searchRadius; z += 10) {
+                    BlockPos checkPos = currentPos.add(x, y, z);
+
+                    if(checkPos.getSquaredDistance(currentPos) < 100) continue;
+
+                    // check if teleport location is safe
+                    if(!isSafeTeleportLocation(world, checkPos)) continue;
+
+                    int blockCount = countBlocksInArea(world, checkPos, checkRadius);
+
+                    if(blockCount > maxBlocks) {
+                        maxBlocks = blockCount;
+                        bestLocation = checkPos;
+                    }
+                }
+            }
+        }
+
+        return maxBlocks > 10 ? bestLocation : null;
+    }
+
+    private BlockPos findNearestPlayer(World world, BlockPos currentPos) {
+        if(mc.player == null || world == null) return null;
+        
+        double nearestDistance = Double.MAX_VALUE;
+        BlockPos nearestPlayerPos = null;
+        
+        for(net.minecraft.entity.player.PlayerEntity player : world.getPlayers()) {
+            // skip self
+            if(player == mc.player) continue;
+            
+            BlockPos playerPos = player.getBlockPos();
+            double distance = currentPos.getSquaredDistance(playerPos);
+            
+            if(distance < nearestDistance && distance > 100) { // 100 = 10^2
+                // safe to teleport?
+                if(isSafeTeleportLocation(world, playerPos)) {
+                    nearestDistance = distance;
+                    nearestPlayerPos = playerPos;
+                }
+            }
+        }
+        
+        return nearestPlayerPos;
+    }
+
+    private boolean isSafeTeleportLocation(World world, BlockPos pos) {
+        BlockPos headPos = pos.up();
+        
+        Block feetBlock = world.getBlockState(pos).getBlock();
+        Block headBlock = world.getBlockState(headPos).getBlock();
+        
+        return (feetBlock == Blocks.AIR || isPassableBlock(feetBlock)) &&
+           (headBlock == Blocks.AIR || isPassableBlock(headBlock));
+    }
+
+    private boolean isPassableBlock(Block block) {
+        return block == Blocks.AIR ||
+           block == Blocks.SHORT_DRY_GRASS ||
+           block == Blocks.SHORT_GRASS ||
+           block == Blocks.TALL_GRASS ||
+           block == Blocks.WATER ||
+           block == Blocks.SNOW ||
+           block == Blocks.VINE ||
+           block == Blocks.WHEAT ||
+           block == Blocks.CARROTS ||
+           block == Blocks.POTATOES;
+    }
+
+    private int countBlocksInArea(World world, BlockPos center, int radius) {
+        int count = 0;
+
+        for(int x = -radius; x <= radius; x++) {
+            for(int y = 0; y <= 20; y += 5) { // only above ground
+                for(int z = -radius; z <= radius; z++) {
+                    BlockPos blockPos = center.add(x, y, z);
+                    Block block = world.getBlockState(blockPos).getBlock();
+
+                    if(block != Blocks.AIR && block != Blocks.BEDROCK) {
+                        count++;
+                    }
+                }
+            }
+        }
+
+        return count;
+    }
 }

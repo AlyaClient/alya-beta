@@ -12,19 +12,12 @@
  *
  */
 
-pluginManagement {
-	repositories {
-		maven {
-			name = 'Fabric'
-			url = 'https://maven.fabricmc.net/'
-		}
-		mavenCentral()
-		gradlePluginPortal()
-	}
-    plugins {
-        id 'org.jetbrains.kotlin.jvm' version '2.2.0'
-    }
-}
-plugins {
-    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+package dev.thoq.utilities.misc;
+
+public class RyeConstants {
+    public static final String NAME = "Rye";
+    public static final String VERSION = "1.1";
+    public static final String NAME_CLIENT = NAME + " Client";
+    public static final String KIND = "Beta";
+    public static final String BUILD_NUMBER = "62825.2";
 }

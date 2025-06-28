@@ -33,6 +33,7 @@ import dev.thoq.module.impl.movement.longjump.LongJumpModule;
 import dev.thoq.module.impl.movement.scaffold.ScaffoldModule;
 import dev.thoq.module.impl.movement.speed.SpeedModule;
 import dev.thoq.module.impl.player.NukerModule;
+import dev.thoq.module.impl.player.ReachModule;
 import dev.thoq.module.impl.player.fastplace.FastPlaceModule;
 import dev.thoq.module.impl.player.nofall.NoFallModule;
 import dev.thoq.module.impl.player.nojumpdelay.NoJumpDelayModule;
@@ -42,6 +43,7 @@ import dev.thoq.module.impl.exploit.TimerModule;
 import dev.thoq.module.impl.visual.clickgui.ClickGUIModule;
 import dev.thoq.module.impl.visual.esp.ESPModule;
 import dev.thoq.utilities.misc.IconLoader;
+import dev.thoq.utilities.misc.RyeConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -134,7 +136,8 @@ public class RyeClient implements ClientModInitializer {
                         new TickBaseModule(),
                         new CPUExploitModule(),
                         new KeyStrokesModule(),
-                        new NukerModule()
+                        new NukerModule(),
+                        new ReachModule()
                 );
     }
 
@@ -152,6 +155,10 @@ public class RyeClient implements ClientModInitializer {
         return eventBus;
     }
 
+    public ModuleRepository getModuleRepository() {
+        return moduleRepository;
+    }
+
     public static String getState() {
         return ryeState;
     }
@@ -161,19 +168,19 @@ public class RyeClient implements ClientModInitializer {
     }
 
     public static String getName() {
-        return "Rye";
+        return RyeConstants.NAME;
     }
 
     public static String getEdition() {
-        return "v1.1";
+        return "v" + RyeConstants.VERSION;
     }
 
     public static String getType() {
-        return "Development";
+        return RyeConstants.KIND;
     }
 
     public static String getBuildNumber() {
-        return "(61825)";
+        return RyeConstants.BUILD_NUMBER;
     }
 
     public static String getFps() {
@@ -213,9 +220,5 @@ public class RyeClient implements ClientModInitializer {
         }
 
         return df.format(bps);
-    }
-
-    public ModuleRepository getModuleRepository() {
-        return moduleRepository;
     }
 }
