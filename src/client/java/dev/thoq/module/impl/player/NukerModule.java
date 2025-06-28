@@ -21,7 +21,6 @@ import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -38,9 +37,8 @@ public class NukerModule extends Module {
 
     // TODO: Make it more then just boom world gone
     private final IEventListener<TickEvent> tickEvent = event -> {
-        if(americanMode.getValue() && mc.getNetworkHandler() != null) {
-            MinecraftClient mc = MinecraftClient.getInstance();
-            if(mc.player == null || mc.world == null) return;
+        if(americanMode.getValue()) {
+            if(mc.player == null || mc.world == null || mc.getNetworkHandler() == null) return;
 
             World world = mc.world;
             BlockPos playerPos = mc.player.getBlockPos();
