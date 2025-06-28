@@ -1,23 +1,24 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.module.impl.movement.flight.verus;
 
+import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.utilities.misc.ChatUtility;
 import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
@@ -25,20 +26,10 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class VerusPacketFlight {
-    public void cancelPackets(Packet<?> packet, CallbackInfo callbackInfo) {
-        if(packet instanceof PlayerInteractBlockC2SPacket) {
-            callbackInfo.cancel();
-        }
 
-        if(packet instanceof PlayerMoveC2SPacket.LookAndOnGround) {
-            callbackInfo.cancel();
-        }
-    }
-
-    public void sendVerusPackets(MinecraftClient mc) {
+    public void sendVerusPackets(MinecraftClient mc, MotionEvent event) {
         if(mc.player == null || mc.getNetworkHandler() == null) return;
 
         ChatUtility.sendDebug("Sending funny packets...");
@@ -48,20 +39,10 @@ public class VerusPacketFlight {
 
         ChatUtility.sendDebug("RESULT: " + hitResult);
 
-        float yaw = mc.player.getYaw();
-        boolean onGround = true;
-        boolean horizontalCollision = mc.player.horizontalCollision;
-
         PlayerInteractBlockC2SPacket placePacket = new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, hitResult, 0);
 
-        PlayerMoveC2SPacket lookDownPacket = new PlayerMoveC2SPacket.LookAndOnGround(
-                yaw,
-                90.0f,
-                onGround,
-                horizontalCollision
-        );
+        event.setPitch(90f);
 
-        mc.getNetworkHandler().sendPacket(lookDownPacket);
         mc.getNetworkHandler().sendPacket(placePacket);
     }
 

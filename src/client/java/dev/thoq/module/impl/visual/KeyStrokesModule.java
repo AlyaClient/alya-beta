@@ -1,10 +1,25 @@
+/*
+ * Copyright (c) Rye Client 2025-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * This project (and subsequently, its files) are all licensed under the MIT License.
+ * This project should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ *
+ */
+
 package dev.thoq.module.impl.visual;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.Render2DEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.render.ColorUtility;
-import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.InputUtil;
 
 public class KeyStrokesModule extends Module {
@@ -16,8 +31,7 @@ public class KeyStrokesModule extends Module {
         addSetting(spaceBar);
     }
 
-    @Override
-    protected void onRender(DrawContext context) {
+    private final IEventListener<Render2DEvent> renderEvent = event -> {
         int startX = 1;
         int startY = 100;
         int keySize = 30;
@@ -35,23 +49,23 @@ public class KeyStrokesModule extends Module {
         int dColor = dPressed ? 0xCC222222 : ColorUtility.getColor(ColorUtility.Colors.PANEL);
         int spaceColor = spacePressed ? 0xCC222222 : ColorUtility.getColor(ColorUtility.Colors.PANEL);
 
-        context.fill(startX + keySize + gap, startY, startX + keySize + gap + keySize, startY + keySize, wColor);
-        context.drawCenteredTextWithShadow(mc.textRenderer, "W", startX + keySize + gap + keySize / 2, startY + keySize / 2 - 4, 0xFFFFFFFF);
+        event.getContext().fill(startX + keySize + gap, startY, startX + keySize + gap + keySize, startY + keySize, wColor);
+        event.getContext().drawCenteredTextWithShadow(mc.textRenderer, "W", startX + keySize + gap + keySize / 2, startY + keySize / 2 - 4, 0xFFFFFFFF);
 
-        context.fill(startX, startY + keySize + gap, startX + keySize, startY + keySize + gap + keySize, aColor);
-        context.drawCenteredTextWithShadow(mc.textRenderer, "A", startX + keySize / 2, startY + keySize + gap + keySize / 2 - 4, 0xFFFFFFFF);
+        event.getContext().fill(startX, startY + keySize + gap, startX + keySize, startY + keySize + gap + keySize, aColor);
+        event.getContext().drawCenteredTextWithShadow(mc.textRenderer, "A", startX + keySize / 2, startY + keySize + gap + keySize / 2 - 4, 0xFFFFFFFF);
 
-        context.fill(startX + keySize + gap, startY + keySize + gap, startX + keySize + gap + keySize, startY + keySize + gap + keySize, sColor);
-        context.drawCenteredTextWithShadow(mc.textRenderer, "S", startX + keySize + gap + keySize / 2, startY + keySize + gap + keySize / 2 - 4, 0xFFFFFFFF);
+        event.getContext().fill(startX + keySize + gap, startY + keySize + gap, startX + keySize + gap + keySize, startY + keySize + gap + keySize, sColor);
+        event.getContext().drawCenteredTextWithShadow(mc.textRenderer, "S", startX + keySize + gap + keySize / 2, startY + keySize + gap + keySize / 2 - 4, 0xFFFFFFFF);
 
-        context.fill(startX + (keySize + gap) * 2, startY + keySize + gap, startX + (keySize + gap) * 2 + keySize, startY + keySize + gap + keySize, dColor);
-        context.drawCenteredTextWithShadow(mc.textRenderer, "D", startX + (keySize + gap) * 2 + keySize / 2, startY + keySize + gap + keySize / 2 - 4, 0xFFFFFFFF);
+        event.getContext().fill(startX + (keySize + gap) * 2, startY + keySize + gap, startX + (keySize + gap) * 2 + keySize, startY + keySize + gap + keySize, dColor);
+        event.getContext().drawCenteredTextWithShadow(mc.textRenderer, "D", startX + (keySize + gap) * 2 + keySize / 2, startY + keySize + gap + keySize / 2 - 4, 0xFFFFFFFF);
 
         if (spaceBar.getValue()) {
             int spaceWidth = keySize * 3 + gap * 2;
             int spaceY = startY + (keySize + gap) * 2;
-            context.fill(startX, spaceY, startX + spaceWidth, spaceY + keySize, spaceColor);
-            context.drawCenteredTextWithShadow(mc.textRenderer, "SPACE", startX + spaceWidth / 2, spaceY + keySize / 2 - 4, 0xFFFFFFFF);
+            event.getContext().fill(startX, spaceY, startX + spaceWidth, spaceY + keySize, spaceColor);
+            event.getContext().drawCenteredTextWithShadow(mc.textRenderer, "SPACE", startX + spaceWidth / 2, spaceY + keySize / 2 - 4, 0xFFFFFFFF);
         }
-    }
+    };
 }

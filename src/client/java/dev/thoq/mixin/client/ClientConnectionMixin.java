@@ -1,18 +1,22 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.mixin.client;
 
+import dev.thoq.RyeClient;
+import dev.thoq.event.EventBus;
+import dev.thoq.event.impl.PacketSendEvent;
 import dev.thoq.module.ModuleRepository;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.Packet;
@@ -28,9 +32,21 @@ public class ClientConnectionMixin {
     @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V",
             at = @At("HEAD"), cancellable = true)
     private void onSend(Packet<?> packet, CallbackInfo ci) {
-        ModuleRepository
-                .getInstance()
-                .getEnabledModules()
-                .forEach(module -> module.packet(packet, ci));
+        PacketSendEvent event = new PacketSendEvent(packet, ci);
+
+        RyeClient.getEventBus().dispatch(event);
+
+        // TODO: correctly cancel
+        if(event.isCanceled())
+            ci.cancel();
+    }
+
+    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V",
+            at = @At("TAIL"), cancellable = true)
+    private void onSendPost(Packet<?> packet, CallbackInfo ci) {
+        PacketSendEvent event = new PacketSendEvent(packet, ci);
+        event.setPost();
+
+        RyeClient.getEventBus().dispatch(event);
     }
 }

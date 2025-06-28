@@ -1,21 +1,21 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.mixin.client;
 
 import dev.thoq.RyeClient;
-import dev.thoq.module.Module;
-import dev.thoq.module.ModuleRepository;
+import dev.thoq.event.impl.TickEvent;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
@@ -57,11 +57,21 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "tick", at = @At("HEAD"))
     private void onPreTick(CallbackInfo ci) {
-        ModuleRepository.getInstance().getEnabledModules().forEach(Module::preTick);
+        TickEvent event = new TickEvent(ci);
+
+        RyeClient.getEventBus().dispatch(event);
+
+        // TODO: correctly cancel
+        if(event.isCanceled())
+            ci.cancel();
     }
 
-    @Inject(method = "tick", at = @At("RETURN"))
+    @Inject(method = "tick", at = @At("TAIL"))
     private void onPostTick(CallbackInfo ci) {
-        ModuleRepository.getInstance().getEnabledModules().forEach(Module::postTick);
+        TickEvent event = new TickEvent(ci);
+
+        event.setPost();
+
+        RyeClient.getEventBus().dispatch(event);
     }
 }

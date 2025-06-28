@@ -1,14 +1,15 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.command.impl;
@@ -72,6 +73,7 @@ public class SettingsCommand extends AbstractCommand {
                 case Float ignored -> Float.parseFloat(valueStr);
                 case Integer ignored -> Integer.parseInt(valueStr);
                 case Boolean ignored -> Boolean.parseBoolean(valueStr);
+                case Double ignored -> Double.parseDouble(valueStr);
                 case String ignored -> valueStr;
                 default -> throw new IllegalArgumentException("Unsupported setting type");
             });
@@ -83,8 +85,8 @@ public class SettingsCommand extends AbstractCommand {
                     Formatting.GREEN
             );
             return 1;
-        } catch(Exception e) {
-            ChatUtility.sendError("Invalid value format!");
+        } catch(Exception ex) {
+            ChatUtility.sendError("Invalid value format: " + ex.getMessage());
             return 0;
         }
     }

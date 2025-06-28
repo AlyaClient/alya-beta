@@ -5,13 +5,14 @@
   "client": [
     "ChatInputSuggestorMixin",
     "ChatScreenMixin",
-    "ClientPlayerEntityMixin",
     "InGameHudMixin",
     "LivingEntityJumpAccessor",
     "MinecraftClientMixin",
     "RenderTickCounterMixin",
     "WatermarkTitleScreenMixin",
-    "ClientConnectionMixin"
+    "ClientConnectionMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "ClientPlayerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

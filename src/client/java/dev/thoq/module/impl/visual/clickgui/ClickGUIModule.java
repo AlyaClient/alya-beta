@@ -1,69 +1,64 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.module.impl.visual.clickgui;
 
+import dev.thoq.RyeClient;
+import dev.thoq.config.KeybindManager;
 import dev.thoq.config.setting.impl.ModeSetting;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.Render2DEvent;
+import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.visual.clickgui.dropdown.DropDownClickGUI;
-import dev.thoq.module.impl.visual.clickgui.window.WindowClickGUI;
-import net.minecraft.client.gui.DrawContext;
+import org.lwjgl.glfw.GLFW;
 
 public class ClickGUIModule extends Module {
 
     private final ModeSetting guiMode = new ModeSetting("GUI Mode", "Choose between dropdown and window GUI", "Dropdown", "Dropdown", "Window");
-    private final DropDownClickGUI dropDownGUI;
-    private final WindowClickGUI windowGUI;
+    private final DropDownClickGUI dropDownGUI = new DropDownClickGUI();
 
     public ClickGUIModule() {
         super("ClickGUI", "Toggle modules with a graphical interface", ModuleCategory.VISUAL);
-        addSetting(guiMode);
 
-        dropDownGUI = new DropDownClickGUI();
-        windowGUI = new WindowClickGUI();
+        KeybindManager.getInstance().bind(this, GLFW.GLFW_KEY_RIGHT_SHIFT);
+        RyeClient.getEventBus().subscribe(this);
+        addSetting(guiMode);
     }
 
     @Override
     protected void onEnable() {
         if(guiMode.getValue().equals("Dropdown")) {
             dropDownGUI.show();
-        } else {
-            windowGUI.show();
         }
     }
 
     @Override
     protected void onDisable() {
         dropDownGUI.hide();
-        windowGUI.hide();
     }
 
-    @Override
-    protected void onPreTick() {
+    private final IEventListener<TickEvent> tickEvent = event -> {
         if(guiMode.getValue().equals("Dropdown")) {
             dropDownGUI.tick();
-        } else {
-            windowGUI.tick();
         }
-    }
+    };
 
-    @Override
-    protected void onRender(DrawContext context) {
+    private final IEventListener<Render2DEvent> renderEvent = event -> {
         if(guiMode.getValue().equals("Dropdown")) {
-            dropDownGUI.render(context);
-        } else {
-            windowGUI.render(context);
+            dropDownGUI.render(event.getContext());
         }
-    }
+    };
 }

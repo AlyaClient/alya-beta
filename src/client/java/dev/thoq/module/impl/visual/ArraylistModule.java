@@ -1,20 +1,23 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.module.impl.visual;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.Render2DEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.ModuleRepository;
@@ -63,8 +66,7 @@ public class ArraylistModule extends Module {
         return activeModules;
     }
 
-    @Override
-    protected void onRender(DrawContext context) {
+    private final IEventListener<Render2DEvent> renderEvents = event -> {
         Collection<Module> allModules = ModuleRepository.getInstance().getModules();
         List<Module> activeModules = sortModulesByLength(allModules);
 
@@ -110,25 +112,25 @@ public class ArraylistModule extends Module {
             moduleTop = currentY - padding;
             moduleBottom = currentY + mc.textRenderer.fontHeight + padding;
 
-            context.fill(moduleLeft, moduleTop, moduleRight, moduleBottom, ColorUtility.getColor(ColorUtility.Colors.PANEL));
+            event.getContext().fill(moduleLeft, moduleTop, moduleRight, moduleBottom, ColorUtility.getColor(ColorUtility.Colors.PANEL));
 
             if(i == 0) {
-                context.fill(moduleLeft - outlineWidth, moduleTop - outlineWidth, moduleRight + outlineWidth, moduleTop, themeColorArgb);
+                event.getContext().fill(moduleLeft - outlineWidth, moduleTop - outlineWidth, moduleRight + outlineWidth, moduleTop, themeColorArgb);
             }
 
             if(i == activeModules.size() - 1) {
-                context.fill(moduleLeft - outlineWidth, moduleBottom, moduleRight + outlineWidth, moduleBottom + outlineWidth, themeColorArgb);
+                event.getContext().fill(moduleLeft - outlineWidth, moduleBottom, moduleRight + outlineWidth, moduleBottom + outlineWidth, themeColorArgb);
             }
 
-            context.fill(moduleLeft - outlineWidth, moduleTop, moduleLeft, moduleBottom, themeColorArgb);
-            context.fill(moduleRight, moduleTop, moduleRight + outlineWidth, moduleBottom, themeColorArgb);
+            event.getContext().fill(moduleLeft - outlineWidth, moduleTop, moduleLeft, moduleBottom, themeColorArgb);
+            event.getContext().fill(moduleRight, moduleTop, moduleRight + outlineWidth, moduleBottom, themeColorArgb);
 
             if(isLeftPosition) {
                 if(i < activeModules.size() - 1) {
                     int nextWidth = moduleWidths.get(i + 1);
                     int nextModuleRight = sidePadding + nextWidth + padding;
                     if(moduleRight > nextModuleRight) {
-                        context.fill(nextModuleRight, moduleBottom, moduleRight + outlineWidth, moduleBottom + outlineWidth, themeColorArgb);
+                        event.getContext().fill(nextModuleRight, moduleBottom, moduleRight + outlineWidth, moduleBottom + outlineWidth, themeColorArgb);
                     }
                 }
             } else {
@@ -137,13 +139,13 @@ public class ArraylistModule extends Module {
                     int nextWidth = moduleWidths.get(i + 1);
                     int nextModuleLeft = screenWidth - nextWidth - sidePadding - padding;
                     if(moduleLeft < nextModuleLeft) {
-                        context.fill(moduleLeft - outlineWidth, moduleBottom, nextModuleLeft, moduleBottom + outlineWidth, themeColorArgb);
+                        event.getContext().fill(moduleLeft - outlineWidth, moduleBottom, nextModuleLeft, moduleBottom + outlineWidth, themeColorArgb);
                     }
                 }
             }
 
             TextRendererUtility.renderText(
-                    context,
+                    event.getContext(),
                     name,
                     ColorUtility.Colors.WHITE,
                     x,
@@ -153,5 +155,5 @@ public class ArraylistModule extends Module {
 
             currentY += mc.textRenderer.fontHeight + padding * 2;
         }
-    }
+    };
 }

@@ -1,14 +1,15 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.config.setting.impl;
@@ -23,7 +24,7 @@ import dev.thoq.config.setting.Setting;
 public class NumberSetting<T extends Number> extends Setting<T> {
 
     private static final double FAST_INCREMENT_FACTOR = 5.0;
-    
+
     /**
      * Creates a new number setting.
      *
@@ -40,13 +41,13 @@ public class NumberSetting<T extends Number> extends Setting<T> {
     /**
      * Increments the value by a small amount based on the type.
      * For floating-point types, ensures the value has only one decimal place.
-     * 
+     *
      * @param fast Whether to increment faster (for held clicks)
      */
     public void increment(boolean fast) {
         T value = getValue();
         double incrementAmount = fast ? FAST_INCREMENT_FACTOR : 1.0;
-        
+
         if(value instanceof Integer) {
             setValue((T) Integer.valueOf(((Integer) value) + (int)incrementAmount));
         } else if(value instanceof Float) {
@@ -59,7 +60,7 @@ public class NumberSetting<T extends Number> extends Setting<T> {
             setValue((T) Double.valueOf(newValue));
         }
     }
-    
+
     /**
      * Increments the value by a small amount based on the type.
      * For backward compatibility.
@@ -71,13 +72,13 @@ public class NumberSetting<T extends Number> extends Setting<T> {
     /**
      * Decrements the value by a small amount based on the type.
      * For floating-point types, ensures the value has only one decimal place.
-     * 
+     *
      * @param fast Whether to decrement faster (for held clicks)
      */
     public void decrement(boolean fast) {
         T value = getValue();
         double decrementAmount = fast ? FAST_INCREMENT_FACTOR : 1.0;
-        
+
         if(value instanceof Integer) {
             setValue((T) Integer.valueOf(((Integer) value) - (int)decrementAmount));
         } else if(value instanceof Float) {
@@ -90,7 +91,7 @@ public class NumberSetting<T extends Number> extends Setting<T> {
             setValue((T) Double.valueOf(newValue));
         }
     }
-    
+
     /**
      * Decrements the value by a small amount based on the type.
      * For backward compatibility.

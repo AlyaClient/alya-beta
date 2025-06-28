@@ -1,9 +1,22 @@
+/*
+ * Copyright (c) Rye Client 2025-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * This project (and subsequently, its files) are all licensed under the MIT License.
+ * This project should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ *
+ */
+
 package dev.thoq.module.impl.movement.flight.verus;
 
+import dev.thoq.event.impl.MotionEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.network.packet.Packet;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 public class VerusFlight {
     private final VerusDamageFly verusDamageFly = new VerusDamageFly();
@@ -14,21 +27,16 @@ public class VerusFlight {
             MinecraftClient mc,
             GameOptions options,
             String verusMode,
-            boolean clip
+            boolean clip,
+            MotionEvent event
     ) {
         switch(verusMode) {
-            case "FunnyPacket" -> {
+            case "Infinite" -> {
                 verusFlight.verusFlight(mc, options);
-                verusFlight.sendVerusPackets(mc);
+                verusFlight.sendVerusPackets(mc, event);
             }
-            case "DamageFly" -> verusDamageFly.damageFly(mc, options);
+            case "Damage" -> verusDamageFly.damageFly(mc, options);
             case "Glide" -> verusGlideFly.verusGlideFly(mc, clip);
-        }
-    }
-
-    public void verusPacket(Packet<?> packet, CallbackInfo callbackInfo, String verusMode) {
-        if(verusMode.equals("FunnyPacket")) {
-            verusFlight.cancelPackets(packet, callbackInfo);
         }
     }
 

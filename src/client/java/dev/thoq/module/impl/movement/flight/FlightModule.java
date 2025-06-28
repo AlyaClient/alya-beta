@@ -1,20 +1,22 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.module.impl.movement.flight;
 
-import dev.thoq.config.setting.Setting;
 import dev.thoq.config.setting.impl.NumberSetting;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.module.Module;
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
@@ -23,8 +25,6 @@ import dev.thoq.module.impl.movement.flight.vanilla.CreativeFlight;
 import dev.thoq.module.impl.movement.flight.vanilla.NormalFlight;
 import dev.thoq.module.impl.movement.flight.verus.VerusFlight;
 import net.minecraft.client.option.GameOptions;
-import net.minecraft.network.packet.Packet;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("unchecked")
 public class FlightModule extends Module {
@@ -51,8 +51,7 @@ public class FlightModule extends Module {
         addSetting(verusGlideClip.setVisibilityCondition(() -> "Glide".equals(verusModeSetting.getValue())));
     }
 
-    @Override
-    protected void onMotion() {
+    private final IEventListener<MotionEvent> motionEvent = event -> {
         if(!isEnabled() || mc.player == null) return;
 
         GameOptions options = mc.options;
@@ -79,28 +78,12 @@ public class FlightModule extends Module {
                 String verusMode = ((ModeSetting) getSetting("Verus Mode")).getValue();
                 boolean clip = ((BooleanSetting) getSetting("Clip")).getValue();
 
-                verusFlight.verusFlight(mc, options, verusMode, clip);
+                verusFlight.verusFlight(mc, options, verusMode, clip, event);
 
                 break;
             }
         }
-    }
-
-    @Override
-    protected void onPacket(Packet<?> packet, CallbackInfo callbackInfo) {
-        if(!isEnabled() || mc.player == null) return;
-
-        Setting<?> modeSetting = settings.get("mode");
-        if(modeSetting == null) return;
-
-        String mode = ((ModeSetting) modeSetting).getValue();
-
-        if("Verus".equals(mode)) {
-            String verusMode = ((ModeSetting) getSetting("Verus Mode")).getValue();
-
-            verusFlight.verusPacket(packet, callbackInfo, verusMode);
-        }
-    }
+    };
 
     @Override
     protected void onEnable() {

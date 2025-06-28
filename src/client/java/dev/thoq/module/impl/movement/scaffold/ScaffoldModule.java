@@ -1,14 +1,15 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.module.impl.movement.scaffold;
@@ -16,6 +17,8 @@ package dev.thoq.module.impl.movement.scaffold;
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.player.MoveUtility;
@@ -80,9 +83,8 @@ public class ScaffoldModule extends Module {
             mc.player.getInventory().setSelectedSlot(originalSlot);
         }
     }
-    
-    @Override
-    protected void onMotion() {
+
+    private final IEventListener<MotionEvent> motionEvent = event -> {
         if (mc.player == null || mc.world == null) return;
         
         blockSlot = findBlockSlot();
@@ -99,8 +101,8 @@ public class ScaffoldModule extends Module {
         
         if (rotate.getValue()) {
             calculateRotations();
-            mc.player.setYaw(targetYaw);
-            mc.player.setPitch(targetPitch);
+            event.setYaw(targetYaw);
+            event.setPitch(targetPitch);
         }
         
         if (tower.getValue() && mc.options.jumpKey.isPressed()) {
@@ -110,7 +112,7 @@ public class ScaffoldModule extends Module {
         if (System.currentTimeMillis() - lastPlaceTime >= delay.getValue()) {
             placeBlock();
         }
-    }
+    };
     
     private int findBlockSlot() {
         if(mc.player == null) return -1;
@@ -182,29 +184,9 @@ public class ScaffoldModule extends Module {
         if (MoveUtility.isMoving()) {
             float forward = MoveUtility.getForward(mc);
             float strafe = MoveUtility.getStrafe(mc);
-            
-            float yawOffset = 0;
-            if (forward > 0) {
-                if (strafe > 0) {
-                    yawOffset = -45;
-                } else if (strafe < 0) {
-                    yawOffset = 45;
-                }
-            } else if (forward < 0) {
-                yawOffset = 180;
-                if (strafe > 0) {
-                    yawOffset += 45;
-                } else if (strafe < 0) {
-                    yawOffset -= 45;
-                }
-            } else {
-                if (strafe > 0) {
-                    yawOffset = -90;
-                } else if (strafe < 0) {
-                    yawOffset = 90;
-                }
-            }
-            
+
+            float yawOffset = getYawOffset(forward, strafe);
+
             moveYaw += yawOffset;
         }
         
@@ -213,7 +195,32 @@ public class ScaffoldModule extends Module {
         
         targetPitch = MathHelper.clamp(targetPitch, -90.0f, 90.0f);
     }
-    
+
+    private static float getYawOffset(float forward, float strafe) {
+        float yawOffset = 0;
+        if (forward > 0) {
+            if (strafe > 0) {
+                yawOffset = -45;
+            } else if (strafe < 0) {
+                yawOffset = 45;
+            }
+        } else if (forward < 0) {
+            yawOffset = 180;
+            if (strafe > 0) {
+                yawOffset += 45;
+            } else if (strafe < 0) {
+                yawOffset -= 45;
+            }
+        } else {
+            if (strafe > 0) {
+                yawOffset = -90;
+            } else if (strafe < 0) {
+                yawOffset = 90;
+            }
+        }
+        return yawOffset;
+    }
+
     private void handleTower() {
         if(mc.player == null) return;
         if (!mc.player.isOnGround()) return;

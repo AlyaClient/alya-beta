@@ -1,14 +1,15 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq;
@@ -20,6 +21,7 @@ import dev.thoq.command.impl.ConfigCommand;
 import dev.thoq.command.impl.SettingsCommand;
 import dev.thoq.command.impl.ToggleCommand;
 import dev.thoq.config.KeybindManager;
+import dev.thoq.event.EventBus;
 import dev.thoq.module.ModuleBuilder;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.module.impl.combat.killaura.KillauraModule;
@@ -30,6 +32,7 @@ import dev.thoq.module.impl.combat.VelocityModule;
 import dev.thoq.module.impl.movement.longjump.LongJumpModule;
 import dev.thoq.module.impl.movement.scaffold.ScaffoldModule;
 import dev.thoq.module.impl.movement.speed.SpeedModule;
+import dev.thoq.module.impl.player.NukerModule;
 import dev.thoq.module.impl.player.fastplace.FastPlaceModule;
 import dev.thoq.module.impl.player.nofall.NoFallModule;
 import dev.thoq.module.impl.player.nojumpdelay.NoJumpDelayModule;
@@ -64,47 +67,20 @@ public class RyeClient implements ClientModInitializer {
     private static long lastMoveTime = 0;
     private static double lastBps = 0.0;
     private static final Set<Integer> previouslyPressedKeys = new HashSet<>();
+    private static EventBus eventBus;
 
     @Override
     public void onInitializeClient() {
         RyeClient.setState("loading");
 
+        eventBus = new EventBus();
+
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> IconLoader.setWindowIcon(client.getWindow().getHandle()));
 
-        ModuleBuilder.create()
-                .putAll(
-                        new ClickGUIModule(),
-                        new SprintModule(),
-                        new NoJumpDelayModule(),
-                        new FastPlaceModule(),
-                        new FlightModule(),
-                        new FullbrightModule(),
-                        new AntiInvisModule(),
-                        new VelocityModule(),
-                        new ESPModule(),
-                        new NoFallModule(),
-                        new SpeedModule(),
-                        new LongJumpModule(),
-                        new TimerModule(),
-                        new KillauraModule(),
-                        new HUDModule(),
-                        new ArraylistModule(),
-                        new ScaffoldModule(),
-                        new FPSModule(),
-                        new BPSModule(),
-                        new DebugModule(),
-                        new TickBaseModule(),
-                        new CPUExploitModule(),
-                        new KeyStrokesModule()
-                );
+        initializeModules();
+        initializeCommands();
 
-        CommandBuilder.create()
-                .putAll(
-                        new ToggleCommand(),
-                        new ConfigCommand(),
-                        new BindCommand(),
-                        new SettingsCommand()
-                );
+        KeybindManager.getInstance().initialize();
 
         CommandRegistrationCallback.EVENT.register((
                 dispatcher,
@@ -132,6 +108,48 @@ public class RyeClient implements ClientModInitializer {
             previouslyPressedKeys.clear();
             previouslyPressedKeys.addAll(currentlyPressed);
         });
+    }
+
+    private static void initializeModules() {
+        ModuleBuilder.create()
+                .putAll(
+                        new ClickGUIModule(),
+                        new SprintModule(),
+                        new NoJumpDelayModule(),
+                        new FastPlaceModule(),
+                        new FlightModule(),
+                        new FullbrightModule(),
+                        new AntiInvisModule(),
+                        new VelocityModule(),
+                        new ESPModule(),
+                        new NoFallModule(),
+                        new SpeedModule(),
+                        new LongJumpModule(),
+                        new TimerModule(),
+                        new KillauraModule(),
+                        new HUDModule(),
+                        new ArraylistModule(),
+                        new ScaffoldModule(),
+                        new DebugModule(),
+                        new TickBaseModule(),
+                        new CPUExploitModule(),
+                        new KeyStrokesModule(),
+                        new NukerModule()
+                );
+    }
+
+    private static void initializeCommands() {
+        CommandBuilder.create()
+                .putAll(
+                        new ToggleCommand(),
+                        new ConfigCommand(),
+                        new BindCommand(),
+                        new SettingsCommand()
+                );
+    }
+
+    public static EventBus getEventBus() {
+        return eventBus;
     }
 
     public static String getState() {

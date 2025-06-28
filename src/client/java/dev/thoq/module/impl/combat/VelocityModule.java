@@ -1,23 +1,27 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.module.impl.combat;
 
 import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.PacketReceiveEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.misc.ChatUtility;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 
 @SuppressWarnings({"rawtypes", "unchecked", "FieldCanBeLocal"})
 public class VelocityModule extends Module {
@@ -33,52 +37,53 @@ public class VelocityModule extends Module {
         addSetting(verticalVelocity.setVisibilityCondition(() -> "Standard".equals(mode.getValue())));
     }
 
-    @Override
-    protected void onPreTick() {
+    private final IEventListener<PacketReceiveEvent> onPacketReceiveEvent = event -> {
         if(!isEnabled() || mc.player == null) return;
 
         String mode = ((ModeSetting) getSetting("Mode")).getValue();
 
-        switch(mode) {
-            case "Standard": {
-                float xz = ((NumberSetting<Float>) getSetting("Horizontal")).getValue();
-                float y = ((NumberSetting<Float>) getSetting("Vertical")).getValue();
+        if(event.getPacket() instanceof EntityVelocityUpdateS2CPacket) {
+            switch(mode) {
+                case "Standard": {
+                    float xz = ((NumberSetting<Float>) getSetting("Horizontal")).getValue();
+                    float y = ((NumberSetting<Float>) getSetting("Vertical")).getValue();
 
-                if(mc.player.hurtTime > 0) {
-                    ChatUtility.sendDebug("player velocity >modified<");
-                    mc.player.setVelocity(
-                            mc.player.getVelocity().x * xz,
-                            mc.player.getVelocity().y * y,
-                            mc.player.getVelocity().z * xz
-                    );
-                }
-                break;
-            }
-
-            case "Jump Reset": {
-                if(mc.player.hurtTime > 0 && mc.player.isOnGround()) {
-                    mc.player.jump();
+                    if(mc.player.hurtTime > 0) {
+                        ChatUtility.sendDebug("player velocity >modified<");
+                        mc.player.setVelocity(
+                                mc.player.getVelocity().x * xz,
+                                mc.player.getVelocity().y * y,
+                                mc.player.getVelocity().z * xz
+                        );
+                    }
+                    break;
                 }
 
-                break;
-            }
+                case "Jump Reset": {
+                    if(mc.player.hurtTime > 0 && mc.player.isOnGround()) {
+                        mc.player.jump();
+                    }
 
-            case "Hurt Time": {
-                double multiplierXZ = 0.6 / mc.player.hurtTime;
-                double multiplierY = 0.9 / mc.player.hurtTime;
-
-                if(mc.player.hurtTime > 0) {
-                    ChatUtility.sendDebug("player velocity >modified<");
-                    ChatUtility.sendDebug(String.format("[multiplierXZ: %f], [multiplierY: %f]", multiplierXZ, multiplierY));
-                    mc.player.setVelocity(
-                            mc.player.getVelocity().y * multiplierXZ,
-                            mc.player.getVelocity().y * multiplierY,
-                            mc.player.getVelocity().z * multiplierXZ
-                    );
+                    break;
                 }
 
-                break;
+                case "Hurt Time": {
+                    double multiplierXZ = 0.6 / mc.player.hurtTime;
+                    double multiplierY = 0.9 / mc.player.hurtTime;
+
+                    if(mc.player.hurtTime > 0) {
+                        ChatUtility.sendDebug("player velocity >modified<");
+                        ChatUtility.sendDebug(String.format("[multiplierXZ: %f], [multiplierY: %f]", multiplierXZ, multiplierY));
+                        mc.player.setVelocity(
+                                mc.player.getVelocity().y * multiplierXZ,
+                                mc.player.getVelocity().y * multiplierY,
+                                mc.player.getVelocity().z * multiplierXZ
+                        );
+                    }
+
+                    break;
+                }
             }
         }
-    }
+    };
 }

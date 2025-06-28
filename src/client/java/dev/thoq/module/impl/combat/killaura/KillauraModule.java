@@ -1,19 +1,21 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.module.impl.combat.killaura;
 
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
@@ -26,6 +28,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -33,6 +37,7 @@ import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.world.RaycastContext;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -44,28 +49,25 @@ public class KillauraModule extends Module {
 
     private final ModeSetting attackMode = new ModeSetting("AttackMode", "Attack mode", "Single", "Single", "Switch", "Multi");
     private final ModeSetting targetMode = new ModeSetting("Target", "Target types", "Players", "Players", "Passive", "Hostile", "All");
-    private final NumberSetting<Double> range = new NumberSetting<>("Range", "Attack range", 4.0, 3.0, 6.0);
+    private final NumberSetting<Double> range = new NumberSetting<>("Range", "Attack range", 4.0, 3.0, 1000.0);
     private final NumberSetting<Integer> cps = new NumberSetting<>("CPS", "Attacks per second", 12, 1, 20);
-
+    private final BooleanSetting noHitDelay = new BooleanSetting("NoHitDelay", "Remove attack delay", false);
+    private final BooleanSetting raycast = new BooleanSetting("Raycast", "Check line of sight to target", true);
+    private final BooleanSetting movementCorrection = new BooleanSetting("MovementCorrection", "Do not attack impossibly", true);
     private final BooleanSetting rotate = new BooleanSetting("Rotate", "Rotate to targets", true);
     private final ModeSetting rotationMode = new ModeSetting("RotationMode", "Rotation mode", "Smooth", "Snap", "Smooth", "Linear");
     private final BooleanSetting serverSideRotations = new BooleanSetting("ServerSideRotations", "Server-side rotations only", true);
     private final NumberSetting<Double> rotationSpeed = new NumberSetting<>("RotationSpeed", "Rotation smoothness", 3.0, 1.0, 10.0);
-    private final BooleanSetting gcdMovementCorrection = new BooleanSetting("GCD Movement Correction", "Corrects rotation movements to GCD values", true);
-
+    private final BooleanSetting gcd = new BooleanSetting("GCD", "Greatest Common Divisor stuff idfk", true);
     private final BooleanSetting autoBlock = new BooleanSetting("AutoBlock", "Auto block with sword", false);
-    private final ModeSetting autoBlockMode = new ModeSetting("AutoBlockMode", "AutoBlock mode", "Vanilla", "Vanilla", "Fake", "Packet");
-
+    private final ModeSetting autoBlockMode = new ModeSetting("AutoBlockMode", "AutoBlock mode", "Vanilla", "Vanilla", "Packet");
     private final BooleanSetting showParticles = new BooleanSetting("ShowParticles", "Show attack particles", false);
-
     private final List<Entity> targets = new ArrayList<>();
     private Entity currentTarget;
     private int switchTimer = 0;
     private boolean isBlocking = false;
-
     private long lastAttackTime = 0;
     private final Random random = new Random();
-
     private float lastYaw = 0f;
     private float lastPitch = 0f;
     private float targetYaw = 0f;
@@ -75,47 +77,58 @@ public class KillauraModule extends Module {
     public KillauraModule() {
         super("Killaura", "Automatically attack entities", ModuleCategory.COMBAT);
 
+        cps.setVisibilityCondition(() -> !noHitDelay.getValue());
         rotationMode.setVisibilityCondition(rotate::getValue);
         serverSideRotations.setVisibilityCondition(rotate::getValue);
         rotationSpeed.setVisibilityCondition(() -> rotate.getValue() && rotationMode.getValue().equals("Smooth"));
         autoBlockMode.setVisibilityCondition(autoBlock::getValue);
-        gcdMovementCorrection.setVisibilityCondition(rotate::getValue);
+        gcd.setVisibilityCondition(rotate::getValue);
 
         addSetting(attackMode);
         addSetting(targetMode);
         addSetting(range);
         addSetting(cps);
+        addSetting(noHitDelay);
+        addSetting(raycast);
         addSetting(rotate);
         addSetting(rotationMode);
         addSetting(serverSideRotations);
         addSetting(rotationSpeed);
-        addSetting(gcdMovementCorrection);
+        addSetting(gcd);
         addSetting(autoBlock);
         addSetting(autoBlockMode);
         addSetting(showParticles);
+        addSetting(movementCorrection);
     }
 
-    @Override
-    protected void onPreTick() {
+    private final IEventListener<MotionEvent> motionEvent = event -> {
         if(mc.player == null || mc.world == null) return;
 
         findTargets();
         selectTarget();
         handleAutoBlock();
 
-        if(currentTarget == null) {
-            if(isBlocking) stopBlocking();
+        if(targets.isEmpty()) {
+            if(isBlocking)
+                stopBlocking();
             return;
         }
 
-        if(rotate.getValue()) {
-            handleRotations();
+        if(rotate.getValue() && currentTarget != null) {
+            calculateRotations();
+
+            if(serverSideRotations.getValue()) {
+                event.setYaw(targetYaw);
+                event.setPitch(targetPitch);
+            } else {
+                mc.player.setYaw(targetYaw);
+                mc.player.setPitch(targetPitch);
+            }
         }
 
-        if(canAttack()) {
+        if(canAttack() && isValidHit())
             performAttack();
-        }
-    }
+    };
 
     private void findTargets() {
         targets.clear();
@@ -133,7 +146,29 @@ public class KillauraModule extends Module {
 
         List<Entity> entities = mc.world.getEntitiesByClass(Entity.class, searchBox, this::isValidTarget);
         entities.sort(Comparator.comparingDouble(entity -> entity.squaredDistanceTo(mc.player)));
-        targets.addAll(entities);
+
+        for(Entity entity : entities) {
+            if(raycast.getValue() && !canSeeTarget(entity)) continue;
+            targets.add(entity);
+        }
+    }
+
+    private boolean canSeeTarget(Entity target) {
+        if(mc.player == null || mc.world == null) return false;
+
+        Vec3d playerEyes = mc.player.getEyePos();
+        Vec3d targetPos = getTargetPosition(target);
+
+        RaycastContext context = new RaycastContext(
+                playerEyes,
+                targetPos,
+                RaycastContext.ShapeType.COLLIDER,
+                RaycastContext.FluidHandling.NONE,
+                mc.player
+        );
+
+        BlockHitResult result = mc.world.raycast(context);
+        return result.getType() == HitResult.Type.MISS;
     }
 
     private boolean isValidTarget(Entity entity) {
@@ -158,8 +193,7 @@ public class KillauraModule extends Module {
 
     private void selectTarget() {
         switch(attackMode.getValue()) {
-            // TODO: Make multi-aura
-            case "Single", "Multi" -> currentTarget = targets.isEmpty() ? null : targets.getFirst();
+            case "Single" -> currentTarget = targets.isEmpty() ? null : targets.getFirst();
             case "Switch" -> {
                 if(switchTimer++ >= 20 && targets.size() > 1) {
                     switchTimer = 0;
@@ -169,11 +203,12 @@ public class KillauraModule extends Module {
                     currentTarget = targets.isEmpty() ? null : targets.getFirst();
                 }
             }
+            case "Multi" -> currentTarget = targets.isEmpty() ? null : targets.getFirst();
         }
     }
 
     private float[] applyGCDCorrection(float yaw, float pitch) {
-        if(!gcdMovementCorrection.getValue()) {
+        if(!gcd.getValue()) {
             return new float[]{yaw, pitch};
         }
 
@@ -188,12 +223,11 @@ public class KillauraModule extends Module {
     }
 
     private float getGCD() {
-
         float sensitivity = mc.options.getMouseSensitivity().getValue().floatValue();
         return sensitivity * 0.6F + 0.2F;
     }
 
-    private void handleRotations() {
+    private void calculateRotations() {
         if(currentTarget == null || mc.player == null) return;
 
         Vec3d playerPos = mc.player.getEyePos();
@@ -225,6 +259,7 @@ public class KillauraModule extends Module {
             }
             case "Linear" -> {
                 long currentTime = System.currentTimeMillis();
+
                 if(currentTime - lastRotationTime > 50) {
                     lastRotationTime = currentTime;
 
@@ -238,75 +273,102 @@ public class KillauraModule extends Module {
         }
 
         float[] correctedRotations = applyGCDCorrection(lastYaw, lastPitch);
-        lastYaw = correctedRotations[0];
-        lastPitch = correctedRotations[1];
-
-        if (serverSideRotations.getValue()) {
-            sendRotationPacket(lastYaw, lastPitch);
-        } else {
-            mc.player.setYaw(lastYaw);
-            mc.player.setPitch(lastPitch);
-        }
+        targetYaw = correctedRotations[0];
+        targetPitch = correctedRotations[1];
     }
 
-    private void sendRotationPacket(float yaw, float pitch) {
-        if (mc.player == null || mc.getNetworkHandler() == null) return;
-        
-        PlayerMoveC2SPacket rotationPacket = new PlayerMoveC2SPacket.LookAndOnGround(
-            yaw,
-            pitch,
-            mc.player.isOnGround(),
-            mc.player.horizontalCollision
-        );
-        
-        mc.getNetworkHandler().sendPacket(rotationPacket);
+    private boolean isValidHit() {
+        if(currentTarget == null || mc.player == null) return false;
+        if(!movementCorrection.getValue()) return true;
+
+        if(attackMode.getValue().equals("Multi")) {
+            return targets.stream().anyMatch(this::canHitTarget);
+        }
+
+        Vec3d playerEyes = mc.player.getEyePos();
+        Vec3d targetPos = getTargetPosition(currentTarget);
+
+        Vec3d direction = targetPos.subtract(playerEyes).normalize();
+
+        float currentYaw = serverSideRotations.getValue() ? targetYaw : mc.player.getYaw();
+        float currentPitch = serverSideRotations.getValue() ? targetPitch : mc.player.getPitch();
+
+        Vec3d lookDirection = getLookDirection(currentYaw, currentPitch);
+
+        double dotProduct = direction.dotProduct(lookDirection);
+        double angleRadians = Math.acos(MathHelper.clamp(dotProduct, -1.0, 1.0));
+        double angleDegrees = Math.toDegrees(angleRadians);
+
+        return angleDegrees <= 90.0;
+    }
+
+    private boolean canHitTarget(Entity target) {
+        if(target == null || mc.player == null) return false;
+
+        Vec3d playerEyes = mc.player.getEyePos();
+        Vec3d targetPos = getTargetPosition(target);
+        Vec3d direction = targetPos.subtract(playerEyes).normalize();
+
+        float currentYaw = serverSideRotations.getValue() ? targetYaw : mc.player.getYaw();
+        float currentPitch = serverSideRotations.getValue() ? targetPitch : mc.player.getPitch();
+
+        Vec3d lookDirection = getLookDirection(currentYaw, currentPitch);
+        double dotProduct = direction.dotProduct(lookDirection);
+        double angleRadians = Math.acos(MathHelper.clamp(dotProduct, -1.0, 1.0));
+        double angleDegrees = Math.toDegrees(angleRadians);
+
+        return angleDegrees <= 90.0;
+    }
+
+    private Vec3d getLookDirection(float yaw, float pitch) {
+        float yawRad = (float) Math.toRadians(yaw);
+        float pitchRad = (float) Math.toRadians(pitch);
+
+        float cosYaw = MathHelper.cos(-yawRad - (float)Math.PI);
+        float sinYaw = MathHelper.sin(-yawRad - (float)Math.PI);
+        float cosPitch = -MathHelper.cos(-pitchRad);
+        float sinPitch = MathHelper.sin(-pitchRad);
+
+        return new Vec3d(sinYaw * cosPitch, sinPitch, cosYaw * cosPitch);
     }
 
     private Vec3d getTargetPosition(Entity target) {
-
         return target.getBoundingBox().getCenter();
     }
 
     private boolean canAttack() {
-        if(currentTarget == null || mc.player == null) return false;
+        if(targets.isEmpty() || mc.player == null) return false;
+
+        if(noHitDelay.getValue()) return true;
 
         long currentTime = System.currentTimeMillis();
-
         long baseDelay = 1000L / cps.getValue();
-
         double randomFactor = 0.8 + (random.nextDouble() * 0.4);
         long actualDelay = Math.round(baseDelay * randomFactor);
-
         actualDelay = Math.max(actualDelay, 50L);
 
         return currentTime - lastAttackTime >= actualDelay;
     }
 
     private void performAttack() {
-        if(currentTarget == null || mc.player == null || mc.interactionManager == null) return;
-
-        if(!isValidTarget(currentTarget) || mc.player.distanceTo(currentTarget) > range.getValue()) {
-            return;
-        }
+        if(mc.player == null || mc.interactionManager == null) return;
 
         boolean wasBlocking = isBlocking;
         if(isBlocking) stopBlocking();
 
-        attackEntity(currentTarget);
-
-        if(attackMode.getValue().equals("Multi") && targets.size() > 1) {
-            int maxTargets = Math.min(targets.size(), 3);
-            for(int i = 1; i < maxTargets; i++) {
-                if(mc.player.distanceTo(targets.get(i)) <= range.getValue()) {
-                    attackEntity(targets.get(i));
-                }
+        if(attackMode.getValue().equals("Multi")) {
+            for(Entity target : targets) {
+                attackEntity(target);
             }
+        } else if(currentTarget != null) {
+            attackEntity(currentTarget);
         }
 
-        lastAttackTime = System.currentTimeMillis();
+        if(!noHitDelay.getValue()) {
+            lastAttackTime = System.currentTimeMillis();
+        }
 
         if(wasBlocking && autoBlock.getValue()) {
-
             new Thread(() -> {
                 try {
                     Thread.sleep(random.nextInt(50) + 25);
@@ -332,7 +394,7 @@ public class KillauraModule extends Module {
 
     private void handleAutoBlock() {
         if(mc.player == null) return;
-        if(!autoBlock.getValue() || currentTarget == null) {
+        if(!autoBlock.getValue() || targets.isEmpty()) {
             if(isBlocking) stopBlocking();
             return;
         }
@@ -348,8 +410,10 @@ public class KillauraModule extends Module {
     }
 
     private boolean canBlock() {
-        // TODO: Check if item is sword or not
-        return false;
+        if(mc.player == null) return false;
+        if(mc.player.getMainHandStack().isEmpty()) return false;
+
+        return mc.player.getMainHandStack().getItem().toString().toLowerCase().contains("sword");
     }
 
     private void startBlocking() {
@@ -392,6 +456,7 @@ public class KillauraModule extends Module {
             lastYaw = mc.player.getYaw();
             lastPitch = mc.player.getPitch();
         }
+
         lastAttackTime = 0;
         switchTimer = 0;
         isBlocking = false;

@@ -1,26 +1,28 @@
 /*
- * Copyright (c) Rye 2025-2025.
+ * Copyright (c) Rye Client 2025-2025.
  *
  * This file belongs to Rye Client,
- * an open-source Fabric Injection client.
+ * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
  * This project (and subsequently, its files) are all licensed under the MIT License.
  * This project should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
+ *
  */
 
 package dev.thoq.module.impl.visual;
 
 import dev.thoq.RyeClient;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.Render2DEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.render.ColorUtility;
+import dev.thoq.utilities.render.RoundedUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
-import dev.thoq.utilities.render.ThemeUtility;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
@@ -32,71 +34,113 @@ public class HUDModule extends Module {
         this.setEnabled(true);
     }
 
-    @Override
-    protected void onRender(DrawContext context) {
-        String displayText = getString();
+    private enum Mode {
+        NORMAL,
+        SCAFFOLD,
+        SPEED,
+        FLIGHT,
+        KILLAURA
+    }
 
-        final int padding = 4;
-        final int xPosition = 1;
+    private final IEventListener<Render2DEvent> renderEvent = event -> {
+        boolean killauraEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Killaura").isEnabled();
+        boolean scaffoldEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Scaffold").isEnabled();
+        boolean speedEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Speed").isEnabled();
+        boolean flightEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Flight").isEnabled();
+
+        Mode mode = Mode.NORMAL;
+
+        if(killauraEnabled) mode = Mode.KILLAURA;
+        if(scaffoldEnabled) mode = Mode.SCAFFOLD;
+        if(speedEnabled) mode = Mode.SPEED;
+        if(flightEnabled) mode = Mode.FLIGHT;
+
+        String displayText = getString(mode);
+
+        final int padding = 15;
+        final int screenWidth = event.getContext().getScaledWindowWidth();
+        final int xPosition = (screenWidth / 2) - (TextRendererUtility.getTextWidth(displayText) / 2);
         final int yPosition = 2;
         final int backgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
-        final int borderWidth = 2;
         final int textWidth = TextRendererUtility.getTextWidth(displayText);
         final int textHeight = mc.textRenderer.fontHeight;
 
-        context.fill(
-                xPosition - padding,
-                yPosition - padding,
-                xPosition + textWidth + padding,
-                yPosition + textHeight + padding,
+        RoundedUtility.drawRoundedRect(
+                event.getContext(),
+                xPosition,
+                yPosition,
+                textWidth + padding,
+                textHeight + padding,
+                30f,
                 backgroundColor
         );
 
-        context.fill(
-                xPosition - padding - borderWidth,
-                yPosition - padding - borderWidth,
-                xPosition + textWidth + padding + borderWidth,
-                yPosition - padding,
-                ColorUtility.getIntFromColor(ThemeUtility.getThemeColorFirst())
-        );
-
-        context.fill(
-                xPosition - padding - borderWidth,
-                yPosition - padding - borderWidth,
-                xPosition - padding,
-                yPosition + textHeight + padding + borderWidth,
-                ColorUtility.getIntFromColor(ThemeUtility.getThemeColorFirst())
-        );
-
         TextRendererUtility.renderText(
-                context,
+                event.getContext(),
                 displayText,
                 ColorUtility.Colors.WHITE,
-                xPosition,
-                yPosition,
-                true
+                xPosition + padding / 2,
+                yPosition + padding / 2,
+                false
         );
-    }
+    };
 
-    private static @NotNull String getString() {
+    private static @NotNull String getString(Mode hudMode) {
         MinecraftClient mc = MinecraftClient.getInstance();
+        if(mc.player == null) throw new IllegalStateException("Minecraft player is null!");
+
         String name = "§l" + "§d" + RyeClient.getName().charAt(0) + "§r§l" + RyeClient.getName().substring(1) + "§r";
         String time = new java.text.SimpleDateFormat("hh:mm a").format(new Date());
 
-        if(mc.player != null) {
-            String userName = mc.player.getName().getString();
-            return String.format(
-                    " %s | %s | %s",
-                    name,
-                    userName,
-                    time
-            );
-        } else {
-            return String.format(
-                    " %s | %s",
-                    name,
-                    time
-            );
+        String bps = RyeClient.getBps();
+        String fps = RyeClient.getFps();
+
+        int scaffoldSlot = mc.player.getInventory().getSelectedSlot();
+        int blocksRemaining = mc.player.getInventory().getStack(scaffoldSlot).getCount();
+
+        switch(hudMode) {
+            case NORMAL -> {
+                String userName = mc.player.getName().getString();
+                return String.format(
+                        " %s | %s f/s | %s | %s",
+                        name,
+                        fps,
+                        userName,
+                        time
+                );
+            }
+
+            case SPEED, FLIGHT -> {
+                return String.format(
+                        " %s | %s f/s | %s b/s | %s",
+                        name,
+                        fps,
+                        bps,
+                        time
+                );
+            }
+
+            case SCAFFOLD -> {
+                return String.format(
+                        " %s | %s f/s | %s Remaining | %s b/s",
+                        name,
+                        fps,
+                        blocksRemaining,
+                        bps
+                );
+            }
+
+            case KILLAURA -> {
+                return String.format(
+                        " %s | %s f/s | %s | %s b/s",
+                        name,
+                        fps,
+                        String.format("%s/%s ♡", mc.player.getHealth() / 2, mc.player.getMaxHealth() / 2),
+                        bps
+                );
+            }
         }
+
+        return "error";
     }
 }
