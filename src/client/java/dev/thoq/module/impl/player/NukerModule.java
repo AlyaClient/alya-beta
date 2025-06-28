@@ -28,24 +28,24 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 public class NukerModule extends Module {
-    private final BooleanSetting destroyAll = new BooleanSetting("Destroy", "Destroy all blocks, instantly", true);
+    private final BooleanSetting americanMode = new BooleanSetting("American", "Eat everything", true);
 
     public NukerModule() {
         super("Nuker", "Destroy blocks automatically", ModuleCategory.PLAYER);
 
-        addSetting(destroyAll);
+        addSetting(americanMode);
     }
 
     // TODO: Make it more then just boom world gone
     private final IEventListener<TickEvent> tickEvent = event -> {
-        if(destroyAll.getValue() && mc.getNetworkHandler() != null) {
+        if(americanMode.getValue() && mc.getNetworkHandler() != null) {
             MinecraftClient mc = MinecraftClient.getInstance();
             if(mc.player == null || mc.world == null) return;
 
             World world = mc.world;
             BlockPos playerPos = mc.player.getBlockPos();
 
-            int radius = 10000;
+            int radius = 2;
 
             for(int x = -radius; x <= radius; x++) {
                 for(int y = -radius; y <= radius; y++) {
