@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.mixin.client;
+package dev.thoq.mixin.client.misc;
 
 import dev.thoq.utilities.player.TimerUtility;
 import org.objectweb.asm.Opcodes;

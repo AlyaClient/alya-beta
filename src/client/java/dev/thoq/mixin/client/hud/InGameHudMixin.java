@@ -14,27 +14,25 @@
  *
  */
 
-package dev.thoq.mixin.client;
+package dev.thoq.mixin.client.hud;
 
 import dev.thoq.RyeClient;
-import dev.thoq.event.EventBus;
-import dev.thoq.event.impl.PacketSendEvent;
-import dev.thoq.module.ModuleRepository;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.packet.Packet;
-
+import dev.thoq.event.impl.Render2DEvent;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.hud.InGameHud;
+import net.minecraft.client.render.RenderTickCounter;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientConnection.class)
-public class ClientConnectionMixin {
+@Mixin(InGameHud.class)
+public class InGameHudMixin {
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    public void onHudRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        RyeClient.setState("inGame");
 
-    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V",
-            at = @At("HEAD"), cancellable = true)
-    private void onSend(Packet<?> packet, CallbackInfo ci) {
-        PacketSendEvent event = new PacketSendEvent(packet, ci);
+        Render2DEvent event = new Render2DEvent(context);
 
         RyeClient.getEventBus().dispatch(event);
 
@@ -43,10 +41,12 @@ public class ClientConnectionMixin {
             ci.cancel();
     }
 
-    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;)V",
-            at = @At("TAIL"), cancellable = true)
-    private void onSendPost(Packet<?> packet, CallbackInfo ci) {
-        PacketSendEvent event = new PacketSendEvent(packet, ci);
+    @Inject( method = "render", at = @At("TAIL"))
+    public void onHudRenderPost(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        RyeClient.setState("inGame");
+
+        Render2DEvent event = new Render2DEvent(context);
+
         event.setPost();
 
         RyeClient.getEventBus().dispatch(event);

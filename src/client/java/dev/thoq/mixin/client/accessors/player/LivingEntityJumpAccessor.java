@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.mixin.client.accessors;
+package dev.thoq.mixin.client.accessors.player;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;

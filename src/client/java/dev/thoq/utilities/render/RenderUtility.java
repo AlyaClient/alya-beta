@@ -16,10 +16,24 @@
 
 package dev.thoq.utilities.render;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.Identifier;
 
 @SuppressWarnings("unused")
 public class RenderUtility {
+    /**
+     * Draws a filled rounded rectangle with the specified position, dimensions, corner radius, and color.
+     *
+     * @param context The {@code DrawContext} used for rendering the rounded rectangle.
+     * @param x       The x-coordinate of the top-left corner of the rectangle.
+     * @param y       The y-coordinate of the top-left corner of the rectangle.
+     * @param width   The width of the rectangle.
+     * @param height  The height of the rectangle.
+     * @param radius  The radius of the rounded corners. The value is clamped to half the smaller of the rectangle's width or height.
+     * @param color   The fill color of the rounded rectangle, specified as an ARGB integer.
+     */
     public static void drawRoundedRect(DrawContext context, float x, float y, float width, float height, float radius, int color) {
         int ix = (int) x;
         int iy = (int) y;
@@ -42,6 +56,18 @@ public class RenderUtility {
         drawCorner(context, ix, iy + iHeight - iRadius, iRadius, color, CornerType.BOTTOM_LEFT);
     }
 
+    /**
+     * Draws the outline of a rounded rectangle with the specified dimensions, border thickness, and color.
+     *
+     * @param context   The {@code DrawContext} used for rendering the rounded rectangle outline.
+     * @param x         The x-coordinate of the top-left corner of the rectangle.
+     * @param y         The y-coordinate of the top-left corner of the rectangle.
+     * @param width     The width of the rectangle.
+     * @param height    The height of the rectangle.
+     * @param radius    The radius of the rounded corners. The value is clamped to half the smaller of the rectangle's width or height.
+     * @param lineWidth The thickness of the outline.
+     * @param color     The color of the outline, specified as an ARGB integer.
+     */
     public static void drawRoundedRectOutline(DrawContext context, float x, float y, float width, float height, float radius, float lineWidth, int color) {
         int ix = (int) x;
         int iy = (int) y;
@@ -66,6 +92,16 @@ public class RenderUtility {
         drawCornerOutline(context, ix, iy + iHeight - iRadius, iRadius, iLineWidth, color, CornerType.BOTTOM_LEFT);
     }
 
+    /**
+     * Draws a corner of a rounded rectangle with specified dimensions, position, and color.
+     *
+     * @param context The {@code DrawContext} used for rendering the corner.
+     * @param x       The x-coordinate of the top-left corner of the corner's bounding box.
+     * @param y       The y-coordinate of the top-left corner of the corner's bounding box.
+     * @param radius  The radius of the circular boundary defining the corner.
+     * @param color   The ARGB color of the corner, specified as an integer.
+     * @param corner  The {@code CornerType} specifying which corner is being drawn (e.g., TOP_LEFT, TOP_RIGHT).
+     */
     private static void drawCorner(DrawContext context, int x, int y, int radius, int color, CornerType corner) {
         int baseAlpha = (color >> 24) & 0xFF;
         int red = (color >> 16) & 0xFF;
@@ -91,6 +127,18 @@ public class RenderUtility {
         }
     }
 
+    /**
+     * Draws the outline of a specified corner of a rounded rectangle with the given radius,
+     * border thickness, and color.
+     *
+     * @param context   The {@code DrawContext} used for rendering the corner outline.
+     * @param x         The x-coordinate of the top-left corner of the bounding box for the corner.
+     * @param y         The y-coordinate of the top-left corner of the bounding box for the corner.
+     * @param radius    The radius of the circular boundary defining the corner.
+     * @param lineWidth The thickness of the outline, specified as an integer.
+     * @param color     The ARGB color of the outline, represented as an integer.
+     * @param corner    The {@code CornerType} representing the specific corner (e.g., TOP_LEFT, TOP_RIGHT, etc.).
+     */
     private static void drawCornerOutline(DrawContext context, int x, int y, int radius, int lineWidth, int color, CornerType corner) {
         int baseAlpha = (color >> 24) & 0xFF;
         int red = (color >> 16) & 0xFF;
@@ -118,6 +166,17 @@ public class RenderUtility {
         }
     }
 
+    /**
+     * Calculates the pixel coverage of a circular region for a given position and radius.
+     * The method uses supersampling with a 4x4 grid to determine the proportion of the pixel
+     * that is covered by the circle.
+     *
+     * @param px     The x-coordinate of the pixel.
+     * @param py     The y-coordinate of the pixel.
+     * @param radius The radius of the circular region.
+     * @param corner The {@code CornerType} specifying which corner of the rounded rectangle is being considered.
+     * @return The fractional coverage of the pixel by the circle as a float value between 0.0 and 1.0.
+     */
     private static float getPixelCoverage(int px, int py, float radius, CornerType corner) {
         if(radius <= 0) return 0;
 
@@ -146,11 +205,51 @@ public class RenderUtility {
         return (float) inside / samples;
     }
 
+    /**
+     * Draws the outline of a rectangle at the specified position with the given dimensions,
+     * line thickness, and color.
+     *
+     * @param context   The {@code DrawContext} used for rendering the rectangle outline.
+     * @param x         The x-coordinate of the top-left corner of the rectangle.
+     * @param y         The y-coordinate of the top-left corner of the rectangle.
+     * @param width     The width of the rectangle.
+     * @param height    The height of the rectangle.
+     * @param lineWidth The thickness of the rectangle's outline, specified as an integer.
+     * @param color     The color of the outline, specified as an ARGB integer.
+     */
     private static void drawRectOutline(DrawContext context, int x, int y, int width, int height, int lineWidth, int color) {
         context.fill(x, y, x + width, y + lineWidth, color);
         context.fill(x, y + height - lineWidth, x + width, y + height, color);
         context.fill(x, y, x + lineWidth, y + height, color);
         context.fill(x + width - lineWidth, y, x + width, y + height, color);
+    }
+
+    public static void drawImage(
+            Identifier texture,
+            int posX,
+            int posY,
+            int renderWidth,
+            int renderHeight,
+            int imageWidth,
+            int imageHeight,
+            DrawContext context
+    ) {
+
+        // minecraft:pipeline/cutout
+        // so this works, and I had to try a bunch
+        // because Mojang moved `.getGuiTextured()` and there
+        // was no documentation,
+        // FUCK YOU MOJANG >:(
+        RenderPipeline renderPipeline = RenderPipelines.getAll().get(27);
+
+        context.drawTexture(
+                renderPipeline,
+                texture,
+                posX, posY,
+                0, 0,
+                renderWidth, renderHeight,
+                imageWidth, imageHeight
+        );
     }
 
     public static void drawRoundedRect(DrawContext context, float x, float y, float width, float height, float radius) {

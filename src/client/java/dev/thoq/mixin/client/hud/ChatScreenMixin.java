@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.mixin.client;
+package dev.thoq.mixin.client.hud;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;

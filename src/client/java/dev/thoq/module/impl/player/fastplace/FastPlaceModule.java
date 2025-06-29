@@ -18,12 +18,9 @@ package dev.thoq.module.impl.player.fastplace;
 
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.TickEvent;
-import dev.thoq.mixin.client.MinecraftClientMixin;
-import dev.thoq.mixin.client.accessors.MinecraftClientAccessor;
+import dev.thoq.mixin.client.accessors.misc.MinecraftClientAccessor;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
-import dev.thoq.utilities.misc.ChatUtility;
-
 
 public class FastPlaceModule extends Module {
 
@@ -31,6 +28,7 @@ public class FastPlaceModule extends Module {
         super("FastPlace", "Helicopter helicopter", ModuleCategory.PLAYER);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<TickEvent> tickEvent = event -> {
         if(!isEnabled() || mc.player == null || !event.isPre()) return;
         ((MinecraftClientAccessor) this.mc).setItemUseCooldown(0);

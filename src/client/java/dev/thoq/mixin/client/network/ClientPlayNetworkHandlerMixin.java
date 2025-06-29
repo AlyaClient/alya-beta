@@ -14,26 +14,23 @@
  *
  */
 
-package dev.thoq.mixin.client;
+package dev.thoq.mixin.client.network;
 
 import dev.thoq.RyeClient;
-import dev.thoq.event.impl.Render2DEvent;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.render.RenderTickCounter;
+import dev.thoq.event.impl.PacketReceiveEvent;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(InGameHud.class)
-public class InGameHudMixin {
-    @Inject(method = "render", at = @At("HEAD"))
-    public void onHudRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        RyeClient.setState("inGame");
+@Mixin(ClientPlayNetworkHandler.class)
+public class ClientPlayNetworkHandlerMixin {
 
-        Render2DEvent event = new Render2DEvent(context);
-
+    @Inject(method = "onGameMessage", at = @At("HEAD"), cancellable = true)
+    private void onPacketReceived(GameMessageS2CPacket packet, CallbackInfo ci) {
+        PacketReceiveEvent event = new PacketReceiveEvent(packet);
         RyeClient.getEventBus().dispatch(event);
 
         // TODO: correctly cancel
@@ -41,14 +38,10 @@ public class InGameHudMixin {
             ci.cancel();
     }
 
-    @Inject( method = "render", at = @At("TAIL"))
-    public void onHudRenderPost(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        RyeClient.setState("inGame");
-
-        Render2DEvent event = new Render2DEvent(context);
-
-        event.setPost();
-
-        RyeClient.getEventBus().dispatch(event);
+    @Inject(method = "onGameMessage", at = @At("TAIL"))
+    private void onPacketReceivedPost(GameMessageS2CPacket packet, CallbackInfo ci) {
+        PacketReceiveEvent event = new PacketReceiveEvent(packet);
+        event.setPacket(packet);
+        RyeClient.getEventBus().dispatch(new PacketReceiveEvent(packet));
     }
 }

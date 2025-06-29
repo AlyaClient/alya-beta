@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.mixin.client;
+package dev.thoq.mixin.client.network;
 
 import dev.thoq.RyeClient;
 import dev.thoq.event.impl.MotionEvent;
@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixin {
 
-    @Inject(method = "sendMovementPackets", at = @At("HEAD"))
+    @Inject(method = "sendMovementPackets", at = @At("HEAD"), cancellable = true)
     private void onSendMovementPackets(CallbackInfo ci) {
         ClientPlayerEntity player = (ClientPlayerEntity)(Object)this;
 

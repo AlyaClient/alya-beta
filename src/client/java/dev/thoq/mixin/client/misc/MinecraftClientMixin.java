@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.mixin.client;
+package dev.thoq.mixin.client.misc;
 
 import dev.thoq.RyeClient;
 import dev.thoq.event.impl.TickEvent;
@@ -57,7 +57,7 @@ public abstract class MinecraftClientMixin {
         getWindow().setTitle(title);
     }
 
-    @Inject(method = "tick", at = @At("HEAD"))
+    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void onPreTick(CallbackInfo ci) {
         TickEvent event = new TickEvent(ci);
 
