@@ -23,17 +23,9 @@ import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
-import me.x150.renderer.fontng.FTLibrary;
-import me.x150.renderer.fontng.FontScalingRegistry;
-import me.x150.renderer.fontng.GlyphBuffer;
-import me.x150.renderer.fontng.Font;
 import me.x150.renderer.render.ExtendedDrawContext;
 import me.x150.renderer.util.Color;
-import me.x150.renderer.util.RenderUtils;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.BufferAllocator;
-import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector4f;
 
@@ -41,9 +33,6 @@ import java.util.Date;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class HUDModule extends Module {
-    private static boolean inited = false;
-    private static Font font, emojiFont;
-    private static GlyphBuffer gb;
 
     public HUDModule() {
         super("HUD", "Shows Heads Up Display", ModuleCategory.VISUAL);
@@ -77,11 +66,11 @@ public class HUDModule extends Module {
         final int padding = 15;
         final int radius = 12;
         final int screenWidth = event.getContext().getScaledWindowWidth();
-        final int xPosition = (screenWidth / 2) - (TextRendererUtility.getTextWidth(displayText) / 2);
-        final int yPosition = 2;
-        final int backgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
         final int textWidth = TextRendererUtility.getTextWidth(displayText);
         final int textHeight = mc.textRenderer.fontHeight;
+        final int xPosition = (screenWidth / 2) - (textWidth + padding) / 2;
+        final int yPosition = 5;
+        final int backgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
 
         ExtendedDrawContext.drawRoundedRect(
                 event.getContext(),
@@ -93,26 +82,14 @@ public class HUDModule extends Module {
                 new Color(backgroundColor)
         );
 
-        if (!inited) {
-            inited = true;
-            FTLibrary ftl = new FTLibrary();
-
-            font = new Font(ftl, "C:\\Users\\trist\\IdeaProjects\\rye-v1\\src\\main\\resources\\assets\\rye\\fonts\\Figtree-Regular.ttf", 0, 20);
-
-            emojiFont = new Font(ftl, "C:\\Users\\trist\\IdeaProjects\\rye-v1\\src\\main\\resources\\assets\\rye\\fonts\\Figtree-Regular.ttf", 0, 20);
-
-            FontScalingRegistry.register(font, emojiFont);
-
-            gb = new GlyphBuffer();
-        }
-
-        gb.clear();
-
-        gb.addString(font, "penis", xPosition, yPosition);
-
-        gb.offsetToTopLeft();
-
-        gb.draw(event.getContext(), xPosition, yPosition);
+        TextRendererUtility.renderText(
+                event.getContext(),
+                displayText,
+                ColorUtility.Colors.WHITE,
+                xPosition + padding / 2,
+                yPosition + padding / 2,
+                true
+        );
     };
 
     private static @NotNull String getString(Mode hudMode) {
