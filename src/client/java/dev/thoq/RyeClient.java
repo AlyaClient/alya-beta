@@ -58,6 +58,7 @@ import org.lwjgl.glfw.GLFW;
 import org.apache.logging.log4j.LogManager;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -222,5 +223,9 @@ public class RyeClient implements ClientModInitializer {
         }
 
         return df.format(bps);
+    }
+
+    public static String getTime() {
+        return new java.text.SimpleDateFormat("hh:mm a").format(new Date());
     }
 }

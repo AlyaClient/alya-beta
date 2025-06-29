@@ -54,6 +54,35 @@ public class TextRendererUtility {
     }
 
     /**
+     * Renders a text string on the screen at the specified position with a designated color and optional shadow.
+     *
+     * @param context The drawing context used for rendering.
+     * @param text The text to be rendered.
+     * @param color The color of the text, specified as an ARGB integer value.
+     * @param posX The X-coordinate where the text should be rendered.
+     * @param posY The Y-coordinate where the text should be rendered.
+     * @param shadow A boolean value indicating whether to render the text with a shadow effect.
+     */
+    public static void renderText(
+            DrawContext context,
+            String text,
+            int color,
+            int posX,
+            int posY,
+            boolean shadow
+    ) {
+        TextRenderer renderer = client.textRenderer;
+        context.drawText(
+                renderer,
+                text,
+                posX,
+                posY,
+                color,
+                shadow
+        );
+    }
+
+    /**
      * Gets the width of the given text.
      *
      * @param text The text to measure
@@ -62,5 +91,14 @@ public class TextRendererUtility {
     public static int getTextWidth(String text) {
         TextRenderer renderer = client.textRenderer;
         return renderer.getWidth(text);
+    }
+
+    /**
+     * Retrieves the height of the text font used by the Minecraft text renderer.
+     *
+     * @return The height of the font in pixels.
+     */
+    public static int getTextHeight() {
+        return MinecraftClient.getInstance().textRenderer.fontHeight;
     }
 }

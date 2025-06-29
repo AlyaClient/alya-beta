@@ -22,17 +22,23 @@ import dev.thoq.event.impl.Render2DEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.render.ColorUtility;
+import dev.thoq.utilities.render.RenderUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
-import me.x150.renderer.render.ExtendedDrawContext;
-import me.x150.renderer.util.Color;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector4f;
 
 import java.util.Date;
 
-@SuppressWarnings("FieldCanBeLocal")
+@SuppressWarnings({"FieldCanBeLocal", "SameParameterValue", "unused"})
 public class HUDModule extends Module {
+
+    private long animationStartTime = 0;
+    private boolean isAnimatingIn = false;
+    private boolean isAnimatingOut = false;
+    private boolean wasVisible = false;
+    private static final long ANIMATION_DURATION = 200;
+    private static final int END_Y_POSITION = 30;
+    private static String lastDynamicText = "";
 
     public HUDModule() {
         super("HUD", "Shows Heads Up Display", ModuleCategory.VISUAL);
@@ -49,6 +55,8 @@ public class HUDModule extends Module {
     }
 
     private final IEventListener<Render2DEvent> renderEvent = event -> {
+        if(mc.player == null) return;
+
         boolean killauraEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Killaura").isEnabled();
         boolean scaffoldEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Scaffold").isEnabled();
         boolean speedEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Speed").isEnabled();
@@ -56,30 +64,57 @@ public class HUDModule extends Module {
 
         Mode mode = Mode.NORMAL;
 
-        if(killauraEnabled) mode = Mode.KILLAURA;
-        if(scaffoldEnabled) mode = Mode.SCAFFOLD;
-        if(speedEnabled) mode = Mode.SPEED;
         if(flightEnabled) mode = Mode.FLIGHT;
+        if(speedEnabled) mode = Mode.SPEED;
+        if(scaffoldEnabled) mode = Mode.SCAFFOLD;
+        if(killauraEnabled) mode = Mode.KILLAURA;
 
-        String displayText = getString(mode);
+        String time = RyeClient.getTime();
+        String fps = RyeClient.getFps();
+        String bps = RyeClient.getBps();
+        String name = mc.player.getName().toString();
+        String clientName = "§l" + "§d" + RyeClient.getName().charAt(0) + "§r§l" + RyeClient.getName().substring(1) + "§r";
+
+        boolean shouldShowDynamic = mode != Mode.NORMAL;
+
+        if(shouldShowDynamic && !wasVisible) {
+            startShowAnimation();
+        } else if(!shouldShowDynamic && wasVisible) {
+            startHideAnimation();
+        }
+
+        wasVisible = shouldShowDynamic;
+
+        if(shouldShowDynamic || isAnimatingOut) {
+            String dynamicText = getString(mode, bps);
+            drawAnimatedDynamicRect(
+                    dynamicText,
+                    event
+            );
+        }
+
+        String displayText = String.format(
+                " %s | %s f/s | %s | %s",
+                clientName,
+                fps,
+                name,
+                time
+        );
 
         final int padding = 15;
-        final int radius = 12;
-        final int screenWidth = event.getContext().getScaledWindowWidth();
         final int textWidth = TextRendererUtility.getTextWidth(displayText);
         final int textHeight = mc.textRenderer.fontHeight;
-        final int xPosition = (screenWidth / 2) - (textWidth + padding) / 2;
-        final int yPosition = 5;
+        final int xPosition = 2;
+        final int yPosition = 2;
         final int backgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
 
-        ExtendedDrawContext.drawRoundedRect(
+        RenderUtility.drawRect(
                 event.getContext(),
                 xPosition,
                 yPosition,
                 textWidth + padding,
                 textHeight + padding,
-                new Vector4f(radius, radius, radius, radius),
-                new Color(backgroundColor)
+                backgroundColor
         );
 
         TextRendererUtility.renderText(
@@ -92,62 +127,167 @@ public class HUDModule extends Module {
         );
     };
 
-    private static @NotNull String getString(Mode hudMode) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if(mc.player == null) throw new IllegalStateException("Minecraft player is null!");
+    private void startShowAnimation() {
+        animationStartTime = System.currentTimeMillis();
+        isAnimatingIn = true;
+        isAnimatingOut = false;
+    }
 
-        String name = "§l" + "§d" + RyeClient.getName().charAt(0) + "§r§l" + RyeClient.getName().substring(1) + "§r";
-        String time = new java.text.SimpleDateFormat("hh:mm a").format(new Date());
+    private void startHideAnimation() {
+        animationStartTime = System.currentTimeMillis();
+        isAnimatingIn = false;
+        isAnimatingOut = true;
+    }
 
-        String bps = RyeClient.getBps();
-        String fps = RyeClient.getFps();
+    private float getAnimationProgress() {
+        long elapsed = System.currentTimeMillis() - animationStartTime;
+        float progress = Math.min(elapsed / (float) ANIMATION_DURATION, 1.0f);
 
-        int scaffoldSlot = mc.player.getInventory().getSelectedSlot();
-        int blocksRemaining = mc.player.getInventory().getStack(scaffoldSlot).getCount();
+        return 1.0f - (float) Math.pow(1.0f - progress, 3);
+    }
 
-        switch(hudMode) {
-            case NORMAL -> {
-                String userName = mc.player.getName().getString();
-                return String.format(
-                        " %s | %s f/s | %s | %s",
-                        name,
-                        fps,
-                        userName,
-                        time
-                );
+    private void drawAnimatedDynamicRect(
+            String displayText,
+            Render2DEvent event
+    ) {
+        if(mc.player == null) return;
+
+        float progress = getAnimationProgress();
+
+        if(progress >= 1.0f) {
+            if(isAnimatingOut) {
+                isAnimatingOut = false;
+                return;
             }
-
-            case SPEED, FLIGHT -> {
-                return String.format(
-                        " %s | %s f/s | %s b/s | %s",
-                        name,
-                        fps,
-                        bps,
-                        time
-                );
-            }
-
-            case SCAFFOLD -> {
-                return String.format(
-                        " %s | %s f/s | %s Remaining | %s b/s",
-                        name,
-                        fps,
-                        blocksRemaining,
-                        bps
-                );
-            }
-
-            case KILLAURA -> {
-                return String.format(
-                        " %s | %s f/s | %s | %s b/s",
-                        name,
-                        fps,
-                        String.format("%s/%s ♡", mc.player.getHealth() / 2, mc.player.getMaxHealth() / 2),
-                        bps
-                );
+            if(isAnimatingIn) {
+                isAnimatingIn = false;
             }
         }
 
-        return "error";
+        float animatedProgress;
+        if(isAnimatingIn) {
+            animatedProgress = progress;
+        } else if(isAnimatingOut) {
+            animatedProgress = 1.0f - progress;
+        } else {
+            animatedProgress = 1.0f;
+        }
+
+        final int hudPadding = 15;
+        final int hudTextWidth = TextRendererUtility.getTextWidth(String.format(
+                " %s | %s f/s | %s | %s",
+                "§l" + "§d" + RyeClient.getName().charAt(0) + "§r§l" + RyeClient.getName().substring(1) + "§r",
+                RyeClient.getFps(),
+                mc.player.getName().toString(),
+                new java.text.SimpleDateFormat("hh:mm a").format(new Date())
+        ));
+
+        final int hudWidth = hudTextWidth + hudPadding;
+        final int dynamicPadding = 15;
+        final int dynamicTextWidth = TextRendererUtility.getTextWidth(displayText);
+        final int dynamicWidth = dynamicTextWidth + dynamicPadding;
+        final int centeredX = 2 + (hudWidth - dynamicWidth) / 2;
+        final int hudBottomY = 2 + mc.textRenderer.fontHeight + hudPadding;
+        final int startY = hudBottomY - 10;
+        final int animatedY = (int) (startY + (END_Y_POSITION - startY) * animatedProgress);
+
+        int alpha = (int) (255 * animatedProgress);
+        int baseBackgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
+        int animatedBackgroundColor = applyAlpha(baseBackgroundColor, alpha);
+
+        drawDynamicRect(
+                displayText,
+                event,
+                centeredX,
+                animatedY,
+                dynamicPadding,
+                animatedBackgroundColor,
+                alpha
+        );
+    }
+
+    private int applyAlpha(int color, int alpha) {
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = color & 0xFF;
+        int originalAlpha = (color >> 24) & 0xFF;
+        
+        int combinedAlpha = (originalAlpha * alpha) / 255;
+        
+        return (combinedAlpha << 24) | (r << 16) | (g << 8) | b;
+    }
+
+    private static void drawDynamicRect(
+            String displayText,
+            Render2DEvent event,
+            int xPosition,
+            int yPosition,
+            int padding,
+            int backgroundColor,
+            int textAlpha
+    ) {
+        int textWidth = TextRendererUtility.getTextWidth(displayText);
+        int textHeight = TextRendererUtility.getTextHeight();
+
+        RenderUtility.drawRect(
+                event.getContext(),
+                xPosition,
+                yPosition,
+                textWidth + padding,
+                textHeight + padding,
+                backgroundColor
+        );
+
+        int textColor = ColorUtility.getColor(ColorUtility.Colors.WHITE);
+        int animatedTextColor = (textAlpha << 24) | (textColor & 0x00FFFFFF);
+
+        TextRendererUtility.renderText(
+                event.getContext(),
+                displayText,
+                animatedTextColor,
+                xPosition + padding / 2,
+                yPosition + padding / 2,
+                true
+        );
+    }
+
+    private static @NotNull String getString(
+            Mode hudMode,
+            String bps
+    ) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        if(mc.player == null) throw new IllegalStateException("Minecraft player is null!");
+
+        switch(hudMode) {
+            case SPEED:
+            case FLIGHT:
+                String speedFlightMsg = String.format("Going %s b/s", RyeClient.getBps());
+                lastDynamicText = speedFlightMsg;
+
+                return speedFlightMsg;
+
+            case SCAFFOLD:
+                int scaffoldSlot = mc.player.getInventory().getSelectedSlot();
+                int blocksRemaining = mc.player.getInventory().getStack(scaffoldSlot).getCount();
+                String scaffoldMsg = String.format("%s Remaining | Going %s b/s", blocksRemaining, RyeClient.getBps());
+
+                lastDynamicText = scaffoldMsg;
+
+                return scaffoldMsg;
+
+            case KILLAURA:
+                String killauraMsg = String.format("%s | Going %s b/s",
+                        String.format("%.1f/%.1f ♡", mc.player.getHealth() / 2, mc.player.getMaxHealth() / 2),
+                        bps);
+
+                lastDynamicText = killauraMsg;
+
+                return killauraMsg;
+
+            case NORMAL:
+            default:
+                if(!lastDynamicText.isEmpty()) return lastDynamicText;
+                else return "Dynamic HUD Encountered an error!";
+        }
     }
 }

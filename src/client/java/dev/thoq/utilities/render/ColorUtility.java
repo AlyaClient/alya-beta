@@ -77,7 +77,7 @@ public class ColorUtility {
             case BLACK -> 0xFF000000;
             case GRAY -> 0xFF808080;
             case LIGHT_GRAY -> 0xFFD3D3D3;
-            case PANEL -> 0x40000000;
+            case PANEL -> 0x60000000;
         };
     }
 

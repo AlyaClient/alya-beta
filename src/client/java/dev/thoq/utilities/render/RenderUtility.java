@@ -18,7 +18,8 @@ package dev.thoq.utilities.render;
 
 import net.minecraft.client.gui.DrawContext;
 
-public class RoundedUtility {
+@SuppressWarnings("unused")
+public class RenderUtility {
     public static void drawRoundedRect(DrawContext context, float x, float y, float width, float height, float radius, int color) {
         int ix = (int) x;
         int iy = (int) y;
@@ -122,9 +123,6 @@ public class RoundedUtility {
 
         float centerX = radius - 0.5f;
         float centerY = radius - 0.5f;
-
-        float pixelCenterX = px + 0.5f;
-        float pixelCenterY = py + 0.5f;
 
         int samples = 0;
         int inside = 0;
