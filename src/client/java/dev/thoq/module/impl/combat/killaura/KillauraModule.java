@@ -1,19 +1,3 @@
-/*
- * Copyright (c) Rye Client 2025-2025.
- *
- * This file belongs to Rye Client,
- * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/RyeClient/rye-v1.git
- *
- * THIS PROJECT DOES NOT HAVE A WARRANTY.
- *
- * Rye (and subsequently, its files) are all licensed under the MIT License.
- * Rye should have come with a copy of the MIT License.
- * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
- *
- */
-
 package dev.thoq.module.impl.combat.killaura;
 
 import dev.thoq.event.IEventListener;
@@ -32,7 +16,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -51,7 +34,8 @@ public class KillauraModule extends Module {
 
     private final ModeSetting attackMode = new ModeSetting("AttackMode", "Attack mode", "Single", "Single", "Switch", "Multi");
     private final ModeSetting targetMode = new ModeSetting("Target", "Target types", "Players", "Players", "Passive", "Hostile", "All");
-    private final NumberSetting<Double> range = new NumberSetting<>("Range", "Attack range", 4.0, 3.0, 1000.0);
+    private final NumberSetting<Double> swingDistance = new NumberSetting<>("SwingDistance", "Distance to start swinging", 4.5, 3.0, 1000.0);
+    private final NumberSetting<Double> reach = new NumberSetting<>("Reach", "Distance to actually attack from", 4.0, 3.0, 1000.0);
     private final NumberSetting<Integer> cps = new NumberSetting<>("CPS", "Attacks per second", 12, 1, 20);
     private final BooleanSetting noHitDelay = new BooleanSetting("NoHitDelay", "Remove attack delay", false);
     private final BooleanSetting raycast = new BooleanSetting("Raycast", "Check line of sight to target", true);
@@ -63,7 +47,6 @@ public class KillauraModule extends Module {
     private final BooleanSetting gcd = new BooleanSetting("GCD", "Greatest Common Divisor stuff idfk", true);
     private final BooleanSetting autoBlock = new BooleanSetting("AutoBlock", "Auto block with sword", false);
     private final ModeSetting autoBlockMode = new ModeSetting("AutoBlockMode", "AutoBlock mode", "Vanilla", "Vanilla", "Packet");
-    private final BooleanSetting showParticles = new BooleanSetting("ShowParticles", "Show attack particles", false);
     private final List<Entity> targets = new ArrayList<>();
     private Entity currentTarget;
     private int switchTimer = 0;
@@ -88,19 +71,19 @@ public class KillauraModule extends Module {
 
         addSetting(attackMode);
         addSetting(targetMode);
-        addSetting(range);
+        addSetting(swingDistance);
+        addSetting(reach);
         addSetting(cps);
-        addSetting(noHitDelay);
-        addSetting(raycast);
         addSetting(rotate);
         addSetting(rotationMode);
         addSetting(serverSideRotations);
         addSetting(rotationSpeed);
-        addSetting(gcd);
         addSetting(autoBlock);
         addSetting(autoBlockMode);
-        addSetting(showParticles);
         addSetting(movementCorrection);
+        addSetting(gcd);
+        addSetting(raycast);
+        addSetting(noHitDelay);
     }
 
     private final IEventListener<MotionEvent> motionEvent = event -> {
@@ -137,16 +120,7 @@ public class KillauraModule extends Module {
 
         if(mc.player == null || mc.world == null) return;
 
-        Box searchBox = new Box(
-                mc.player.getX() - range.getValue(),
-                mc.player.getY() - range.getValue(),
-                mc.player.getZ() - range.getValue(),
-                mc.player.getX() + range.getValue(),
-                mc.player.getY() + range.getValue(),
-                mc.player.getZ() + range.getValue()
-        );
-
-        List<Entity> entities = mc.world.getEntitiesByClass(Entity.class, searchBox, this::isValidTarget);
+        List<Entity> entities = mc.world.getEntitiesByClass(Entity.class, mc.player.getBoundingBox().expand(1000), this::isValidTarget);
         entities.sort(Comparator.comparingDouble(entity -> entity.squaredDistanceTo(mc.player)));
 
         for(Entity entity : entities) {
@@ -341,6 +315,10 @@ public class KillauraModule extends Module {
     private boolean canAttack() {
         if(targets.isEmpty() || mc.player == null) return false;
 
+        if(currentTarget != null && mc.player.distanceTo(currentTarget) > reach.getValue()) {
+            return false;
+        }
+
         if(noHitDelay.getValue()) return true;
 
         long currentTime = System.currentTimeMillis();
@@ -360,9 +338,11 @@ public class KillauraModule extends Module {
 
         if(attackMode.getValue().equals("Multi")) {
             for(Entity target : targets) {
-                attackEntity(target);
+                if(mc.player.distanceTo(target) <= reach.getValue()) {
+                    attackEntity(target);
+                }
             }
-        } else if(currentTarget != null) {
+        } else if(currentTarget != null && mc.player.distanceTo(currentTarget) <= reach.getValue()) {
             attackEntity(currentTarget);
         }
 
@@ -386,11 +366,14 @@ public class KillauraModule extends Module {
     private void attackEntity(Entity target) {
         if(target == null || mc.interactionManager == null || mc.player == null) return;
 
-        mc.interactionManager.attackEntity(mc.player, target);
-        mc.player.swingHand(Hand.MAIN_HAND);
+        double distanceToTarget = mc.player.distanceTo(target);
 
-        if(showParticles.getValue()) {
-            mc.player.onAttacking(target);
+        if(distanceToTarget <= swingDistance.getValue()) {
+            mc.player.swingHand(Hand.MAIN_HAND);
+        }
+
+        if(distanceToTarget <= reach.getValue()) {
+            mc.interactionManager.attackEntity(mc.player, target);
         }
     }
 

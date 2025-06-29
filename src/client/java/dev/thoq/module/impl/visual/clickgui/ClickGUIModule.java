@@ -29,7 +29,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class ClickGUIModule extends Module {
 
-    private final ModeSetting guiMode = new ModeSetting("GUI Mode", "Choose between dropdown and window GUI", "Dropdown", "Dropdown", "Window");
+    private final ModeSetting guiMode = new ModeSetting("GUIMode", "Choose between dropdown and window GUI", "Dropdown", "Dropdown");
     private final DropDownClickGUI dropDownGUI = new DropDownClickGUI();
 
     public ClickGUIModule() {
