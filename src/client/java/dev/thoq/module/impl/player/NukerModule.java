@@ -31,14 +31,17 @@ import net.minecraft.world.World;
 
 @SuppressWarnings("unused")
 public class NukerModule extends Module {
+    private final BooleanSetting clearStatsOnToggle = new BooleanSetting("ClearStats", "Clear stats on toggle", false);
     private final BooleanSetting instaBreak = new BooleanSetting("InstaBreak", "kachow", true);
     private final BooleanSetting americanMode = new BooleanSetting("American", "Eat the map whilst being teleported", false);
     private final BooleanSetting teleportToPlayerOverride = new BooleanSetting("PlayerPort", "Teleport to players instead of blocks", false);
     private int teleportCooldown = 0;
+    private static int blocksDestroyed = 0;
 
     public NukerModule() {
         super("Nuker", "Destroy blocks automatically", ModuleCategory.PLAYER);
 
+        addSetting(clearStatsOnToggle);
         addSetting(instaBreak.setVisibilityCondition(() -> !americanMode.getValue()));
         addSetting(americanMode);
         addSetting(teleportToPlayerOverride.setVisibilityCondition(americanMode::getValue));
@@ -76,6 +79,8 @@ public class NukerModule extends Module {
 
                         mc.getNetworkHandler().sendPacket(startBreaking);
                         mc.getNetworkHandler().sendPacket(stopBreaking);
+
+                        blocksDestroyed++;
                     }
                 }
             }
@@ -116,6 +121,7 @@ public class NukerModule extends Module {
 
                         mc.getNetworkHandler().sendPacket(startBreaking);
                         mc.getNetworkHandler().sendPacket(stopBreaking);
+                        blocksDestroyed++;
                     }
                 }
             }
@@ -234,5 +240,21 @@ public class NukerModule extends Module {
         }
 
         return count;
+    }
+
+    @Override
+    protected void onEnable() {
+        if(clearStatsOnToggle.getValue())
+            blocksDestroyed = 0;
+    }
+
+    @Override
+    protected void onDisable() {
+        if(clearStatsOnToggle.getValue())
+            blocksDestroyed = 0;
+    }
+
+    public static int getBlocksDestroyed() {
+        return blocksDestroyed;
     }
 }

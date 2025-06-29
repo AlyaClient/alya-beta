@@ -21,6 +21,7 @@ import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.Render2DEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
+import dev.thoq.module.impl.player.NukerModule;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.RenderUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
@@ -51,7 +52,8 @@ public class HUDModule extends Module {
         SCAFFOLD,
         SPEED,
         FLIGHT,
-        KILLAURA
+        KILLAURA,
+        NUKER
     }
 
     private final IEventListener<Render2DEvent> renderEvent = event -> {
@@ -61,6 +63,7 @@ public class HUDModule extends Module {
         boolean scaffoldEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Scaffold").isEnabled();
         boolean speedEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Speed").isEnabled();
         boolean flightEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Flight").isEnabled();
+        boolean nukerEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Nuker").isEnabled();
 
         Mode mode = Mode.NORMAL;
 
@@ -68,11 +71,12 @@ public class HUDModule extends Module {
         if(speedEnabled) mode = Mode.SPEED;
         if(scaffoldEnabled) mode = Mode.SCAFFOLD;
         if(killauraEnabled) mode = Mode.KILLAURA;
+        if(nukerEnabled) mode = Mode.NUKER;
 
         String time = RyeClient.getTime();
         String fps = RyeClient.getFps();
         String bps = RyeClient.getBps();
-        String name = mc.player.getName().toString();
+        String name = mc.player.getName().getString();
         String clientName = "§l" + "§d" + RyeClient.getName().charAt(0) + "§r§l" + RyeClient.getName().substring(1) + "§r";
 
         boolean shouldShowDynamic = mode != Mode.NORMAL;
@@ -178,7 +182,7 @@ public class HUDModule extends Module {
                 " %s | %s f/s | %s | %s",
                 "§l" + "§d" + RyeClient.getName().charAt(0) + "§r§l" + RyeClient.getName().substring(1) + "§r",
                 RyeClient.getFps(),
-                mc.player.getName().toString(),
+                mc.player.getName().getString(),
                 new java.text.SimpleDateFormat("hh:mm a").format(new Date())
         ));
 
@@ -283,6 +287,13 @@ public class HUDModule extends Module {
                 lastDynamicText = killauraMsg;
 
                 return killauraMsg;
+
+            case NUKER:
+                String nukerMsg = String.format("%s blocks destroyed", NukerModule.getBlocksDestroyed());
+
+                lastDynamicText = nukerMsg;
+
+                return nukerMsg;
 
             case NORMAL:
             default:
