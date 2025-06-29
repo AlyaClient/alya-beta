@@ -14,7 +14,7 @@
     "WatermarkTitleScreenMixin",
     "WatermarkTitleScreenMixin",
     "accessors.MinecraftClientAccessor",
-    "accessors.MinecraftClientAccessor"
+    "accessors.LivingEntityJumpAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

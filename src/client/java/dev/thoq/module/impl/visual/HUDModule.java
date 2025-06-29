@@ -22,6 +22,7 @@ import dev.thoq.event.impl.Render2DEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.player.NukerModule;
+import dev.thoq.module.impl.player.ReachModule;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.RenderUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
@@ -53,7 +54,8 @@ public class HUDModule extends Module {
         SPEED,
         FLIGHT,
         KILLAURA,
-        NUKER
+        NUKER,
+        REACH,
     }
 
     private final IEventListener<Render2DEvent> renderEvent = event -> {
@@ -64,6 +66,7 @@ public class HUDModule extends Module {
         boolean speedEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Speed").isEnabled();
         boolean flightEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Flight").isEnabled();
         boolean nukerEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Nuker").isEnabled();
+        boolean reachEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Reach").isEnabled();
 
         Mode mode = Mode.NORMAL;
 
@@ -72,6 +75,7 @@ public class HUDModule extends Module {
         if(scaffoldEnabled) mode = Mode.SCAFFOLD;
         if(killauraEnabled) mode = Mode.KILLAURA;
         if(nukerEnabled) mode = Mode.NUKER;
+        if(reachEnabled) mode = Mode.REACH;
 
         String time = RyeClient.getTime();
         String fps = RyeClient.getFps();
@@ -294,6 +298,13 @@ public class HUDModule extends Module {
                 lastDynamicText = nukerMsg;
 
                 return nukerMsg;
+
+            case REACH:
+                String reachMsg = String.format("Reached %.1f blocks", ReachModule.getLastReach());
+
+                lastDynamicText = reachMsg;
+
+                return reachMsg;
 
             case NORMAL:
             default:

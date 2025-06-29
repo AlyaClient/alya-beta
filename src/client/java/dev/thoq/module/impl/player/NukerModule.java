@@ -17,126 +17,181 @@
 package dev.thoq.module.impl.player;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
+import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.misc.ChatUtility;
+import dev.thoq.utilities.misc.RaycastUtility;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 @SuppressWarnings("unused")
 public class NukerModule extends Module {
-    private final BooleanSetting clearStatsOnToggle = new BooleanSetting("ClearStats", "Clear stats on toggle", false);
-    private final BooleanSetting instaBreak = new BooleanSetting("InstaBreak", "kachow", true);
-    private final BooleanSetting americanMode = new BooleanSetting("American", "Eat the map whilst being teleported", false);
+    private final ModeSetting modeSetting = new ModeSetting("Mode", "modes go brrrrr", "Instant", "Instant", "American", "RemoteBomb");
     private final BooleanSetting teleportToPlayerOverride = new BooleanSetting("PlayerPort", "Teleport to players instead of blocks", false);
+    private final BooleanSetting clearStatsOnToggle = new BooleanSetting("ClearStats", "Clear stats on toggle", false);
     private int teleportCooldown = 0;
     private static int blocksDestroyed = 0;
 
     public NukerModule() {
         super("Nuker", "Destroy blocks automatically", ModuleCategory.PLAYER);
 
+        addSetting(modeSetting);
+        addSetting(teleportToPlayerOverride.setVisibilityCondition(() -> "American".equals(modeSetting.getValue())));
         addSetting(clearStatsOnToggle);
-        addSetting(instaBreak.setVisibilityCondition(() -> !americanMode.getValue()));
-        addSetting(americanMode);
-        addSetting(teleportToPlayerOverride.setVisibilityCondition(americanMode::getValue));
     }
 
     // TODO: Make it more then just boom world gone
     private final IEventListener<TickEvent> tickEvent = event -> {
-        if(instaBreak.getValue()) {
-            if(mc.player == null || mc.world == null || mc.getNetworkHandler() == null || !event.isPre()) return;
+        String mode = ((ModeSetting) getSetting("Mode")).getValue();
+        switch(mode) {
+            case "Instant": {
+                if(mc.player == null || mc.world == null || mc.getNetworkHandler() == null || !event.isPre()) return;
 
-            World world = mc.world;
-            BlockPos playerPos = mc.player.getBlockPos();
+                World world = mc.world;
+                BlockPos playerPos = mc.player.getBlockPos();
 
-            int radius = 2;
+                int radius = 2;
 
-            for(int x = -radius; x <= radius; x++) {
-                for(int y = -radius; y <= radius; y++) {
-                    for(int z = -radius; z <= radius; z++) {
-                        BlockPos blockPos = playerPos.add(x, y, z);
-                        Block block = world.getBlockState(blockPos).getBlock();
+                for(int x = -radius; x <= radius; x++) {
+                    for(int y = -radius; y <= radius; y++) {
+                        for(int z = -radius; z <= radius; z++) {
+                            BlockPos blockPos = playerPos.add(x, y, z);
+                            Block block = world.getBlockState(blockPos).getBlock();
 
-                        if(block == Blocks.AIR) continue;
+                            if(block == Blocks.AIR) continue;
 
-                        PlayerActionC2SPacket startBreaking = new PlayerActionC2SPacket(
-                                PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
-                                blockPos,
-                                Direction.UP
-                        );
+                            PlayerActionC2SPacket startBreaking = new PlayerActionC2SPacket(
+                                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
+                                    blockPos,
+                                    Direction.UP
+                            );
 
-                        PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
-                                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
-                                blockPos,
-                                Direction.UP
-                        );
+                            PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
+                                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
+                                    blockPos,
+                                    Direction.UP
+                            );
 
-                        mc.getNetworkHandler().sendPacket(startBreaking);
-                        mc.getNetworkHandler().sendPacket(stopBreaking);
+                            mc.getNetworkHandler().sendPacket(startBreaking);
+                            mc.getNetworkHandler().sendPacket(stopBreaking);
 
-                        blocksDestroyed++;
+                            blocksDestroyed++;
+                        }
                     }
                 }
+
+                break;
             }
-        } else if(americanMode.getValue()) {
-            final int teleportDelay = 5; // ticks
 
-            if(mc.player == null || mc.player.getGameMode() == null || mc.world == null || mc.getNetworkHandler() == null || !event.isPre())
-                return;
+            case "American": {
+                final int teleportDelay = 5; // ticks
 
-            World world = mc.world;
-            BlockPos playerPos = mc.player.getBlockPos();
-            int radius = 1;
+                if(mc.player == null || mc.player.getGameMode() == null || mc.world == null || mc.getNetworkHandler() == null || !event.isPre())
+                    return;
 
-            // eat all blocks around the player
-            boolean foundBlocks = false;
-            for(int x = -radius; x <= radius; x++) {
-                for(int y = -radius; y <= radius; y++) {
-                    for(int z = -radius; z <= radius; z++) {
-                        BlockPos blockPos = playerPos.add(x, y, z);
-                        Block block = world.getBlockState(blockPos).getBlock();
+                World world = mc.world;
+                BlockPos playerPos = mc.player.getBlockPos();
+                int radius = 1;
 
-                        if(block == Blocks.AIR) continue;
-                        if(!mc.player.getGameMode().isCreative() && block == Blocks.BEDROCK) continue;
+                // eat all blocks around the player
+                boolean foundBlocks = false;
+                for(int x = -radius; x <= radius; x++) {
+                    for(int y = -radius; y <= radius; y++) {
+                        for(int z = -radius; z <= radius; z++) {
+                            BlockPos blockPos = playerPos.add(x, y, z);
+                            Block block = world.getBlockState(blockPos).getBlock();
 
-                        foundBlocks = true;
+                            if(block == Blocks.AIR) continue;
+                            if(!mc.player.getGameMode().isCreative() && block == Blocks.BEDROCK) continue;
 
-                        PlayerActionC2SPacket startBreaking = new PlayerActionC2SPacket(
-                                PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
-                                blockPos,
-                                Direction.UP
-                        );
+                            foundBlocks = true;
 
-                        PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
-                                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
-                                blockPos,
-                                Direction.UP
-                        );
+                            PlayerActionC2SPacket startBreaking = new PlayerActionC2SPacket(
+                                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
+                                    blockPos,
+                                    Direction.UP
+                            );
 
-                        mc.getNetworkHandler().sendPacket(startBreaking);
-                        mc.getNetworkHandler().sendPacket(stopBreaking);
-                        blocksDestroyed++;
+                            PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
+                                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
+                                    blockPos,
+                                    Direction.UP
+                            );
+
+                            mc.getNetworkHandler().sendPacket(startBreaking);
+                            mc.getNetworkHandler().sendPacket(stopBreaking);
+                            blocksDestroyed++;
+                        }
                     }
                 }
-            }
 
-            if(!foundBlocks && teleportCooldown <= 0) {
-                BlockPos bestLocation = findLocationWithMostBlocks(world, playerPos);
-                if(bestLocation != null) {
-                    ChatUtility.sendDebug("teleported");
-                    mc.player.setPosition(bestLocation.getX() + 0.5, bestLocation.getY() + 1, bestLocation.getZ() + 0.5);
-                    teleportCooldown = teleportDelay;
+                if(!foundBlocks && teleportCooldown <= 0) {
+                    BlockPos bestLocation = findLocationWithMostBlocks(world, playerPos);
+                    if(bestLocation != null) {
+                        ChatUtility.sendDebug("teleported");
+                        mc.player.setPosition(bestLocation.getX() + 0.5, bestLocation.getY() + 1, bestLocation.getZ() + 0.5);
+                        teleportCooldown = teleportDelay;
+                    }
                 }
+
+                if(teleportCooldown > 0) {
+                    teleportCooldown--;
+                }
+
+                break;
             }
 
-            if(teleportCooldown > 0) {
-                teleportCooldown--;
+            case "RemoteBomb": {
+                if(mc.player == null || mc.player.getGameMode() == null || mc.world == null || mc.getNetworkHandler() == null || !event.isPre()) return;
+
+                if(mc.options.attackKey.isPressed()) {
+                    BlockHitResult hitResult = RaycastUtility.raycast(mc, 1000.0);
+
+                    if(hitResult != null) {
+                        BlockPos centerPos = hitResult.getBlockPos();
+                        Direction face = hitResult.getSide();
+
+                        int radius = 2;
+
+                        for(int x = -radius; x <= radius; x++) {
+                            for(int y = -radius; y <= radius; y++) {
+                                for(int z = -radius; z <= radius; z++) {
+                                    BlockPos blockPos = centerPos.add(x, y, z);
+                                    Block block = mc.world.getBlockState(blockPos).getBlock();
+
+                                    if(block == Blocks.AIR) continue;
+                                    if(!mc.player.getGameMode().isCreative() && block == Blocks.BEDROCK) continue;
+
+                                    PlayerActionC2SPacket startBreaking = new PlayerActionC2SPacket(
+                                            PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
+                                            blockPos,
+                                            face
+                                    );
+
+                                    PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
+                                            PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
+                                            blockPos,
+                                            face
+                                    );
+
+                                    mc.getNetworkHandler().sendPacket(startBreaking);
+                                    mc.getNetworkHandler().sendPacket(stopBreaking);
+
+                                    blocksDestroyed++;
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
             }
         }
     };

@@ -21,6 +21,7 @@ import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
+import dev.thoq.utilities.misc.RaycastUtility;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -31,6 +32,7 @@ import net.minecraft.world.RaycastContext;
 
 @SuppressWarnings("SameParameterValue")
 public class ReachModule extends Module {
+    private static double lastReach = 0d;
 
     /**
      * @credit: NezhaAnticheat - for funny name
@@ -43,34 +45,10 @@ public class ReachModule extends Module {
         addSetting(remoteSpleefHacks);
     }
 
-    private BlockHitResult raycast(double maxDistance) {
-        if(mc.player == null || mc.world == null) return null;
-
-        Vec3d start = mc.player.getCameraPosVec(1.0f);
-        Vec3d direction = mc.player.getRotationVec(1.0f);
-        Vec3d end = start.add(direction.multiply(maxDistance));
-
-        RaycastContext context = new RaycastContext(
-                start,
-                end,
-                RaycastContext.ShapeType.OUTLINE,
-                RaycastContext.FluidHandling.NONE,
-                mc.player
-        );
-
-        BlockHitResult result = mc.world.raycast(context);
-
-        if(result.getType() == HitResult.Type.BLOCK) {
-            return result;
-        }
-
-        return null;
-    }
-
     private final IEventListener<MotionEvent> motionEvent = event -> {
         if(remoteSpleefHacks.getValue() && mc.player != null && mc.world != null && mc.getNetworkHandler() != null) {
             if(mc.options.attackKey.isPressed()) {
-                BlockHitResult hitResult = raycast(100.0);
+                BlockHitResult hitResult = RaycastUtility.raycast(mc, 10000.0);
 
                 if(hitResult != null) {
                     BlockPos blockPos = hitResult.getBlockPos();
@@ -90,8 +68,14 @@ public class ReachModule extends Module {
 
                     mc.getNetworkHandler().sendPacket(startBreaking);
                     mc.getNetworkHandler().sendPacket(stopBreaking);
+
+                    lastReach = hitResult.getPos().distanceTo(mc.player.getEyePos());
                 }
             }
         }
     };
+
+    public static double getLastReach() {
+        return lastReach;
+    }
 }
