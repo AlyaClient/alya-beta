@@ -58,7 +58,7 @@ public class NukerModule extends Module {
                 World world = mc.world;
                 BlockPos playerPos = mc.player.getBlockPos();
 
-                int radius = 2;
+                int radius = 3;
 
                 for(int x = -radius; x <= radius; x++) {
                     for(int y = -radius; y <= radius; y++) {
