@@ -5,8 +5,10 @@
  * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
- * This project (and subsequently, its files) are all licensed under the MIT License.
- * This project should have come with a copy of the MIT License.
+ * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ *
+ * Rye (and subsequently, its files) are all licensed under the MIT License.
+ * Rye should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
  *
@@ -20,17 +22,21 @@ import dev.thoq.event.impl.Render2DEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.render.ColorUtility;
-import dev.thoq.utilities.render.RoundedUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
+import me.x150.renderer.render.ExtendedDrawContext;
+import me.x150.renderer.util.Color;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector4f;
 
 import java.util.Date;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class HUDModule extends Module {
 
     public HUDModule() {
         super("HUD", "Shows Heads Up Display", ModuleCategory.VISUAL);
+
         this.setEnabled(true);
     }
 
@@ -58,6 +64,7 @@ public class HUDModule extends Module {
         String displayText = getString(mode);
 
         final int padding = 15;
+        final int radius = 12;
         final int screenWidth = event.getContext().getScaledWindowWidth();
         final int xPosition = (screenWidth / 2) - (TextRendererUtility.getTextWidth(displayText) / 2);
         final int yPosition = 2;
@@ -65,23 +72,23 @@ public class HUDModule extends Module {
         final int textWidth = TextRendererUtility.getTextWidth(displayText);
         final int textHeight = mc.textRenderer.fontHeight;
 
-        RoundedUtility.drawRoundedRect(
+        ExtendedDrawContext.drawRoundedRect(
                 event.getContext(),
                 xPosition,
                 yPosition,
                 textWidth + padding,
                 textHeight + padding,
-                30f,
-                backgroundColor
+                new Vector4f(radius, radius, radius, radius),
+                new Color(backgroundColor)
         );
 
         TextRendererUtility.renderText(
                 event.getContext(),
                 displayText,
                 ColorUtility.Colors.WHITE,
-                xPosition + padding / 2,
-                yPosition + padding / 2,
-                false
+                xPosition,
+                yPosition,
+                true
         );
     };
 

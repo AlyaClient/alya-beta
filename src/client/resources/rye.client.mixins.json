@@ -9,11 +9,12 @@
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
     "InGameHudMixin",
-    "LivingEntityJumpAccessor",
+    "accessors.MinecraftClientAccessor",
     "MinecraftClientMixin",
     "RenderTickCounterMixin",
     "WatermarkTitleScreenMixin",
     "accessors.MinecraftClientAccessor"
+    "WatermarkTitleScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
