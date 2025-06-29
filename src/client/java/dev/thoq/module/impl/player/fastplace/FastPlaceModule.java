@@ -18,6 +18,8 @@ package dev.thoq.module.impl.player.fastplace;
 
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.TickEvent;
+import dev.thoq.mixin.client.MinecraftClientMixin;
+import dev.thoq.mixin.client.accessors.MinecraftClientAccessor;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.misc.ChatUtility;
@@ -31,7 +33,7 @@ public class FastPlaceModule extends Module {
 
     private final IEventListener<TickEvent> tickEvent = event -> {
         if(!isEnabled() || mc.player == null || !event.isPre()) return;
-
-        // ig so it merges??
+        ((MinecraftClientAccessor) this.mc).setItemUseCooldown(0);
     };
+
 }

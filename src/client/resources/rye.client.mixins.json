@@ -12,6 +12,8 @@
     "accessors.MinecraftClientAccessor",
     "MinecraftClientMixin",
     "RenderTickCounterMixin",
+    "WatermarkTitleScreenMixin",
+    "accessors.MinecraftClientAccessor"
     "WatermarkTitleScreenMixin"
   ],
   "injectors": {
