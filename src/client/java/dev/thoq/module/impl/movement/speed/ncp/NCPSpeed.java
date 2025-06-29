@@ -16,7 +16,7 @@
 
 package dev.thoq.module.impl.movement.speed.ncp;
 
-import dev.thoq.mixin.client.LivingEntityJumpAccessor;
+import dev.thoq.mixin.client.accessors.LivingEntityJumpAccessor;
 import dev.thoq.utilities.misc.ChatUtility;
 import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
