@@ -5,12 +5,31 @@
  * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
- * This project (and subsequently, its files) are all licensed under the MIT License.
- * This project should have come with a copy of the MIT License.
+ * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ *
+ * Rye (and subsequently, its files) are all licensed under the MIT License.
+ * Rye should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
  *
  */
+
+import org.gradle.internal.os.OperatingSystem
+
+class Lwjgl {
+	static String getClassifier() {
+		switch (OperatingSystem.current()) {
+			case OperatingSystem.LINUX:
+				return "linux"
+			case OperatingSystem.MAC_OS:
+				return System.getProperty("os.arch").startsWith("aarch64") ? "macos-arm64" : "macos"
+			case OperatingSystem.WINDOWS:
+				return System.getProperty("os.arch").contains("64") ? "windows" : "windows-x86"
+			default:
+				throw new Error("Unrecognized or unsupported Operating system. Please set \"lwjglNatives\" manually")
+		}
+	}
+}
 
 plugins {
 	id 'fabric-loom' version '1.10-SNAPSHOT'
@@ -55,7 +74,17 @@ dependencies {
 
 	// Jackson for JSON processing
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+	// LWJGL HarfBuzz bindings
+	include(implementation("org.lwjgl:lwjgl-harfbuzz:3.3.3"))
+
+	// Platform-specific natives
+	def lwjglNatives = Lwjgl.getClassifier()
+	include(implementation("org.lwjgl:lwjgl-harfbuzz:3.3.3:natives-${lwjglNatives}"))
+
+	// i do not want to make a renderer
+	modImplementation "io.github.0x3c50.renderer:renderer-fabric:2.1.0"
 }
 
 processResources {
@@ -95,6 +124,7 @@ publishing {
 		}
 	}
 }
+
 kotlin {
     jvmToolchain(21)
 }

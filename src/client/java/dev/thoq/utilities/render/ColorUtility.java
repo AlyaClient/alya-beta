@@ -5,8 +5,10 @@
  * an open-source Fabric injection client.
  * Rye GitHub: https://github.com/RyeClient/rye-v1.git
  *
- * This project (and subsequently, its files) are all licensed under the MIT License.
- * This project should have come with a copy of the MIT License.
+ * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ *
+ * Rye (and subsequently, its files) are all licensed under the MIT License.
+ * Rye should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
  *
@@ -75,7 +77,7 @@ public class ColorUtility {
             case BLACK -> 0xFF000000;
             case GRAY -> 0xFF808080;
             case LIGHT_GRAY -> 0xFFD3D3D3;
-            case PANEL -> 0x90000000;
+            case PANEL -> 0x40000000;
         };
     }
 
