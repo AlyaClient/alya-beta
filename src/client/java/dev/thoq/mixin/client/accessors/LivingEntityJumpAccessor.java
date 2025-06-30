@@ -14,16 +14,14 @@
  *
  */
 
-package dev.thoq.mixin.client.accessors.misc;
+package dev.thoq.mixin.client.accessors;
 
-import net.minecraft.client.MinecraftClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import net.minecraft.entity.LivingEntity;
 
-@Mixin(MinecraftClient.class)
-public interface MinecraftClientAccessor {
-
-    @Accessor("itemUseCooldown")
-    void setItemUseCooldown(int cooldown);
-
+@Mixin(LivingEntity.class)
+public interface LivingEntityJumpAccessor {
+    @Accessor("jumpingCooldown")
+    void setJumpingCooldown(int jumpingCooldown);
 }

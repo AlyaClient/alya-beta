@@ -3,8 +3,8 @@
   "package": "dev.thoq.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "accessors.misc.MinecraftClientAccessor",
-    "accessors.player.LivingEntityJumpAccessor",
+    "accessors.MinecraftClientAccessor",
+    "accessors.LivingEntityJumpAccessor",
     "hud.ChatInputSuggestorMixin",
     "hud.ChatScreenMixin",
     "hud.InGameHudMixin",

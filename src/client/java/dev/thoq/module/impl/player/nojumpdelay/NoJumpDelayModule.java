@@ -18,7 +18,7 @@ package dev.thoq.module.impl.player.nojumpdelay;
 
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.MotionEvent;
-import dev.thoq.mixin.client.accessors.player.LivingEntityJumpAccessor;
+import dev.thoq.mixin.client.accessors.LivingEntityJumpAccessor;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 

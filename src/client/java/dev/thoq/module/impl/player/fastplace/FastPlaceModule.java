@@ -18,7 +18,7 @@ package dev.thoq.module.impl.player.fastplace;
 
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.TickEvent;
-import dev.thoq.mixin.client.accessors.misc.MinecraftClientAccessor;
+import dev.thoq.mixin.client.accessors.MinecraftClientAccessor;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 
