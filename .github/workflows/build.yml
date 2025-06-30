@@ -33,8 +33,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: dev-${{ github.run_number }}
-          name: Development Build ${{ github.run_number }}
-          body: Rye Development build (dev-${{ github.run_number }})
+          name: v1.1.${{ github.run_number }}
+          body: Rye Development Build (dev-${{ github.run_number }})
           files: build/libs/*
           prerelease: true
         env:
