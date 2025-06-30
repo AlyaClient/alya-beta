@@ -140,7 +140,8 @@ public class RyeClient implements ClientModInitializer {
                         new CPUExploitModule(),
                         new KeyStrokesModule(),
                         new NukerModule(),
-                        new ReachModule()
+                        new ReachModule(),
+                        new PerformanceModule()
                 );
     }
 

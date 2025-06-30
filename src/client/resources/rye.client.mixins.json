@@ -3,8 +3,8 @@
   "package": "dev.thoq.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "accessors.MinecraftClientAccessor",
     "accessors.LivingEntityJumpAccessor",
+    "accessors.MinecraftClientAccessor",
     "hud.ChatInputSuggestorMixin",
     "hud.ChatScreenMixin",
     "hud.InGameHudMixin",
@@ -13,6 +13,10 @@
     "network.ClientConnectionMixin",
     "network.ClientPlayerEntityMixin",
     "network.ClientPlayNetworkHandlerMixin",
+    "performance.ChunkBuilderOptimizationMixin",
+    "performance.ChunkOcclusionOptimizationMixin",
+    "performance.ChunkRenderingOptimizationMixin",
+    "performance.EntityCullingOptimizationMixin",
     "ui.ScreenMixin",
     "ui.WatermarkTitleScreenMixin"
   ],
