@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Rye Client 2025-2025.
+ * Copyright (c) Rye Client 2024-2025.
  *
  * This file belongs to Rye Client,
  * an open-source Fabric injection client.

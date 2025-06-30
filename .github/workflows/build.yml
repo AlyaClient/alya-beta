@@ -32,9 +32,9 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v0.1.${{ github.run_number }}
-          name: v0.1.${{ github.run_number }}
-          body: Rye Development Build (dev-${{ github.run_number }})
+          tag_name: v0.2.0
+          name: Rye Beta v0.2.0
+          body: Rye Development (Beta) Build (dev-${{ github.run_number }})
           files: build/libs/*
           prerelease: true
         env:
