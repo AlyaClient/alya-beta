@@ -18,6 +18,7 @@ package dev.thoq.module.impl.player;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
+import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
@@ -34,16 +35,18 @@ import net.minecraft.world.World;
 
 @SuppressWarnings("unused")
 public class NukerModule extends Module {
-    private final ModeSetting modeSetting = new ModeSetting("Mode", "modes go brrrrr", "Instant", "Instant", "American", "RemoteBomb");
+    private final ModeSetting modeSetting = new ModeSetting("Mode", "modes go brrrrr", "Instant", "Instant", "American", "RemoteBomb", "Bed");
+    private final NumberSetting<Integer> bedDist = new NumberSetting<>("Distance", "Distance to break bed", 3, 1, 10);
     private final BooleanSetting teleportToPlayerOverride = new BooleanSetting("PlayerPort", "Teleport to players instead of blocks", false);
     private final BooleanSetting clearStatsOnToggle = new BooleanSetting("ClearStats", "Clear stats on toggle", false);
     private int teleportCooldown = 0;
     private static int blocksDestroyed = 0;
 
     public NukerModule() {
-        super("Nuker", "Destroy blocks automatically", ModuleCategory.PLAYER);
+        super("Nuker", "Destroy blocks automatically", ModuleCategory.UTILITY);
 
         addSetting(modeSetting);
+        addSetting(bedDist.setVisibilityCondition(() -> "Bed".equals(modeSetting.getValue())));
         addSetting(teleportToPlayerOverride.setVisibilityCondition(() -> "American".equals(modeSetting.getValue())));
         addSetting(clearStatsOnToggle);
     }
@@ -193,6 +196,48 @@ public class NukerModule extends Module {
                 }
                 break;
             }
+
+            case "Bed": {
+                if(mc.player == null || mc.player.getGameMode() == null || mc.world == null || mc.getNetworkHandler() == null || !event.isPre())
+                    return;
+
+                World world = mc.world;
+                BlockPos playerPos = mc.player.getBlockPos();
+                int radius = bedDist.getValue();
+
+                for(int x = -radius; x <= radius; x++) {
+                    for(int y = -radius; y <= radius; y++) {
+                        for(int z = -radius; z <= radius; z++) {
+                            BlockPos blockPos = playerPos.add(x, y, z);
+                            Block block = world.getBlockState(blockPos).getBlock();
+
+                            if(block != Blocks.RED_BED && block != Blocks.BLACK_BED && block != Blocks.BLUE_BED
+                                    && block != Blocks.BROWN_BED && block != Blocks.CYAN_BED && block != Blocks.GRAY_BED
+                                    && block != Blocks.GREEN_BED && block != Blocks.LIGHT_BLUE_BED && block != Blocks.LIGHT_GRAY_BED
+                                    && block != Blocks.LIME_BED && block != Blocks.MAGENTA_BED && block != Blocks.ORANGE_BED
+                                    && block != Blocks.PINK_BED && block != Blocks.PURPLE_BED && block != Blocks.WHITE_BED
+                                    && block != Blocks.YELLOW_BED) continue;
+
+                            PlayerActionC2SPacket startBreaking = new PlayerActionC2SPacket(
+                                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
+                                    blockPos,
+                                    Direction.UP
+                            );
+
+                            PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
+                                    PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
+                                    blockPos,
+                                    Direction.UP
+                            );
+
+                            mc.getNetworkHandler().sendPacket(startBreaking);
+                            mc.getNetworkHandler().sendPacket(stopBreaking);
+                            blocksDestroyed++;
+                        }
+                    }
+                }
+                break;
+            }
         }
     };
 
@@ -200,7 +245,7 @@ public class NukerModule extends Module {
         if(teleportToPlayerOverride.getValue()) {
             return findNearestPlayer(world, currentPos);
         }
-        
+
         BlockPos bestLocation = null;
         int maxBlocks = 0;
         int searchRadius = 50;

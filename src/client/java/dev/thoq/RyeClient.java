@@ -27,21 +27,20 @@ import dev.thoq.event.EventBus;
 import dev.thoq.module.ModuleBuilder;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.module.impl.combat.killaura.KillauraModule;
-import dev.thoq.module.impl.exploit.CPUExploitModule;
-import dev.thoq.module.impl.exploit.TickBaseModule;
+import dev.thoq.module.impl.world.TickBaseModule;
 import dev.thoq.module.impl.movement.flight.FlightModule;
 import dev.thoq.module.impl.combat.VelocityModule;
 import dev.thoq.module.impl.movement.longjump.LongJumpModule;
 import dev.thoq.module.impl.movement.scaffold.ScaffoldModule;
 import dev.thoq.module.impl.movement.speed.SpeedModule;
 import dev.thoq.module.impl.player.NukerModule;
-import dev.thoq.module.impl.player.ReachModule;
+import dev.thoq.module.impl.combat.ReachModule;
 import dev.thoq.module.impl.player.fastplace.FastPlaceModule;
 import dev.thoq.module.impl.player.nofall.NoFallModule;
 import dev.thoq.module.impl.player.nojumpdelay.NoJumpDelayModule;
 import dev.thoq.module.impl.player.sprint.SprintModule;
 import dev.thoq.module.impl.visual.*;
-import dev.thoq.module.impl.exploit.TimerModule;
+import dev.thoq.module.impl.world.TimerModule;
 import dev.thoq.module.impl.visual.clickgui.ClickGUIModule;
 import dev.thoq.module.impl.visual.esp.ESPModule;
 import dev.thoq.utilities.misc.IconLoader;
@@ -137,7 +136,6 @@ public class RyeClient implements ClientModInitializer {
                         new ScaffoldModule(),
                         new DebugModule(),
                         new TickBaseModule(),
-                        new CPUExploitModule(),
                         new KeyStrokesModule(),
                         new NukerModule(),
                         new ReachModule(),

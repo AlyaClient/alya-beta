@@ -14,12 +14,11 @@
  *
  */
 
-package dev.thoq.module.impl.exploit;
+package dev.thoq.module.impl.world;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.event.IEventListener;
-import dev.thoq.event.impl.PacketReceiveEvent;
 import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
@@ -42,7 +41,7 @@ public class TickBaseModule extends Module {
         super(
                 "TickBase",
                 "Exploits Minecraft's tickspeed to speed up the game while appearing like lag to server.",
-                ModuleCategory.EXPLOIT
+                ModuleCategory.UTILITY
         );
 
         addSetting(ticksToAccumulate);
@@ -63,6 +62,7 @@ public class TickBaseModule extends Module {
         TimerUtility.resetTimer();
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<TickEvent> tickEvent = event -> {
         if(mc.player == null || mc.world == null) return;
 

@@ -24,7 +24,7 @@ import dev.thoq.module.ModuleCategory;
 
 public class NoJumpDelayModule extends Module {
     public NoJumpDelayModule() {
-        super("NoJumpDelay", "Makes player a bouncy ball", ModuleCategory.PLAYER);
+        super("NoJumpDelay", "Makes player a bouncy ball", ModuleCategory.UTILITY);
     }
 
     @SuppressWarnings("unused")

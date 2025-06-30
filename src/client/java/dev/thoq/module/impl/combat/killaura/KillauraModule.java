@@ -45,7 +45,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-@SuppressWarnings("FieldCanBeLocal")
+@SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class KillauraModule extends Module {
 
     private final ModeSetting attackMode = new ModeSetting("AttackMode", "Attack mode", "Single", "Single", "Switch", "Multi");
@@ -57,10 +57,10 @@ public class KillauraModule extends Module {
     private final BooleanSetting raycast = new BooleanSetting("Raycast", "Check line of sight to target", true);
     private final BooleanSetting movementCorrection = new BooleanSetting("MovementCorrection", "Do not attack impossibly", true);
     private final BooleanSetting rotate = new BooleanSetting("Rotate", "Rotate to targets", true);
-    private final ModeSetting rotationMode = new ModeSetting("RotationMode", "Rotation mode", "Smooth", "Snap", "Smooth", "Linear");
-    private final BooleanSetting serverSideRotations = new BooleanSetting("ServerSideRotations", "Server-side rotations only", true);
+    private final ModeSetting rotationType = new ModeSetting("RotationType", "Rotation mode", "Smooth", "Snap", "Smooth", "Linear");
+    private final ModeSetting rotationMode = new ModeSetting("RotationMode", "Choose where to rotate", "Server", "Server", "Client", "Client");
     private final NumberSetting<Double> rotationSpeed = new NumberSetting<>("RotationSpeed", "Rotation smoothness", 3.0, 1.0, 10.0);
-    private final BooleanSetting gcd = new BooleanSetting("GCD", "Greatest Common Divisor stuff idfk", true);
+    private final BooleanSetting gcd = new BooleanSetting("GCD", "Greatest Common Divisor stuff idk", true);
     private final BooleanSetting autoBlock = new BooleanSetting("AutoBlock", "Auto block with sword", false);
     private final ModeSetting autoBlockMode = new ModeSetting("AutoBlockMode", "AutoBlock mode", "Vanilla", "Vanilla", "Packet");
     private final List<Entity> targets = new ArrayList<>();
@@ -79,9 +79,9 @@ public class KillauraModule extends Module {
         super("Killaura", "Automatically attack entities", ModuleCategory.COMBAT);
 
         cps.setVisibilityCondition(() -> !noHitDelay.getValue());
+        rotationType.setVisibilityCondition(rotate::getValue);
         rotationMode.setVisibilityCondition(rotate::getValue);
-        serverSideRotations.setVisibilityCondition(rotate::getValue);
-        rotationSpeed.setVisibilityCondition(() -> rotate.getValue() && rotationMode.getValue().equals("Smooth"));
+        rotationSpeed.setVisibilityCondition(() -> rotate.getValue() && rotationType.getValue().equals("Smooth"));
         autoBlockMode.setVisibilityCondition(autoBlock::getValue);
         gcd.setVisibilityCondition(rotate::getValue);
 
@@ -91,8 +91,8 @@ public class KillauraModule extends Module {
         addSetting(reach);
         addSetting(cps);
         addSetting(rotate);
+        addSetting(rotationType);
         addSetting(rotationMode);
-        addSetting(serverSideRotations);
         addSetting(rotationSpeed);
         addSetting(autoBlock);
         addSetting(autoBlockMode);
@@ -118,7 +118,7 @@ public class KillauraModule extends Module {
         if(rotate.getValue() && currentTarget != null) {
             calculateRotations();
 
-            if(serverSideRotations.getValue()) {
+            if(rotationMode.getValue().equals("Server")) {
                 event.setYaw(targetYaw);
                 event.setPitch(targetPitch);
             } else {
@@ -185,7 +185,7 @@ public class KillauraModule extends Module {
 
     private void selectTarget() {
         switch(attackMode.getValue()) {
-            case "Single" -> currentTarget = targets.isEmpty() ? null : targets.getFirst();
+            case "Single", "Multi" -> currentTarget = targets.isEmpty() ? null : targets.getFirst();
             case "Switch" -> {
                 if(switchTimer++ >= 20 && targets.size() > 1) {
                     switchTimer = 0;
@@ -195,7 +195,6 @@ public class KillauraModule extends Module {
                     currentTarget = targets.isEmpty() ? null : targets.getFirst();
                 }
             }
-            case "Multi" -> currentTarget = targets.isEmpty() ? null : targets.getFirst();
         }
     }
 
@@ -235,7 +234,7 @@ public class KillauraModule extends Module {
         targetPitch = (float) -Math.toDegrees(Math.atan2(deltaY, horizontalDistance));
         targetPitch = MathHelper.clamp(targetPitch, -90.0F, 90.0F);
 
-        switch(rotationMode.getValue()) {
+        switch(rotationType.getValue()) {
             case "Snap" -> {
                 lastYaw = targetYaw;
                 lastPitch = targetPitch;
@@ -282,8 +281,8 @@ public class KillauraModule extends Module {
 
         Vec3d direction = targetPos.subtract(playerEyes).normalize();
 
-        float currentYaw = serverSideRotations.getValue() ? targetYaw : mc.player.getYaw();
-        float currentPitch = serverSideRotations.getValue() ? targetPitch : mc.player.getPitch();
+        float currentYaw = rotationMode.getValue().equals("Server") ? targetYaw : mc.player.getYaw();
+        float currentPitch = rotationMode.getValue().equals("Server") ? targetPitch : mc.player.getPitch();
 
         Vec3d lookDirection = getLookDirection(currentYaw, currentPitch);
 
@@ -301,8 +300,8 @@ public class KillauraModule extends Module {
         Vec3d targetPos = getTargetPosition(target);
         Vec3d direction = targetPos.subtract(playerEyes).normalize();
 
-        float currentYaw = serverSideRotations.getValue() ? targetYaw : mc.player.getYaw();
-        float currentPitch = serverSideRotations.getValue() ? targetPitch : mc.player.getPitch();
+        float currentYaw = rotationMode.getValue().equals("Server") ? targetYaw : mc.player.getYaw();
+        float currentPitch = rotationMode.getValue().equals("Server") ? targetPitch : mc.player.getPitch();
 
         Vec3d lookDirection = getLookDirection(currentYaw, currentPitch);
         double dotProduct = direction.dotProduct(lookDirection);

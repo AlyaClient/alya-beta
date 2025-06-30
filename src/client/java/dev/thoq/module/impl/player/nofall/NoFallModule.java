@@ -19,7 +19,6 @@ package dev.thoq.module.impl.player.nofall;
 import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.MotionEvent;
-import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.player.nofall.vanilla.VanillaNoFall;
@@ -27,13 +26,14 @@ import dev.thoq.module.impl.player.nofall.verus.VerusNoFall;
 
 public class NoFallModule extends Module {
     public NoFallModule() {
-        super("NoFall", "Prevents fall damage", ModuleCategory.PLAYER);
+        super("NoFall", "Prevents fall damage", ModuleCategory.UTILITY);
 
         ModeSetting mode = new ModeSetting("Mode", "NoFall mode", "Vanilla", "Vanilla", "Verus");
 
         addSetting(mode);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> motionEvent = event -> {
         if(!isEnabled() || mc.player == null || !event.isPre()) return;
 

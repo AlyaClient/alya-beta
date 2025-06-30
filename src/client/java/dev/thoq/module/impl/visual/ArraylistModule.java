@@ -1,19 +1,3 @@
-/*
- * Copyright (c) Rye Client 2024-2025.
- *
- * This file belongs to Rye Client,
- * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/RyeClient/rye-v1.git
- *
- * THIS PROJECT DOES NOT HAVE A WARRANTY.
- *
- * Rye (and subsequently, its files) are all licensed under the MIT License.
- * Rye should have come with a copy of the MIT License.
- * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
- *
- */
-
 package dev.thoq.module.impl.visual;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
@@ -25,19 +9,23 @@ import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
-import dev.thoq.utilities.render.ThemeUtility;
-import net.minecraft.client.gui.DrawContext;
+import dev.thoq.utilities.render.Theme;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-@SuppressWarnings("ConstantValue")
 public class ArraylistModule extends Module {
     private static final BooleanSetting showVisualModules = new BooleanSetting("Show Visual", "Should Arraylist show visual modules?", true);
     private static final ModeSetting position = new ModeSetting("Position", "Arraylist Position", "Right", "Left", "Right");
+
+    private final Map<Module, Float> moduleAnimations = new HashMap<>();
+    private final Map<Module, Long> animationStartTimes = new HashMap<>();
+    private final Map<Module, Boolean> wasEnabled = new HashMap<>();
+    private static final long SLIDE_DURATION = 1000;
 
     public ArraylistModule() {
         super("Arraylist", "Render all active modules", ModuleCategory.VISUAL);
@@ -48,31 +36,71 @@ public class ArraylistModule extends Module {
         this.setEnabled(true);
     }
 
-    private static List<Module> sortModulesByLength(Collection<Module> modules) {
-        List<Module> activeModules = new ArrayList<>();
-        for(Module module : modules) {
-            if(module.isEnabled() && !(module instanceof ArraylistModule)) {
-                if(Objects.equals(module.getName(), "ClickGUI")) continue;
-                if(!showVisualModules.getValue() && module.getCategory() == ModuleCategory.VISUAL) continue;
+    private float getAnimationValue(Module module) {
+        if(!moduleAnimations.containsKey(module)) {
+            moduleAnimations.put(module, module.isEnabled() ? 1.0f : 0.0f);
+            wasEnabled.put(module, module.isEnabled());
+            return moduleAnimations.get(module);
+        }
 
-                activeModules.add(module);
+        boolean currentlyEnabled = module.isEnabled();
+        boolean previouslyEnabled = wasEnabled.getOrDefault(module, false);
+
+        if(currentlyEnabled != previouslyEnabled) {
+            animationStartTimes.put(module, System.currentTimeMillis());
+            wasEnabled.put(module, currentlyEnabled);
+        }
+
+        Long startTime = animationStartTimes.get(module);
+        if(startTime == null) {
+            return currentlyEnabled ? 1.0f : 0.0f;
+        }
+
+        long elapsed = System.currentTimeMillis() - startTime;
+        float progress = Math.min(elapsed / (float) SLIDE_DURATION, 1.0f);
+        progress = 1.0f - (float) Math.pow(1.0f - progress, 3);
+
+        float targetValue = currentlyEnabled ? 1.0f : 0.0f;
+        float currentValue = moduleAnimations.get(module);
+        float newValue = currentValue + (targetValue - currentValue) * progress;
+
+        moduleAnimations.put(module, newValue);
+        return newValue;
+    }
+
+    private int getWaveColor(int index, int totalModules) {
+        float time = System.currentTimeMillis() / 1000.0f;
+        float waveOffset = (float) index / Math.max(1, totalModules - 1);
+        float phase = time * 2.0f + waveOffset * 4.0f;
+
+        Theme currentTheme = Theme.getCurrentTheme();
+        if(currentTheme.hasGradient()) {
+            float factor = (float) (Math.sin(phase) + 1.0) / 2.0f;
+            return Theme.interpolateColorInt(currentTheme.getPrimaryColor(), currentTheme.getSecondaryColor(), factor);
+        } else {
+            return currentTheme.getPrimaryColorInt();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private final IEventListener<Render2DEvent> renderEvents = event -> {
+        Collection<Module> allModules = ModuleRepository.getInstance().getModules();
+
+        List<Module> animatingModules = new ArrayList<>();
+        for(Module module : ModuleRepository.getInstance().getModules()) {
+            float animValue = getAnimationValue(module);
+            if(animValue > 0.0f) {
+                animatingModules.add(module);
             }
         }
 
-        activeModules.sort((module1, module2) -> {
+        animatingModules.sort((module1, module2) -> {
             int width1 = TextRendererUtility.getTextWidth(module1.getName());
             int width2 = TextRendererUtility.getTextWidth(module2.getName());
             return Integer.compare(width2, width1);
         });
 
-        return activeModules;
-    }
-
-    private final IEventListener<Render2DEvent> renderEvents = event -> {
-        Collection<Module> allModules = ModuleRepository.getInstance().getModules();
-        List<Module> activeModules = sortModulesByLength(allModules);
-
-        if(activeModules.isEmpty()) return;
+        if(animatingModules.isEmpty()) return;
 
         final int padding = 2;
         final int leftTopMargin = 15;
@@ -85,77 +113,96 @@ public class ArraylistModule extends Module {
 
         int currentY = isLeftPosition ? leftTopMargin : rightTopMargin;
 
-        Color themeColor = ThemeUtility.getThemeColorFirst();
-        int themeColorArgb = ColorUtility.getIntFromColor(themeColor);
-
         List<Integer> moduleWidths = new ArrayList<>();
-        for(Module module : activeModules) {
+        for(Module module : animatingModules) {
             moduleWidths.add(TextRendererUtility.getTextWidth(module.getName()));
         }
 
-        for(int i = 0; i < activeModules.size(); i++) {
-            Module module = activeModules.get(i);
+        for(int i = 0; i < animatingModules.size(); i++) {
+            Module module = animatingModules.get(i);
             String name = module.getName();
             int textWidth = moduleWidths.get(i);
+            float animValue = getAnimationValue(module);
+
+            if(animValue <= 0.0f) continue;
+
+            int animatedWidth = (int) (textWidth * animValue);
             int x;
 
             int moduleLeft, moduleRight, moduleTop, moduleBottom;
 
             if(isLeftPosition) {
-                x = sidePadding;
+                x = sidePadding - (int) ((textWidth - animatedWidth) * animValue);
                 moduleLeft = x - padding;
-                moduleRight = x + textWidth + padding;
+                moduleRight = x + animatedWidth + padding;
             } else {
-                x = screenWidth - textWidth - sidePadding;
+                x = screenWidth - animatedWidth - sidePadding + (int) ((textWidth - animatedWidth) * animValue);
                 moduleLeft = x - padding;
-                moduleRight = screenWidth - sidePadding + padding;
+                moduleRight = screenWidth - sidePadding + padding - (int) ((textWidth - animatedWidth) * animValue);
             }
 
             moduleTop = currentY - padding;
             moduleBottom = currentY + mc.textRenderer.fontHeight + padding;
 
-            event.getContext().fill(moduleLeft, moduleTop, moduleRight, moduleBottom, ColorUtility.getColor(ColorUtility.Colors.PANEL));
+            int panelColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
+            int panelAlpha = (int) (255 * animValue);
+            panelColor = (panelColor & 0x00FFFFFF) | (panelAlpha << 24);
+
+            event.getContext().fill(moduleLeft, moduleTop, moduleRight, moduleBottom, panelColor);
+
+            int waveColor = getWaveColor(i, animatingModules.size());
+            int waveAlpha = (int) (255 * animValue);
+            waveColor = (waveColor & 0x00FFFFFF) | (waveAlpha << 24);
 
             if(i == 0) {
-                event.getContext().fill(moduleLeft - outlineWidth, moduleTop - outlineWidth, moduleRight + outlineWidth, moduleTop, themeColorArgb);
+                event.getContext().fill(moduleLeft - outlineWidth, moduleTop - outlineWidth, moduleRight + outlineWidth, moduleTop, waveColor);
             }
 
-            if(i == activeModules.size() - 1) {
-                event.getContext().fill(moduleLeft - outlineWidth, moduleBottom, moduleRight + outlineWidth, moduleBottom + outlineWidth, themeColorArgb);
+            if(i == animatingModules.size() - 1) {
+                event.getContext().fill(moduleLeft - outlineWidth, moduleBottom, moduleRight + outlineWidth, moduleBottom + outlineWidth, waveColor);
             }
 
-            event.getContext().fill(moduleLeft - outlineWidth, moduleTop, moduleLeft, moduleBottom, themeColorArgb);
-            event.getContext().fill(moduleRight, moduleTop, moduleRight + outlineWidth, moduleBottom, themeColorArgb);
+            event.getContext().fill(moduleLeft - outlineWidth, moduleTop, moduleLeft, moduleBottom, waveColor);
+            event.getContext().fill(moduleRight, moduleTop, moduleRight + outlineWidth, moduleBottom, waveColor);
 
             if(isLeftPosition) {
-                if(i < activeModules.size() - 1) {
-                    int nextWidth = moduleWidths.get(i + 1);
+                if(i < animatingModules.size() - 1) {
+                    Module nextModule = animatingModules.get(i + 1);
+                    float nextAnimValue = getAnimationValue(nextModule);
+                    int nextWidth = (int) (moduleWidths.get(i + 1) * nextAnimValue);
                     int nextModuleRight = sidePadding + nextWidth + padding;
                     if(moduleRight > nextModuleRight) {
-                        event.getContext().fill(nextModuleRight, moduleBottom, moduleRight + outlineWidth, moduleBottom + outlineWidth, themeColorArgb);
+                        event.getContext().fill(nextModuleRight, moduleBottom, moduleRight + outlineWidth, moduleBottom + outlineWidth, waveColor);
                     }
                 }
             } else {
-
-                if(i < activeModules.size() - 1) {
-                    int nextWidth = moduleWidths.get(i + 1);
+                if(i < animatingModules.size() - 1) {
+                    Module nextModule = animatingModules.get(i + 1);
+                    float nextAnimValue = getAnimationValue(nextModule);
+                    int nextWidth = (int) (moduleWidths.get(i + 1) * nextAnimValue);
                     int nextModuleLeft = screenWidth - nextWidth - sidePadding - padding;
                     if(moduleLeft < nextModuleLeft) {
-                        event.getContext().fill(moduleLeft - outlineWidth, moduleBottom, nextModuleLeft, moduleBottom + outlineWidth, themeColorArgb);
+                        event.getContext().fill(moduleLeft - outlineWidth, moduleBottom, nextModuleLeft, moduleBottom + outlineWidth, waveColor);
                     }
                 }
             }
 
+            int textColor = ColorUtility.getColor(ColorUtility.Colors.WHITE);
+            int textAlpha = (int) (255 * animValue);
+            textColor = (textColor & 0x00FFFFFF) | (textAlpha << 24);
+
+            event.getContext().enableScissor(moduleLeft, moduleTop, moduleRight, moduleBottom);
             TextRendererUtility.renderText(
                     event.getContext(),
                     name,
-                    ColorUtility.Colors.WHITE,
+                    textColor,
                     x,
                     currentY,
                     true
             );
+            event.getContext().disableScissor();
 
-            currentY += mc.textRenderer.fontHeight + padding * 2;
+            currentY += (int) ((mc.textRenderer.fontHeight + padding * 2) * animValue);
         }
     };
 }

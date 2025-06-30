@@ -17,9 +17,12 @@
 package dev.thoq.utilities.render;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import me.x150.renderer.render.ExtendedDrawContext;
+import me.x150.renderer.util.Color;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
+import org.joml.Vector4f;
 
 @SuppressWarnings("unused")
 public class RenderUtility {
@@ -34,26 +37,25 @@ public class RenderUtility {
      * @param radius  The radius of the rounded corners. The value is clamped to half the smaller of the rectangle's width or height.
      * @param color   The fill color of the rounded rectangle, specified as an ARGB integer.
      */
-    public static void drawRoundedRect(DrawContext context, float x, float y, float width, float height, float radius, int color) {
-        int ix = (int) x;
-        int iy = (int) y;
-        int iWidth = (int) width;
-        int iHeight = (int) height;
-        int iRadius = Math.min((int) radius, Math.min(iWidth, iHeight) / 2);
+    public static void drawRoundedRect(
+            DrawContext context,
+            int x,
+            int y,
+            int width,
+            int height,
+            Vector4f radius,
+            int color
+    ) {
 
-        if(iRadius <= 0) {
-            context.fill(ix, iy, ix + iWidth, iy + iHeight, color);
-            return;
-        }
-
-        context.fill(ix + iRadius, iy, ix + iWidth - iRadius, iy + iHeight, color);
-        context.fill(ix, iy + iRadius, ix + iRadius, iy + iHeight - iRadius, color);
-        context.fill(ix + iWidth - iRadius, iy + iRadius, ix + iWidth, iy + iHeight - iRadius, color);
-
-        drawCorner(context, ix, iy, iRadius, color, CornerType.TOP_LEFT);
-        drawCorner(context, ix + iWidth - iRadius, iy, iRadius, color, CornerType.TOP_RIGHT);
-        drawCorner(context, ix + iWidth - iRadius, iy + iHeight - iRadius, iRadius, color, CornerType.BOTTOM_RIGHT);
-        drawCorner(context, ix, iy + iHeight - iRadius, iRadius, color, CornerType.BOTTOM_LEFT);
+        ExtendedDrawContext.drawRoundedRect(
+                context,
+                x,
+                y,
+                width,
+                height,
+                radius,
+                new Color(ColorUtility.getColorFromInt(color))
+        );
     }
 
     /**
@@ -224,6 +226,18 @@ public class RenderUtility {
         context.fill(x + width - lineWidth, y, x + width, y + height, color);
     }
 
+    /**
+     * Draws an image onto the screen with specified position, dimensions, and scaling.
+     *
+     * @param texture      The {@code Identifier} representing the texture to draw.
+     * @param posX         The x-coordinate of the top-left corner where the image will be rendered.
+     * @param posY         The y-coordinate of the top-left corner where the image will be rendered.
+     * @param renderWidth  The width of the area where the image will be rendered on screen.
+     * @param renderHeight The height of the area where the image will be rendered on screen.
+     * @param imageWidth   The actual width of the source image or texture.
+     * @param imageHeight  The actual height of the source image or texture.
+     * @param context      The {@code DrawContext} used for rendering the image.
+     */
     public static void drawImage(
             Identifier texture,
             int posX,
@@ -252,7 +266,7 @@ public class RenderUtility {
         );
     }
 
-    public static void drawRoundedRect(DrawContext context, float x, float y, float width, float height, float radius) {
+    public static void drawRoundedRect(DrawContext context, int x, int y, int width, int height, Vector4f radius) {
         drawRoundedRect(context, x, y, width, height, radius, 0xFFFFFFFF);
     }
 
@@ -260,8 +274,16 @@ public class RenderUtility {
         drawRoundedRectOutline(context, x, y, width, height, radius, lineWidth, 0xFFFFFFFF);
     }
 
-    public static void drawGradientRoundedRect(DrawContext context, float x, float y, float width, float height, float radius, int colorTop, int colorBottom) {
-        drawRoundedRect(context, x, y, width, height, radius, colorTop);
+    public static void drawGradientRoundedRect(DrawContext context, int x, int y, int width, int height, Vector4f radius, int colorTop, int colorBottom) {
+        for (int i = 0; i < height; i++) {
+            float factor = (float) i / height;
+            int interpolatedColor = ColorUtility.interpolateColor(colorTop, colorBottom, factor);
+
+            boolean inTopCorners = i < radius.x || i < radius.y;
+            boolean inBottomCorners = i > height - radius.z || i > height - radius.w;
+
+            context.fill(x, y + i, x + width, y + i + 1, interpolatedColor);
+        }
     }
 
     public static void drawRect(DrawContext context, float x, float y, float width, float height, int color) {

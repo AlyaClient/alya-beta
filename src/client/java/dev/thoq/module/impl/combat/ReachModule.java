@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.module.impl.player;
+package dev.thoq.module.impl.combat;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.event.IEventListener;
@@ -24,11 +24,8 @@ import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.misc.RaycastUtility;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 
 @SuppressWarnings("SameParameterValue")
 public class ReachModule extends Module {
@@ -40,11 +37,12 @@ public class ReachModule extends Module {
     private static final BooleanSetting remoteSpleefHacks = new BooleanSetting("RemoteSpleefHacks", "Allows you to hit blocks from very far away", false);
 
     public ReachModule() {
-        super("Reach", "billy big-arms", ModuleCategory.PLAYER);
+        super("Reach", "billy big-arms", ModuleCategory.COMBAT);
 
         addSetting(remoteSpleefHacks);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> motionEvent = event -> {
         if(remoteSpleefHacks.getValue() && mc.player != null && mc.world != null && mc.getNetworkHandler() != null) {
             if(mc.options.attackKey.isPressed()) {

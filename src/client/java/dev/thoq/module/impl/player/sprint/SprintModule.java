@@ -28,10 +28,11 @@ public class SprintModule extends Module {
     private final BooleanSetting omniSprint = new BooleanSetting("OmniSprint", "Sprint in all directions", false);
 
     public SprintModule() {
-        super("Sprint", "Makes player less american", ModuleCategory.PLAYER);
+    super("Sprint", "Makes player less american", ModuleCategory.UTILITY);
         addSetting(omniSprint);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<TickEvent> tickEvent = event -> {
         if(!isEnabled() || mc.player == null || mc.options == null || !event.isPre()) return;
 

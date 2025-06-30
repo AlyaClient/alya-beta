@@ -30,9 +30,9 @@ package dev.thoq.module;
 public enum ModuleCategory {
     COMBAT("Combat"),
     MOVEMENT("Movement"),
-    PLAYER("Player"),
-    EXPLOIT("Exploit"),
-    VISUAL("Visual");
+    VISUAL("Visual"),
+    WORLD("World"),
+    UTILITY("Utility");
 
     private final String displayName;
 

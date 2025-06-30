@@ -25,7 +25,7 @@ import dev.thoq.module.ModuleCategory;
 public class FastPlaceModule extends Module {
 
     public FastPlaceModule() {
-        super("FastPlace", "Helicopter helicopter", ModuleCategory.PLAYER);
+        super("FastPlace", "Helicopter helicopter", ModuleCategory.UTILITY);
     }
 
     @SuppressWarnings("unused")

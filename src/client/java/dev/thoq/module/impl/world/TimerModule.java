@@ -14,11 +14,10 @@
  *
  */
 
-package dev.thoq.module.impl.exploit;
+package dev.thoq.module.impl.world;
 
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.event.IEventListener;
-import dev.thoq.event.impl.PacketReceiveEvent;
 import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
@@ -28,11 +27,12 @@ public class TimerModule extends Module {
     private final NumberSetting<Float> timerSpeed = new NumberSetting<>("Speed", "Game speed multiplier", 1.0f, 0.1f, 10.0f);
 
     public TimerModule() {
-        super("Timer", "Allows you to change the game speed", ModuleCategory.EXPLOIT);
+        super("Timer", "Allows you to change the game speed", ModuleCategory.WORLD);
 
         addSetting(timerSpeed);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<TickEvent> tickEvent = event -> {
         if(timerSpeed.getValue() != TimerUtility.getTimerSpeed()) {
             TimerUtility.setTimerSpeed(timerSpeed.getValue());

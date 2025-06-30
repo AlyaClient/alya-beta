@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) Rye Client 2024-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ *
+ * Rye (and subsequently, its files) are all licensed under the MIT License.
+ * Rye should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ *
+ */
+
 package dev.thoq.module.impl.visual.clickgui.dropdown;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
@@ -9,10 +25,14 @@ import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.utilities.render.ColorUtility;
+import dev.thoq.utilities.render.RenderUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
+import dev.thoq.utilities.render.Theme;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -34,9 +54,10 @@ public class DropDownClickGUI extends Screen {
     private static final int PANEL_Y = 20;
     private static final int PANEL_SPACING = 10;
     private static final int PADDING = 2;
-    private static final int BACKGROUND_COLOR = ColorUtility.getColor(ColorUtility.Colors.PANEL);
-    private static final int CATEGORY_COLOR = 0xDD000000;
+    private static final int BACKGROUND_COLOR = ColorUtility.getColor(ColorUtility.Colors.GRAY);
+    private static final int CATEGORY_COLOR = 0xFF222222;
     private static final int HOVER_COLOR = 0x10FFFFFF;
+    private static final float CORNER_RADIUS = 4.0f;
 
     public DropDownClickGUI() {
         super(Text.literal("Click GUI"));
@@ -61,8 +82,27 @@ public class DropDownClickGUI extends Screen {
         }
     }
 
+
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        if(Theme.get("Rye") == null) {
+            Theme.init();
+        }
+
+        ModuleRepository repository = ModuleRepository.getInstance();
+        Module hudModule = repository.getModuleByName("HUD");
+        if(hudModule != null) {
+            for(Setting<?> setting : hudModule.getSettings()) {
+                if(setting.getName().equals("Theme") && setting instanceof ModeSetting themeSetting) {
+                    String currentThemeName = themeSetting.getValue();
+                    if(currentThemeName != null) {
+                        Theme.setCurrentTheme(currentThemeName);
+                    }
+                    break;
+                }
+            }
+        }
+
         int categoryIndex = 0;
 
         for(Map.Entry<ModuleCategory, List<Module>> entry : categorizedModules.entrySet()) {
@@ -72,53 +112,116 @@ public class DropDownClickGUI extends Screen {
             boolean expanded = expandedCategories.get(category);
             int categoryX = PANEL_X + (PANEL_WIDTH + PANEL_SPACING) * categoryIndex;
             int y = PANEL_Y;
-            boolean hoverCategory = isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT);
 
-            renderRect(context, categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT, CATEGORY_COLOR);
+            Vector4f categoryRadius = new Vector4f(CORNER_RADIUS, 0, CORNER_RADIUS, 0);
+            RenderUtility.drawRoundedRect(context, categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT, categoryRadius, CATEGORY_COLOR);
 
-            if(hoverCategory)
-                renderRect(context, categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT, HOVER_COLOR);
+            Identifier img = Identifier.of("rye", "icons/category/" + category.toString().toLowerCase() + ".png");
 
             TextRendererUtility.renderText(
                     context,
-                    category.getDisplayName() + (expanded ? " ▼" : " ▶"),
+                    category.getDisplayName(),
                     ColorUtility.Colors.WHITE,
                     categoryX + PADDING,
                     y + PADDING + 2,
                     false
             );
 
+            RenderUtility.drawImage(
+                    img,
+                    categoryX + PANEL_WIDTH - 12 - PADDING,
+                    y + PADDING + 2,
+                    10,
+                    10,
+                    225,
+                    225,
+                    context
+            );
+
             y += CATEGORY_HEIGHT;
 
             if(expanded) {
+                int moduleIndex = 0;
+
                 for(Module module : modules) {
                     boolean hoverModule = isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT);
+                    boolean isLastModule = (moduleIndex == modules.size() - 1);
+                    boolean isModuleExpanded = expandedModules.getOrDefault(module, false);
 
-                    renderRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT, BACKGROUND_COLOR);
+                    int moduleBackgroundColor = BACKGROUND_COLOR;
+                    Vector4f moduleRadius = new Vector4f(0, 0, 0, 0);
 
-                    if(hoverModule)
-                        renderRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT, HOVER_COLOR);
+                    if(isLastModule && !isModuleExpanded) {
+                        moduleRadius = new Vector4f(0, CORNER_RADIUS, 0, CORNER_RADIUS);
+                    }
+
+                    // TODO: if enabled + gradient, round the thingy please omg
+                    if(module.isEnabled()) {
+                        Theme currentTheme = Theme.getCurrentTheme();
+                        if(currentTheme.hasGradient()) {
+                            int primaryColor = currentTheme.getPrimaryColorInt();
+                            int secondaryColor = currentTheme.getSecondaryColorInt();
+
+                            primaryColor = primaryColor | 0xFF000000;
+                            secondaryColor = secondaryColor | 0xFF000000;
+
+                            renderGradientRoundedRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT,
+                                    primaryColor, secondaryColor);
+                        } else {
+                            moduleBackgroundColor = (currentTheme.getPrimaryColorInt() & 0x00FFFFFF) | 0x60000000;
+                            RenderUtility.drawRoundedRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT, moduleRadius, moduleBackgroundColor);
+                        }
+                    } else {
+                        RenderUtility.drawRoundedRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT, moduleRadius, moduleBackgroundColor);
+                    }
+
+                    if(hoverModule) {
+                        RenderUtility.drawRoundedRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT, moduleRadius, HOVER_COLOR);
+                    }
+
+                    int textColor;
+                    if(module.isEnabled()) {
+                        textColor = ColorUtility.getColor(ColorUtility.Colors.WHITE);
+                    } else {
+                        textColor = ColorUtility.getColor(ColorUtility.Colors.LIGHT_GRAY);
+                    }
 
                     TextRendererUtility.renderText(
                             context,
                             module.getName(),
-                            module.isEnabled() ? ColorUtility.Colors.WHITE : ColorUtility.Colors.GRAY,
+                            textColor,
                             categoryX + PADDING * 3,
                             y + PADDING + 2,
                             false
                     );
 
                     y += MODULE_HEIGHT;
+                    moduleIndex++;
 
-                    if(expandedModules.getOrDefault(module, false)) {
+                    if(isModuleExpanded) {
+                        List<Setting<?>> visibleSettings = new ArrayList<>();
                         for(Setting<?> setting : module.getSettings()) {
-                            if(!setting.isVisible()) continue;
+                            if(setting.isVisible()) {
+                                visibleSettings.add(setting);
+                            }
+                        }
 
-                            renderRect(context, categoryX, y, PANEL_WIDTH, SETTING_HEIGHT, BACKGROUND_COLOR);
+                        int settingIndex = 0;
+                        for(Setting<?> setting : visibleSettings) {
+                            boolean isLastSetting = (settingIndex == visibleSettings.size() - 1);
+                            boolean shouldRoundSetting = isLastModule && isLastSetting;
+
+                            Vector4f settingRadius = new Vector4f(0, 0, 0, 0);
+                            if(shouldRoundSetting) {
+                                settingRadius = new Vector4f(0, CORNER_RADIUS, 0, CORNER_RADIUS);
+                            }
+
+                            RenderUtility.drawRoundedRect(context, categoryX, y, PANEL_WIDTH, SETTING_HEIGHT, settingRadius, BACKGROUND_COLOR);
+
                             TextRendererUtility.renderText(
                                     context,
                                     setting.getName() + ": ",
-                                    ColorUtility.Colors.GRAY,
+                                    ColorUtility.Colors.LIGHT_GRAY,
                                     categoryX + PADDING * 3 + SETTING_INDENT,
                                     y + PADDING + 2,
                                     false
@@ -134,15 +237,18 @@ public class DropDownClickGUI extends Screen {
                                 valueText = setting.getValue().toString();
                             }
 
+                            int valueColor = ColorUtility.getColor(ColorUtility.Colors.WHITE);
+
                             TextRendererUtility.renderText(
                                     context,
                                     valueText,
-                                    ColorUtility.Colors.WHITE,
+                                    valueColor,
                                     categoryX + PANEL_WIDTH - TextRendererUtility.getTextWidth(valueText) - PADDING * 3,
                                     y + PADDING + 2,
                                     false
                             );
                             y += SETTING_HEIGHT;
+                            settingIndex++;
                         }
                     }
                 }
@@ -156,9 +262,9 @@ public class DropDownClickGUI extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if(button == 0) {
-            handleLeftClick((int)mouseX, (int)mouseY);
+            handleLeftClick((int) mouseX, (int) mouseY);
         } else if(button == 1) {
-            handleRightClick((int)mouseX, (int)mouseY);
+            handleRightClick((int) mouseX, (int) mouseY);
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -266,8 +372,13 @@ public class DropDownClickGUI extends Screen {
                 mouseY >= y && mouseY <= y + height;
     }
 
-    private void renderRect(DrawContext context, int x, int y, int width, int height, int color) {
-        context.fill(x, y, x + width, y + height, color);
+    private void renderGradientRoundedRect(DrawContext context, int x, int y, int width, int height, int color1, int color2) {
+        for(int i = 0; i < width; i++) {
+            float factor = (float) i / width;
+            int interpolatedColor = ColorUtility.interpolateColor(color1, color2, factor);
+
+            context.fill(x + i, y, x + i + 1, y + height, interpolatedColor);
+        }
     }
 
     @Override
