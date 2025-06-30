@@ -1,19 +1,3 @@
-/*
- * Copyright (c) Rye Client 2024-2025.
- *
- * This file belongs to Rye Client,
- * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/RyeClient/rye-v1.git
- *
- * THIS PROJECT DOES NOT HAVE A WARRANTY.
- *
- * Rye (and subsequently, its files) are all licensed under the MIT License.
- * Rye should have come with a copy of the MIT License.
- * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
- *
- */
-
 package dev.thoq.module.impl.visual.clickgui.dropdown;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
@@ -26,9 +10,9 @@ import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -37,8 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings({"SameParameterValue", "rawtypes", "FieldCanBeLocal"})
-public class DropDownClickGUI {
-    private boolean visible = false;
+public class DropDownClickGUI extends Screen {
     private final Map<ModuleCategory, List<Module>> categorizedModules = new EnumMap<>(ModuleCategory.class);
     private final Map<ModuleCategory, Boolean> expandedCategories = new EnumMap<>(ModuleCategory.class);
     private final Map<Module, Boolean> expandedModules = new HashMap<>();
@@ -54,22 +37,19 @@ public class DropDownClickGUI {
     private static final int BACKGROUND_COLOR = ColorUtility.getColor(ColorUtility.Colors.PANEL);
     private static final int CATEGORY_COLOR = 0xDD000000;
     private static final int HOVER_COLOR = 0x10FFFFFF;
-    private int mouseX;
-    private int mouseY;
-    private boolean mouseDown;
-    private boolean wasMouseDown;
-    private boolean rightMouseDown;
-    private boolean wasRightMouseDown;
-    private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public DropDownClickGUI() {
+        super(Text.literal("Click GUI"));
+
         for(ModuleCategory category : ModuleCategory.values()) {
             categorizedModules.put(category, new ArrayList<>());
             expandedCategories.put(category, true);
         }
+
+        initializeModules();
     }
 
-    public void show() {
+    private void initializeModules() {
         for(List<Module> modules : categorizedModules.values())
             modules.clear();
 
@@ -79,46 +59,10 @@ public class DropDownClickGUI {
             ModuleCategory category = module.getCategory();
             categorizedModules.get(category).add(module);
         }
-
-        visible = true;
     }
 
-    public void hide() {
-        visible = false;
-    }
-
-    public void tick() {
-        if(!visible) return;
-
-        updateMouseInput();
-
-        if(mouseDown && !wasMouseDown)
-            handleLeftClick();
-
-        if(rightMouseDown && !wasRightMouseDown)
-            handleRightClick();
-    }
-
-    private void updateMouseInput() {
-        long handle = mc.getWindow().getHandle();
-        double[] xPos = new double[1];
-        double[] yPos = new double[1];
-        int scaleFactor = mc.getWindow().getScaleFactor();
-
-        GLFW.glfwGetCursorPos(handle, xPos, yPos);
-
-        mouseX = (int) xPos[0] / scaleFactor;
-        mouseY = (int) yPos[0] / scaleFactor;
-
-        wasMouseDown = mouseDown;
-        mouseDown = GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
-        wasRightMouseDown = rightMouseDown;
-        rightMouseDown = GLFW.glfwGetMouseButton(handle, GLFW.GLFW_MOUSE_BUTTON_RIGHT) == GLFW.GLFW_PRESS;
-    }
-
-    public void render(DrawContext context) {
-        if(!visible) return;
-
+    @Override
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         int categoryIndex = 0;
 
         for(Map.Entry<ModuleCategory, List<Module>> entry : categorizedModules.entrySet()) {
@@ -128,7 +72,7 @@ public class DropDownClickGUI {
             boolean expanded = expandedCategories.get(category);
             int categoryX = PANEL_X + (PANEL_WIDTH + PANEL_SPACING) * categoryIndex;
             int y = PANEL_Y;
-            boolean hoverCategory = isMouseOver(categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT);
+            boolean hoverCategory = isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT);
 
             renderRect(context, categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT, CATEGORY_COLOR);
 
@@ -148,7 +92,7 @@ public class DropDownClickGUI {
 
             if(expanded) {
                 for(Module module : modules) {
-                    boolean hoverModule = isMouseOver(categoryX, y, PANEL_WIDTH, MODULE_HEIGHT);
+                    boolean hoverModule = isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT);
 
                     renderRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT, BACKGROUND_COLOR);
 
@@ -205,9 +149,21 @@ public class DropDownClickGUI {
             }
             categoryIndex++;
         }
+
+        super.render(context, mouseX, mouseY, delta);
     }
 
-    private void handleLeftClick() {
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if(button == 0) {
+            handleLeftClick((int)mouseX, (int)mouseY);
+        } else if(button == 1) {
+            handleRightClick((int)mouseX, (int)mouseY);
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private void handleLeftClick(int mouseX, int mouseY) {
         int categoryIndex = 0;
 
         for(Map.Entry<ModuleCategory, List<Module>> entry : categorizedModules.entrySet()) {
@@ -217,7 +173,7 @@ public class DropDownClickGUI {
             int categoryX = PANEL_X + (PANEL_WIDTH + PANEL_SPACING) * categoryIndex;
             int y = PANEL_Y;
 
-            if(isMouseOver(categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT)) {
+            if(isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT)) {
                 expandedCategories.put(category, !expandedCategories.get(category));
                 return;
             }
@@ -226,7 +182,7 @@ public class DropDownClickGUI {
 
             if(expandedCategories.get(category)) {
                 for(Module module : modules) {
-                    if(isMouseOver(categoryX, y, PANEL_WIDTH, MODULE_HEIGHT)) {
+                    if(isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT)) {
                         module.toggle();
                         return;
                     }
@@ -236,40 +192,31 @@ public class DropDownClickGUI {
                     if(expandedModules.getOrDefault(module, false)) {
                         for(Setting<?> setting : module.getSettings()) {
                             if(!setting.isVisible()) continue;
-                            if(isMouseOver(categoryX, y, PANEL_WIDTH, SETTING_HEIGHT)) {
+                            if(isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, SETTING_HEIGHT)) {
                                 switch(setting) {
                                     case BooleanSetting booleanSetting -> booleanSetting.toggle();
                                     case ModeSetting modeSetting -> modeSetting.cycle();
-
-                                    case NumberSetting numberSetting -> {
-                                        boolean fastIncrement = mouseDown && wasMouseDown;
-                                        numberSetting.increment(fastIncrement);
-                                    }
-
+                                    case NumberSetting numberSetting -> numberSetting.increment(false);
                                     case SliderSetting sliderSetting -> {
                                         double normalizedPos = Math.max(0.0, Math.min(1.0,
                                                 (double) (mouseX - categoryX) / PANEL_WIDTH));
                                         sliderSetting.setFromNormalizedValue(normalizedPos);
                                     }
-
                                     default -> {
                                     }
                                 }
-
                                 return;
                             }
-
                             y += SETTING_HEIGHT;
                         }
                     }
                 }
             }
-
             categoryIndex++;
         }
     }
 
-    private void handleRightClick() {
+    private void handleRightClick(int mouseX, int mouseY) {
         int categoryIndex = 0;
 
         for(Map.Entry<ModuleCategory, List<Module>> entry : categorizedModules.entrySet()) {
@@ -279,7 +226,7 @@ public class DropDownClickGUI {
             int categoryX = PANEL_X + (PANEL_WIDTH + PANEL_SPACING) * categoryIndex;
             int y = PANEL_Y;
 
-            if(isMouseOver(categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT)) {
+            if(isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, CATEGORY_HEIGHT)) {
                 expandedCategories.put(category, !expandedCategories.get(category));
                 return;
             }
@@ -288,7 +235,7 @@ public class DropDownClickGUI {
 
             if(expandedCategories.get(category)) {
                 for(Module module : modules) {
-                    if(isMouseOver(categoryX, y, PANEL_WIDTH, MODULE_HEIGHT)) {
+                    if(isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT)) {
                         expandedModules.put(module, !expandedModules.getOrDefault(module, false));
                         return;
                     }
@@ -299,14 +246,12 @@ public class DropDownClickGUI {
                         for(Setting<?> setting : module.getSettings()) {
                             if(!setting.isVisible()) continue;
 
-                            if(isMouseOver(categoryX, y, PANEL_WIDTH, SETTING_HEIGHT)) {
+                            if(isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, SETTING_HEIGHT)) {
                                 if(setting instanceof NumberSetting numberSetting) {
-                                    boolean fastDecrement = rightMouseDown && wasRightMouseDown;
-                                    numberSetting.decrement(fastDecrement);
+                                    numberSetting.decrement(false);
                                     return;
                                 }
                             }
-
                             y += SETTING_HEIGHT;
                         }
                     }
@@ -316,12 +261,17 @@ public class DropDownClickGUI {
         }
     }
 
-    private boolean isMouseOver(int x, int y, int width, int height) {
+    private boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height) {
         return mouseX >= x && mouseX <= x + width &&
                 mouseY >= y && mouseY <= y + height;
     }
 
     private void renderRect(DrawContext context, int x, int y, int width, int height, int color) {
         context.fill(x, y, x + width, y + height, color);
+    }
+
+    @Override
+    public boolean shouldPause() {
+        return false;
     }
 }
