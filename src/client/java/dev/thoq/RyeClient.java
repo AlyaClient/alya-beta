@@ -46,7 +46,6 @@ import dev.thoq.module.impl.visual.*;
 import dev.thoq.module.impl.world.TimerModule;
 import dev.thoq.module.impl.visual.clickgui.ClickGUIModule;
 import dev.thoq.module.impl.visual.esp.ESPModule;
-import dev.thoq.utilities.integration.DiscordIntegration;
 import dev.thoq.utilities.misc.IconLoader;
 import dev.thoq.utilities.misc.RyeConstants;
 import net.fabricmc.api.ClientModInitializer;
