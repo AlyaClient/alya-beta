@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.module.impl.player.fastplace;
+package dev.thoq.module.impl.utility.fastplace;
 
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.TickEvent;
@@ -25,7 +25,7 @@ import dev.thoq.module.ModuleCategory;
 public class FastPlaceModule extends Module {
 
     public FastPlaceModule() {
-        super("FastPlace", "Helicopter helicopter", ModuleCategory.UTILITY);
+        super("FastPlace", "Fast Place", "Helicopter helicopter", ModuleCategory.UTILITY);
     }
 
     @SuppressWarnings("unused")

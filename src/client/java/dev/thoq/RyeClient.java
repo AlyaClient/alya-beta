@@ -26,23 +26,27 @@ import dev.thoq.config.KeybindManager;
 import dev.thoq.event.EventBus;
 import dev.thoq.module.ModuleBuilder;
 import dev.thoq.module.ModuleRepository;
+import dev.thoq.module.impl.combat.AttackDelayModule;
 import dev.thoq.module.impl.combat.killaura.KillauraModule;
+import dev.thoq.module.impl.movement.StrafeModule;
+import dev.thoq.module.impl.movement.highjump.HighJumpModule;
 import dev.thoq.module.impl.world.TickBaseModule;
 import dev.thoq.module.impl.movement.flight.FlightModule;
 import dev.thoq.module.impl.combat.VelocityModule;
 import dev.thoq.module.impl.movement.longjump.LongJumpModule;
 import dev.thoq.module.impl.movement.scaffold.ScaffoldModule;
 import dev.thoq.module.impl.movement.speed.SpeedModule;
-import dev.thoq.module.impl.player.NukerModule;
+import dev.thoq.module.impl.utility.NukerModule;
 import dev.thoq.module.impl.combat.ReachModule;
-import dev.thoq.module.impl.player.fastplace.FastPlaceModule;
-import dev.thoq.module.impl.player.nofall.NoFallModule;
-import dev.thoq.module.impl.player.nojumpdelay.NoJumpDelayModule;
-import dev.thoq.module.impl.player.sprint.SprintModule;
+import dev.thoq.module.impl.utility.fastplace.FastPlaceModule;
+import dev.thoq.module.impl.utility.nofall.NoFallModule;
+import dev.thoq.module.impl.movement.jumpcooldown.JumpCooldownModule;
+import dev.thoq.module.impl.movement.sprint.SprintModule;
 import dev.thoq.module.impl.visual.*;
 import dev.thoq.module.impl.world.TimerModule;
 import dev.thoq.module.impl.visual.clickgui.ClickGUIModule;
 import dev.thoq.module.impl.visual.esp.ESPModule;
+import dev.thoq.utilities.integration.DiscordIntegration;
 import dev.thoq.utilities.misc.IconLoader;
 import dev.thoq.utilities.misc.RyeConstants;
 import net.fabricmc.api.ClientModInitializer;
@@ -78,6 +82,8 @@ public class RyeClient implements ClientModInitializer {
         RyeClient.setState("loading");
 
         eventBus = new EventBus();
+
+        // DiscordIntegration.initialize();
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> IconLoader.setWindowIcon(client.getWindow().getHandle()));
 
@@ -119,7 +125,7 @@ public class RyeClient implements ClientModInitializer {
                 .putAll(
                         new ClickGUIModule(),
                         new SprintModule(),
-                        new NoJumpDelayModule(),
+                        new JumpCooldownModule(),
                         new FastPlaceModule(),
                         new FlightModule(),
                         new FullbrightModule(),
@@ -139,7 +145,12 @@ public class RyeClient implements ClientModInitializer {
                         new KeyStrokesModule(),
                         new NukerModule(),
                         new ReachModule(),
-                        new PerformanceModule()
+                        new PerformanceModule(),
+                        new AttackDelayModule(),
+                        new StrafeModule(),
+                        new HighJumpModule(),
+                        new AmbienceModule(),
+                        new DiscordRPCModule()
                 );
     }
 

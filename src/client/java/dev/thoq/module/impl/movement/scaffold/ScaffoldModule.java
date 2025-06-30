@@ -62,7 +62,7 @@ public class ScaffoldModule extends Module {
     private Vec3d targetHitVec;
 
     public ScaffoldModule() {
-        super("Scaffold", "Automatically places blocks beneath you", ModuleCategory.MOVEMENT);
+        super("Scaffold", "Automatically places blocks beneath you", ModuleCategory.WORLD);
 
         addSetting(sprint);
         addSetting(swing);

@@ -16,6 +16,7 @@
 
 package dev.thoq.module.impl.combat.killaura;
 
+import dev.thoq.RyeClient;
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.config.setting.impl.BooleanSetting;
@@ -23,6 +24,7 @@ import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
+import dev.thoq.module.impl.combat.AttackDelayModule;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.PassiveEntity;
@@ -76,7 +78,7 @@ public class KillauraModule extends Module {
     private long lastRotationTime = 0;
 
     public KillauraModule() {
-        super("Killaura", "Automatically attack entities", ModuleCategory.COMBAT);
+        super("Killaura", "Kill Aura", "Automatically attack entities", ModuleCategory.COMBAT);
 
         cps.setVisibilityCondition(() -> !noHitDelay.getValue());
         rotationType.setVisibilityCondition(rotate::getValue);
@@ -347,6 +349,14 @@ public class KillauraModule extends Module {
 
     private void performAttack() {
         if(mc.player == null || mc.interactionManager == null) return;
+
+        AttackDelayModule attackDelayModule = RyeClient.INSTANCE.getModuleRepository().getModule(AttackDelayModule.class);
+
+        if(attackDelayModule != null && attackDelayModule.isEnabled()) {
+            if(!attackDelayModule.canAttack()) {
+                return;
+            }
+        }
 
         boolean wasBlocking = isBlocking;
         if(isBlocking) stopBlocking();

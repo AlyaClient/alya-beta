@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.module.impl.player.nofall.verus;
+package dev.thoq.module.impl.utility.nofall.verus;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;

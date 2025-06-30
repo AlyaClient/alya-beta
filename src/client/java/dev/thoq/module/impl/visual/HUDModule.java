@@ -22,7 +22,7 @@ import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.Render2DEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
-import dev.thoq.module.impl.player.NukerModule;
+import dev.thoq.module.impl.utility.NukerModule;
 import dev.thoq.module.impl.combat.ReachModule;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.RenderUtility;
@@ -33,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Objects;
 
 @SuppressWarnings({"FieldCanBeLocal", "SameParameterValue", "unused"})
 public class HUDModule extends Module {
@@ -45,7 +44,7 @@ public class HUDModule extends Module {
     private static final long ANIMATION_DURATION = 200;
     private static final int END_Y_POSITION = 30;
     private static String lastDynamicText = "";
-    private ModeSetting themeSetting;
+    private final ModeSetting themeSetting;
 
     public HUDModule() {
         super("HUD", "Shows Heads Up Display", ModuleCategory.VISUAL);
@@ -69,8 +68,6 @@ public class HUDModule extends Module {
 
     private final IEventListener<Render2DEvent> renderEvent = event -> {
         if(mc.player == null) return;
-
-        Theme.setCurrentTheme(Objects.requireNonNull(themeSetting.getValue()));
 
         boolean killauraEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Killaura").isEnabled();
         boolean scaffoldEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Scaffold").isEnabled();
@@ -127,7 +124,6 @@ public class HUDModule extends Module {
         final int xPosition = 2;
         final int yPosition = 2;
 
-        Theme currentTheme = Theme.getCurrentTheme();
         int backgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
 
         RenderUtility.drawRect(
@@ -270,15 +266,7 @@ public class HUDModule extends Module {
         final int animatedY = (int) (startY + (END_Y_POSITION - startY) * animatedProgress);
 
         int alpha = (int) (255 * animatedProgress);
-
-        Theme currentTheme = Theme.getCurrentTheme();
-        int baseBackgroundColor;
-        if (currentTheme.hasGradient()) {
-            baseBackgroundColor = Theme.getInterpolatedThemeColorInt(0.2f);
-            baseBackgroundColor = (baseBackgroundColor & 0x00FFFFFF) | 0x60000000;
-        } else {
-            baseBackgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
-        }
+        int baseBackgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
 
         drawDynamicRect(
                 displayText,

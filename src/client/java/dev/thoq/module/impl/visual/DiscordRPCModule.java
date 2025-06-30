@@ -19,21 +19,19 @@ package dev.thoq.module.impl.visual;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 
-public class FullbrightModule extends Module {
-    private double previousGamma;
+public class DiscordRPCModule extends Module {
+    // private static int ticksRunning = 0;
 
-    public FullbrightModule() {
-        super("FullBright", "Full Bright", "Light mode for minecraft caves", ModuleCategory.VISUAL);
+    public DiscordRPCModule() {
+        super("DiscordRPC", "Discord RPC", "Shows client status in Discord", ModuleCategory.VISUAL);
     }
 
-    @Override
-    protected void onEnable() {
-        previousGamma = mc.options.getGamma().getValue();
-        mc.options.getGamma().setValue(1.0D);
-    }
-
-    @Override
-    protected void onDisable() {
-        mc.options.getGamma().setValue(previousGamma);
-    }
+//    private final IEventListener<TickEvent> tickEvent = event -> {
+//        ticksRunning++;
+//
+//        if(ticksRunning >= 40) {
+//            DiscordIntegration.updatePresence();ryecl
+//            ticksRunning = 0;
+//        }
+//    };
 }

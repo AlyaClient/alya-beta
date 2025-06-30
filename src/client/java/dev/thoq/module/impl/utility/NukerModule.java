@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.module.impl.player;
+package dev.thoq.module.impl.utility;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
@@ -43,7 +43,7 @@ public class NukerModule extends Module {
     private static int blocksDestroyed = 0;
 
     public NukerModule() {
-        super("Nuker", "Destroy blocks automatically", ModuleCategory.UTILITY);
+        super("Nuker", "Destroy blocks automatically", ModuleCategory.WORLD);
 
         addSetting(modeSetting);
         addSetting(bedDist.setVisibilityCondition(() -> "Bed".equals(modeSetting.getValue())));

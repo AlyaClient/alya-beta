@@ -30,7 +30,7 @@ public class ClickGUIModule extends Module {
     private final ModeSetting guiMode = new ModeSetting("GUIMode", "Choose between dropdown and window GUI", "Dropdown", "Dropdown");
 
     public ClickGUIModule() {
-        super("ClickGUI", "Toggle modules with a graphical interface", ModuleCategory.VISUAL);
+        super("ClickGUI", "Click GUI", "Toggle modules with a graphical interface", ModuleCategory.VISUAL);
 
         KeybindManager.getInstance().bind(this, GLFW.GLFW_KEY_RIGHT_SHIFT);
         RyeClient.getEventBus().subscribe(this);

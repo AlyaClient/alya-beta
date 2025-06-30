@@ -79,12 +79,15 @@ dependencies {
 	// LWJGL HarfBuzz bindings
 	include(implementation("org.lwjgl:lwjgl-harfbuzz:3.3.3"))
 
-	// Platform-specific natives
+	// Platform-specific natives (gradle is cool)
 	def lwjglNatives = Lwjgl.getClassifier()
 	include(implementation("org.lwjgl:lwjgl-harfbuzz:3.3.3:natives-${lwjglNatives}"))
 
 	// i do not want to make a renderer
 	modImplementation "io.github.0x3c50.renderer:renderer-fabric:2.1.0"
+
+	// so like its diff for platforms-no thanks
+	implementation 'net.arikia.dev:discord-rpc:1.6.2'
 }
 
 processResources {
@@ -123,8 +126,4 @@ publishing {
 			from components.java
 		}
 	}
-}
-
-kotlin {
-    jvmToolchain(21)
 }

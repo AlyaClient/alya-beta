@@ -33,7 +33,7 @@ public class LongJumpModule extends Module {
     private final VerusLongJump verusLongJump = new VerusLongJump();
 
     public LongJumpModule() {
-        super("LongJump", "Makes you jump further", ModuleCategory.MOVEMENT);
+        super("LongJump", "Long Jump", "Makes you jump further", ModuleCategory.MOVEMENT);
 
         ModeSetting mode = new ModeSetting("Mode", "Speed mode", "Verus", "Verus");
         ModeSetting verusMode = new ModeSetting("Kind", "Kind of LongJump to use", "Fireball", "Fireball", "Packet");

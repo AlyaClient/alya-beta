@@ -40,6 +40,7 @@ public class TickBaseModule extends Module {
     public TickBaseModule() {
         super(
                 "TickBase",
+                "Tick Base",
                 "Exploits Minecraft's tickspeed to speed up the game while appearing like lag to server.",
                 ModuleCategory.UTILITY
         );

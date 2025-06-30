@@ -27,14 +27,23 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public abstract class Module {
     private final String name;
+    private final String displayName;
     private final String description;
     private final ModuleCategory category;
     private boolean enabled;
     protected final Map<String, Setting<?>> settings = new HashMap<>();
     protected final MinecraftClient mc = MinecraftClient.getInstance();
 
+    protected Module(String name, String displayName, String description, ModuleCategory category) {
+        this.name = name;
+        this.displayName = displayName;
+        this.description = description;
+        this.category = category;
+    }
+
     protected Module(String name, String description, ModuleCategory category) {
         this.name = name;
+        this.displayName = name;
         this.description = description;
         this.category = category;
     }
@@ -53,6 +62,10 @@ public abstract class Module {
 
     public String getName() {
         return name;
+    }
+
+    public String getDisplayName() {
+        return displayName;
     }
 
     public String getDescription() {

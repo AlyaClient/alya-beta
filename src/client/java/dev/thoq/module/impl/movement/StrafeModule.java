@@ -14,26 +14,23 @@
  *
  */
 
-package dev.thoq.module.impl.visual;
+package dev.thoq.module.impl.movement;
 
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
+import dev.thoq.utilities.player.MoveUtility;
 
-public class FullbrightModule extends Module {
-    private double previousGamma;
-
-    public FullbrightModule() {
-        super("FullBright", "Full Bright", "Light mode for minecraft caves", ModuleCategory.VISUAL);
+public class StrafeModule extends Module {
+    public StrafeModule() {
+        super("Strafe", "Allow strafing mid-air", ModuleCategory.MOVEMENT);
     }
 
-    @Override
-    protected void onEnable() {
-        previousGamma = mc.options.getGamma().getValue();
-        mc.options.getGamma().setValue(1.0D);
-    }
+    @SuppressWarnings("unused")
+    private final IEventListener<MotionEvent> motionEvent = event -> {
+        if(mc.player == null || !event.isPre()) return;
 
-    @Override
-    protected void onDisable() {
-        mc.options.getGamma().setValue(previousGamma);
-    }
+        MoveUtility.setStrafe(true);
+    };
 }

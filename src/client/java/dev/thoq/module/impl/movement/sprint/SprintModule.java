@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.module.impl.player.sprint;
+package dev.thoq.module.impl.movement.sprint;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.event.IEventListener;
@@ -28,7 +28,7 @@ public class SprintModule extends Module {
     private final BooleanSetting omniSprint = new BooleanSetting("OmniSprint", "Sprint in all directions", false);
 
     public SprintModule() {
-    super("Sprint", "Makes player less american", ModuleCategory.UTILITY);
+    super("Sprint", "Sprint", "Makes player less american", ModuleCategory.MOVEMENT);
         addSetting(omniSprint);
     }
 

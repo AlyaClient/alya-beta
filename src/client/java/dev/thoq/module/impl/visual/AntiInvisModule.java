@@ -24,7 +24,7 @@ import net.minecraft.entity.Entity;
 
 public class AntiInvisModule extends Module {
     public AntiInvisModule() {
-        super("AntiInvis", "See things you're not supposed to, like your paren-", ModuleCategory.VISUAL);
+        super("AntiInvis", "Anti-Invis", "See things you're not supposed to, like your paren-", ModuleCategory.VISUAL);
     }
 
     private final IEventListener<TickEvent> tickEvent = event -> {

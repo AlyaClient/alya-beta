@@ -14,26 +14,33 @@
  *
  */
 
-package dev.thoq.module.impl.player.nojumpdelay;
+package dev.thoq.module.impl.movement.highjump;
 
+import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.MotionEvent;
-import dev.thoq.mixin.client.accessors.LivingEntityJumpAccessor;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
+import dev.thoq.utilities.player.MoveUtility;
+import net.minecraft.predicate.entity.MovementPredicate;
 
-public class NoJumpDelayModule extends Module {
-    public NoJumpDelayModule() {
-        super("NoJumpDelay", "Makes player a bouncy ball", ModuleCategory.UTILITY);
+public class HighJumpModule extends Module {
+    private final NumberSetting<Float> height = new NumberSetting<>("Height", "Height of the jump", 1.0f, 0.1f, 10.0f);
+
+    public HighJumpModule() {
+        super("HighJump", "High Jump", "Makes you jump very high", ModuleCategory.MOVEMENT);
+
+        addSetting(height);
     }
 
     @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> motionEvent = event -> {
-        if(!isEnabled() || mc.player == null || !event.isPre()) return;
+        if(mc.player == null || !event.isPre()) return;
 
-        if(mc.player.isOnGround()) {
-            LivingEntityJumpAccessor livingEntityJumpAccessor = (LivingEntityJumpAccessor) mc.player;
-            livingEntityJumpAccessor.setJumpingCooldown(0);
+        float jumpHeight = height.getValue();
+
+        if(mc.player.isOnGround() && mc.player.isJumping()) {
+            MoveUtility.setMotionY(jumpHeight);
         }
     };
 }

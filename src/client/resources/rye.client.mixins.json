@@ -13,8 +13,6 @@
     "network.ClientConnectionMixin",
     "network.ClientPlayerEntityMixin",
     "network.ClientPlayNetworkHandlerMixin",
-    "performance.ChunkBuilderOptimizationMixin",
-    "performance.ChunkOcclusionOptimizationMixin",
     "performance.ChunkRenderingOptimizationMixin",
     "performance.EntityCullingOptimizationMixin",
     "ui.ScreenMixin",

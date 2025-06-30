@@ -45,19 +45,19 @@ public class DropDownClickGUI extends Screen {
     private final Map<ModuleCategory, List<Module>> categorizedModules = new EnumMap<>(ModuleCategory.class);
     private final Map<ModuleCategory, Boolean> expandedCategories = new EnumMap<>(ModuleCategory.class);
     private final Map<Module, Boolean> expandedModules = new HashMap<>();
-    private static final int SETTING_HEIGHT = 16;
-    private static final int SETTING_INDENT = 15;
-    private static final int CATEGORY_HEIGHT = 20;
-    private static final int MODULE_HEIGHT = 16;
-    private static final int PANEL_WIDTH = 140;
+    private static final int SETTING_HEIGHT = 20;
+    private static final int SETTING_INDENT = 5;
+    private static final int CATEGORY_HEIGHT = 34;
+    private static final int MODULE_HEIGHT = 25;
+    private static final int PANEL_WIDTH = 160;
     private static final int PANEL_X = 70;
     private static final int PANEL_Y = 20;
-    private static final int PANEL_SPACING = 10;
-    private static final int PADDING = 2;
+    private static final int PANEL_SPACING = 15;
+    private static final int PADDING = 6;
     private static final int BACKGROUND_COLOR = ColorUtility.getColor(ColorUtility.Colors.GRAY);
     private static final int CATEGORY_COLOR = 0xFF222222;
     private static final int HOVER_COLOR = 0x10FFFFFF;
-    private static final float CORNER_RADIUS = 4.0f;
+    private static final float CORNER_RADIUS = 5.0f;
 
     public DropDownClickGUI() {
         super(Text.literal("Click GUI"));
@@ -82,25 +82,10 @@ public class DropDownClickGUI extends Screen {
         }
     }
 
-
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         if(Theme.get("Rye") == null) {
             Theme.init();
-        }
-
-        ModuleRepository repository = ModuleRepository.getInstance();
-        Module hudModule = repository.getModuleByName("HUD");
-        if(hudModule != null) {
-            for(Setting<?> setting : hudModule.getSettings()) {
-                if(setting.getName().equals("Theme") && setting instanceof ModeSetting themeSetting) {
-                    String currentThemeName = themeSetting.getValue();
-                    if(currentThemeName != null) {
-                        Theme.setCurrentTheme(currentThemeName);
-                    }
-                    break;
-                }
-            }
         }
 
         int categoryIndex = 0;
@@ -148,31 +133,24 @@ public class DropDownClickGUI extends Screen {
                     boolean isLastModule = (moduleIndex == modules.size() - 1);
                     boolean isModuleExpanded = expandedModules.getOrDefault(module, false);
 
-                    int moduleBackgroundColor = BACKGROUND_COLOR;
                     Vector4f moduleRadius = new Vector4f(0, 0, 0, 0);
 
                     if(isLastModule && !isModuleExpanded) {
                         moduleRadius = new Vector4f(0, CORNER_RADIUS, 0, CORNER_RADIUS);
                     }
 
-                    // TODO: if enabled + gradient, round the thingy please omg
                     if(module.isEnabled()) {
                         Theme currentTheme = Theme.getCurrentTheme();
-                        if(currentTheme.hasGradient()) {
-                            int primaryColor = currentTheme.getPrimaryColorInt();
-                            int secondaryColor = currentTheme.getSecondaryColorInt();
+                        int primaryColor = currentTheme.getPrimaryColorInt();
+                        int secondaryColor = currentTheme.getSecondaryColorInt();
 
-                            primaryColor = primaryColor | 0xFF000000;
-                            secondaryColor = secondaryColor | 0xFF000000;
+                        primaryColor = primaryColor | 0xFF000000;
+                        secondaryColor = secondaryColor | 0xFF000000;
 
-                            renderGradientRoundedRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT,
-                                    primaryColor, secondaryColor);
-                        } else {
-                            moduleBackgroundColor = (currentTheme.getPrimaryColorInt() & 0x00FFFFFF) | 0x60000000;
-                            RenderUtility.drawRoundedRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT, moduleRadius, moduleBackgroundColor);
-                        }
+                        renderGradientRoundedRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT,
+                                primaryColor, secondaryColor, moduleRadius);
                     } else {
-                        RenderUtility.drawRoundedRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT, moduleRadius, moduleBackgroundColor);
+                        RenderUtility.drawRoundedRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT, moduleRadius, BACKGROUND_COLOR);
                     }
 
                     if(hoverModule) {
@@ -188,7 +166,7 @@ public class DropDownClickGUI extends Screen {
 
                     TextRendererUtility.renderText(
                             context,
-                            module.getName(),
+                            module.getDisplayName(),
                             textColor,
                             categoryX + PADDING * 3,
                             y + PADDING + 2,
@@ -372,13 +350,8 @@ public class DropDownClickGUI extends Screen {
                 mouseY >= y && mouseY <= y + height;
     }
 
-    private void renderGradientRoundedRect(DrawContext context, int x, int y, int width, int height, int color1, int color2) {
-        for(int i = 0; i < width; i++) {
-            float factor = (float) i / width;
-            int interpolatedColor = ColorUtility.interpolateColor(color1, color2, factor);
-
-            context.fill(x + i, y, x + i + 1, y + height, interpolatedColor);
-        }
+    private void renderGradientRoundedRect(DrawContext context, int x, int y, int width, int height, int color1, int color2, Vector4f radius) {
+        RenderUtility.drawGradientRoundedRect(context, x, y, width, height, radius, color1, color2);
     }
 
     @Override

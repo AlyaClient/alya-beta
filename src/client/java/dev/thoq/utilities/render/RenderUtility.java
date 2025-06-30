@@ -274,15 +274,23 @@ public class RenderUtility {
         drawRoundedRectOutline(context, x, y, width, height, radius, lineWidth, 0xFFFFFFFF);
     }
 
-    public static void drawGradientRoundedRect(DrawContext context, int x, int y, int width, int height, Vector4f radius, int colorTop, int colorBottom) {
-        for (int i = 0; i < height; i++) {
-            float factor = (float) i / height;
-            int interpolatedColor = ColorUtility.interpolateColor(colorTop, colorBottom, factor);
+    public static void drawGradientRoundedRect(DrawContext context, int x, int y, int width, int height, Vector4f radius, int colorLeft, int colorRight) {
+        for (int i = 0; i < width; i++) {
+            float factor = (float) i / width;
+            int interpolatedColor = ColorUtility.interpolateColor(colorLeft, colorRight, factor);
 
-            boolean inTopCorners = i < radius.x || i < radius.y;
-            boolean inBottomCorners = i > height - radius.z || i > height - radius.w;
+            Vector4f columnRadius = new Vector4f(0, 0, 0, 0);
+            
+            if (i == 0) {
+                columnRadius.x = radius.x;
+                columnRadius.w = radius.w;
+            }
+            if (i == width - 1) {
+                columnRadius.y = radius.y;
+                columnRadius.z = radius.z;
+            }
 
-            context.fill(x, y + i, x + width, y + i + 1, interpolatedColor);
+            drawRoundedRect(context, x + i, y, 1, height, columnRadius, interpolatedColor);
         }
     }
 

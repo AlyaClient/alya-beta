@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.module.impl.player.nofall.vanilla;
+package dev.thoq.module.impl.utility.nofall.vanilla;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;

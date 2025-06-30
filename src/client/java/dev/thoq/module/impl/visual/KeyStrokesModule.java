@@ -28,7 +28,7 @@ public class KeyStrokesModule extends Module {
     private final BooleanSetting spaceBar = new BooleanSetting("Spacebar", "Draw Spacebar?", true);
 
     public KeyStrokesModule() {
-        super("Keystrokes", "Draws your Keystrokes", ModuleCategory.VISUAL);
+        super("Keystrokes", "Key Strokes", "Draws your Keystrokes", ModuleCategory.VISUAL);
 
         addSetting(spaceBar);
     }

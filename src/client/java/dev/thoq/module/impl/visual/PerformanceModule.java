@@ -26,24 +26,11 @@ public class PerformanceModule extends Module {
     public PerformanceModule() {
         super("Performance", "Improves performance", ModuleCategory.VISUAL);
 
-        BooleanSetting chunkBuilderOptimization = new BooleanSetting("Chunk Builder", "Optimizes the chunk builder", true);
-        // BooleanSetting chunkOcclusionOptimization = new BooleanSetting("Chunk Occlusion", "Removes invisible chunks", true);
         BooleanSetting entityCullingOptimization = new BooleanSetting("Entity Culling", "Hides invisible entities", true);
         BooleanSetting chunkRenderingOptimization = new BooleanSetting("Chunk Rendering", "Optimize the chunk renderer", true);
 
-        addSetting(chunkBuilderOptimization);
-        // addSetting(chunkOcclusionOptimization);
         addSetting(chunkRenderingOptimization);
         addSetting(entityCullingOptimization);
-    }
-
-    public boolean shouldOptimizeChunkBuilder() {
-        return ((BooleanSetting) getSetting("Chunk Builder")).getValue();
-    }
-
-    public boolean shouldOptimizeChunkOcclusion() {
-        // return ((BooleanSetting) getSetting("Chunk Occlusion")).getValue();
-        return false;
     }
 
     public boolean shouldOptimizeChunkRendering() {

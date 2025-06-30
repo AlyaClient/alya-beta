@@ -32,7 +32,7 @@ public class DebugModule extends Module {
     private final BooleanSetting packetLog = new BooleanSetting("Packets", "Log all packets to console, may lag game", false);
 
     public DebugModule() {
-        super("Debug", "Shows debug info, only intrest to developers", ModuleCategory.VISUAL);
+        super("Debug", "Shows debug info-only of intrest to developers", ModuleCategory.VISUAL);
 
         addSetting(packetLog);
 

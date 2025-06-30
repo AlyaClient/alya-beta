@@ -104,6 +104,50 @@ public class MoveUtility {
     }
 
     /**
+     * Adjusts the player's movement, allowing strafing behavior under specific conditions.
+     *
+     * @param strafe Determines whether strafing mode is enabled. If true, the method attempts
+     *               to apply a strafing motion to the player's movement when conditions such
+     *               as being in liquid and not on the ground are met.
+     */
+    public static void setStrafe(boolean strafe) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        ClientPlayerEntity player = mc.player;
+
+        if(player == null) return;
+
+        boolean isInLiquid = !player.isTouchingWater() && !player.isInLava();
+        boolean playerMoveOk = !player.isOnGround() && !player.getAbilities().flying;
+        boolean canStrafe = strafe && isInLiquid && playerMoveOk;
+
+        if(canStrafe) {
+            float forward = getForward(mc);
+            float strafe_value = getStrafe(mc);
+            float yaw = player.getYaw();
+
+            if(forward != 0.0f) {
+                if(strafe_value >= 1.0f) {
+                    yaw += (forward > 0.0f ? -45 : 45);
+                    strafe_value = 0.0f;
+                } else if(strafe_value <= -1.0f) {
+                    yaw += (forward > 0.0f ? 45 : -45);
+                    strafe_value = 0.0f;
+                }
+                forward = (forward > 0.0f) ? 1.0f : -1.0f;
+            }
+
+            double sin = Math.sin(Math.toRadians(yaw + 90.0f));
+            double cos = Math.cos(Math.toRadians(yaw + 90.0f));
+
+            double speed = 0.2;
+            double xVelocity = forward * speed * cos + strafe_value * speed * sin;
+            double zVelocity = forward * speed * sin - strafe_value * speed * cos;
+
+            player.setVelocity(xVelocity, player.getVelocity().y, zVelocity);
+        }
+    }
+
+    /**
      * Sets the player's motion in the X direction.
      *
      * @param x The motion value to set for the X axis.

@@ -28,7 +28,7 @@ public class ArraylistModule extends Module {
     private static final long SLIDE_DURATION = 1000;
 
     public ArraylistModule() {
-        super("Arraylist", "Render all active modules", ModuleCategory.VISUAL);
+        super("Arraylist", "Array List", "Render all active modules", ModuleCategory.VISUAL);
 
         addSetting(showVisualModules);
         addSetting(position);
@@ -74,12 +74,9 @@ public class ArraylistModule extends Module {
         float phase = time * 2.0f + waveOffset * 4.0f;
 
         Theme currentTheme = Theme.getCurrentTheme();
-        if(currentTheme.hasGradient()) {
-            float factor = (float) (Math.sin(phase) + 1.0) / 2.0f;
-            return Theme.interpolateColorInt(currentTheme.getPrimaryColor(), currentTheme.getSecondaryColor(), factor);
-        } else {
-            return currentTheme.getPrimaryColorInt();
-        }
+        float factor = (float) (Math.sin(phase) + 1.0) / 2.0f;
+
+        return Theme.interpolateColorInt(currentTheme.getPrimaryColor(), currentTheme.getSecondaryColor(), factor);
     }
 
     @SuppressWarnings("unused")
@@ -95,8 +92,8 @@ public class ArraylistModule extends Module {
         }
 
         animatingModules.sort((module1, module2) -> {
-            int width1 = TextRendererUtility.getTextWidth(module1.getName());
-            int width2 = TextRendererUtility.getTextWidth(module2.getName());
+            int width1 = TextRendererUtility.getTextWidth(module1.getDisplayName());
+            int width2 = TextRendererUtility.getTextWidth(module2.getDisplayName());
             return Integer.compare(width2, width1);
         });
 
@@ -115,12 +112,12 @@ public class ArraylistModule extends Module {
 
         List<Integer> moduleWidths = new ArrayList<>();
         for(Module module : animatingModules) {
-            moduleWidths.add(TextRendererUtility.getTextWidth(module.getName()));
+            moduleWidths.add(TextRendererUtility.getTextWidth(module.getDisplayName()));
         }
 
         for(int i = 0; i < animatingModules.size(); i++) {
             Module module = animatingModules.get(i);
-            String name = module.getName();
+            String name = module.getDisplayName();
             int textWidth = moduleWidths.get(i);
             float animValue = getAnimationValue(module);
 

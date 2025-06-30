@@ -14,39 +14,34 @@
  *
  */
 
-package dev.thoq.module.impl.player.nofall;
+package dev.thoq.module.impl.movement.jumpcooldown;
 
-import dev.thoq.config.setting.impl.ModeSetting;
+import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.MotionEvent;
+import dev.thoq.mixin.client.accessors.LivingEntityJumpAccessor;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
-import dev.thoq.module.impl.player.nofall.vanilla.VanillaNoFall;
-import dev.thoq.module.impl.player.nofall.verus.VerusNoFall;
 
-public class NoFallModule extends Module {
-    public NoFallModule() {
-        super("NoFall", "Prevents fall damage", ModuleCategory.UTILITY);
+// todo: borked
+public class JumpCooldownModule extends Module {
+    private final NumberSetting<Integer> cooldown = new NumberSetting<>("Cooldown", "Cooldown of the jump", 0, 0, 1);
 
-        ModeSetting mode = new ModeSetting("Mode", "NoFall mode", "Vanilla", "Vanilla", "Verus");
+    public JumpCooldownModule() {
+        super("JumpCooldown", "Jump Cooldown", "Makes player a bouncy ball", ModuleCategory.MOVEMENT);
 
-        addSetting(mode);
+        addSetting(cooldown);
     }
 
     @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> motionEvent = event -> {
         if(!isEnabled() || mc.player == null || !event.isPre()) return;
 
-        switch(((ModeSetting) getSetting("Mode")).getValue()) {
-            case "Vanilla": {
-                VanillaNoFall.vanillaNoFall(mc);
-                break;
-            }
+        int cooldownValue = cooldown.getValue();
 
-            case "Verus": {
-                VerusNoFall.verusNoFall(mc);
-                break;
-            }
+        if(mc.player.isOnGround()) {
+            LivingEntityJumpAccessor livingEntityJumpAccessor = (LivingEntityJumpAccessor) mc.player;
+            livingEntityJumpAccessor.setJumpingCooldown(cooldownValue);
         }
     };
 }
