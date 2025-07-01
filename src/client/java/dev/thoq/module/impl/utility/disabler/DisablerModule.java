@@ -16,32 +16,38 @@
 
 package dev.thoq.module.impl.utility.disabler;
 
-import dev.thoq.config.setting.impl.ModeSetting;
+import dev.thoq.config.setting.impl.MultipleBooleanSetting;
 import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.event.impl.PacketSendEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
+import dev.thoq.module.impl.utility.disabler.cubecraft.CubecraftDisabler;
 import dev.thoq.module.impl.utility.disabler.omnisprint.OmniSprintDisabler;
 
 public class DisablerModule extends Module {
     private final OmniSprintDisabler omniSprintDisabler = new OmniSprintDisabler();
+    private final CubecraftDisabler cubecraftDisabler = new CubecraftDisabler();
+
+    private final MultipleBooleanSetting disabler = new MultipleBooleanSetting("Mode", "Disabler mode", "OmniSprint", "Cubecraft");
 
     public DisablerModule() {
         super("Disabler", "Partially or fully disable some anticheats", ModuleCategory.UTILITY);
 
-        ModeSetting modeSetting = new ModeSetting("Mode", "Disabler mode", "OmniSprint", "OmniSprint");
-
-        addSetting(modeSetting);
+        addSetting(disabler);
     }
 
-    @SuppressWarnings({"SwitchStatementWithTooFewBranches", "unused"})
+    @SuppressWarnings({"unused"})
     private final IEventListener<PacketSendEvent> packetSendEvent = event -> {
-        String mode = ((ModeSetting) getSetting("Mode")).getValue();
+        if(disabler.isEnabled("OmniSprint")) {
+            omniSprintDisabler.omniSprintDisabler(event, mc);
+        }
+    };
 
-        switch(mode) {
-            case "OmniSprint": {
-                omniSprintDisabler.omniSprintDisabler(event, mc);
-            }
+    @SuppressWarnings("unused")
+    private final IEventListener<MotionEvent> motionEvent = event -> {
+        if(disabler.isEnabled("Cubecraft")) {
+            cubecraftDisabler.cubecraftDisabler(event, mc);
         }
     };
 }
