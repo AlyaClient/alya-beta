@@ -1,0 +1,51 @@
+/*
+ * Copyright (c) Rye Client 2024-2025.
+ *
+ * This file belongs to Rye Client,
+ * an open-source Fabric injection client.
+ * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ *
+ * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ *
+ * Rye (and subsequently, its files) are all licensed under the MIT License.
+ * Rye should have come with a copy of the MIT License.
+ * If it did not, you may obtain a copy here:
+ * MIT License: https://opensource.org/license/mit
+ *
+ */
+
+package dev.thoq.module.impl.movement.flight.vanilla;
+
+import dev.thoq.utilities.player.MoveUtility;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.option.GameOptions;
+
+public class NormalFlight {
+    public void normalFlight(
+            MinecraftClient mc,
+            GameOptions options,
+            float speed,
+            boolean verticalEnabled,
+            boolean preventVanillaKick
+    ) {
+        if(mc.player == null) return;
+
+        boolean up = options.jumpKey.isPressed();
+        boolean down = options.sneakKey.isPressed();
+        boolean verticalMovement = up || down;
+
+        if(verticalEnabled) {
+            if(up)
+                MoveUtility.setMotionY(speed / 2);
+            else if(down)
+                MoveUtility.setMotionY(-speed / 2);
+        }
+
+        if(preventVanillaKick && !verticalMovement)
+            MoveUtility.setMotionY(MoveUtility.getVanillaFallingSpeed());
+        else if(!verticalMovement)
+            MoveUtility.setMotionY(0);
+
+        MoveUtility.setSpeed(speed, true);
+    }
+}
