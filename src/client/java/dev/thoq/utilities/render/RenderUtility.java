@@ -260,7 +260,7 @@ public class RenderUtility {
             DrawContext context
     ) {
         context.drawTexture(
-                RenderPipelines.GUI_TEXTURED, // Should've looked harder.
+                RenderPipelines.GUI_TEXTURED, // Should've looked harder. shut up rare
                 texture,
                 posX, posY,
                 0, 0,
