@@ -139,7 +139,7 @@ public class MoveUtility {
             double sin = Math.sin(Math.toRadians(yaw + 90.0f));
             double cos = Math.cos(Math.toRadians(yaw + 90.0f));
 
-            double speed = 0.2;
+            double speed = player.isSprinting() ? 0.2873 : 0.2;
             double xVelocity = forward * speed * cos + strafe_value * speed * sin;
             double zVelocity = forward * speed * sin - strafe_value * speed * cos;
 

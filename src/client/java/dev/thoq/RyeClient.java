@@ -30,13 +30,14 @@ import dev.thoq.module.impl.combat.AttackDelayModule;
 import dev.thoq.module.impl.combat.killaura.KillauraModule;
 import dev.thoq.module.impl.movement.StrafeModule;
 import dev.thoq.module.impl.movement.highjump.HighJumpModule;
+import dev.thoq.module.impl.utility.disabler.DisablerModule;
 import dev.thoq.module.impl.world.TickBaseModule;
 import dev.thoq.module.impl.movement.flight.FlightModule;
 import dev.thoq.module.impl.combat.VelocityModule;
 import dev.thoq.module.impl.movement.longjump.LongJumpModule;
 import dev.thoq.module.impl.movement.scaffold.ScaffoldModule;
 import dev.thoq.module.impl.movement.speed.SpeedModule;
-import dev.thoq.module.impl.utility.NukerModule;
+import dev.thoq.module.impl.world.NukerModule;
 import dev.thoq.module.impl.combat.ReachModule;
 import dev.thoq.module.impl.utility.fastplace.FastPlaceModule;
 import dev.thoq.module.impl.utility.nofall.NoFallModule;
@@ -149,7 +150,8 @@ public class RyeClient implements ClientModInitializer {
                         new StrafeModule(),
                         new HighJumpModule(),
                         new AmbienceModule(),
-                        new DiscordRPCModule()
+                        new DiscordRPCModule(),
+                        new DisablerModule()
                 );
     }
 

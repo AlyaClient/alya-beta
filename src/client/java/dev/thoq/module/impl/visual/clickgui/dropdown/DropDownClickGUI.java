@@ -28,6 +28,7 @@ import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.RenderUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
 import dev.thoq.utilities.render.Theme;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -49,7 +50,7 @@ public class DropDownClickGUI extends Screen {
     private final Map<Module, Boolean> expandedModules = new HashMap<>();
     private static final int SETTING_HEIGHT = 20;
     private static final int SETTING_INDENT = 5;
-    private static final int CATEGORY_HEIGHT = 34;
+    private static final int CATEGORY_HEIGHT = 24;
     private static final int MODULE_HEIGHT = 25;
     private static final int PANEL_WIDTH = 160;
     private static final int PANEL_X = 70;
@@ -60,6 +61,14 @@ public class DropDownClickGUI extends Screen {
     private static final int CATEGORY_COLOR = 0xFF222222;
     private static final int HOVER_COLOR = 0x10FFFFFF;
     private static final float CORNER_RADIUS = 5.0f;
+    private static final int TOOLTIP_BACKGROUND = 0xE0000000;
+    private static final int TOOLTIP_BORDER = 0xFF555555;
+    private static final int TOOLTIP_MAX_WIDTH = 200;
+    private static final int TOOLTIP_PADDING = 8;
+
+    private String hoveredTooltip = null;
+    private int tooltipX = 0;
+    private int tooltipY = 0;
 
     public DropDownClickGUI() {
         super(Text.literal("Click GUI"));
@@ -90,6 +99,7 @@ public class DropDownClickGUI extends Screen {
             Theme.init();
         }
 
+        hoveredTooltip = null;
         int categoryIndex = 0;
 
         for(Map.Entry<ModuleCategory, List<Module>> entry : categorizedModules.entrySet()) {
@@ -134,6 +144,12 @@ public class DropDownClickGUI extends Screen {
                     boolean hoverModule = isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT);
                     boolean isLastModule = (moduleIndex == modules.size() - 1);
                     boolean isModuleExpanded = expandedModules.getOrDefault(module, false);
+
+                    if(hoverModule && module.getDescription() != null && !module.getDescription().isEmpty()) {
+                        hoveredTooltip = module.getDescription();
+                        tooltipX = mouseX;
+                        tooltipY = mouseY;
+                    }
 
                     Vector4f moduleRadius = new Vector4f(0, 0, 0, 0);
 
@@ -188,8 +204,15 @@ public class DropDownClickGUI extends Screen {
 
                         int settingIndex = 0;
                         for(Setting<?> setting : visibleSettings) {
+                            boolean hoverSetting = isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, SETTING_HEIGHT);
                             boolean isLastSetting = (settingIndex == visibleSettings.size() - 1);
                             boolean shouldRoundSetting = isLastModule && isLastSetting;
+
+                            if(hoverSetting && setting.getDescription() != null && !setting.getDescription().isEmpty()) {
+                                hoveredTooltip = setting.getDescription();
+                                tooltipX = mouseX;
+                                tooltipY = mouseY;
+                            }
 
                             Vector4f settingRadius = new Vector4f(0, 0, 0, 0);
                             if(shouldRoundSetting) {
@@ -236,7 +259,87 @@ public class DropDownClickGUI extends Screen {
             categoryIndex++;
         }
 
+        if(hoveredTooltip != null) {
+            renderTooltip(context, hoveredTooltip, tooltipX, tooltipY);
+        }
+
         super.render(context, mouseX, mouseY, delta);
+    }
+
+    private void renderTooltip(DrawContext context, String text, int x, int y) {
+        if(text == null || text.isEmpty()) return;
+
+        List<String> lines = wrapText(text, TOOLTIP_MAX_WIDTH);
+        if(lines.isEmpty()) return;
+
+        int maxLineWidth = 0;
+        for(String line : lines) {
+            int lineWidth = TextRendererUtility.getTextWidth(line);
+            if(lineWidth > maxLineWidth) {
+                maxLineWidth = lineWidth;
+            }
+        }
+
+        int tooltipWidth = maxLineWidth + TOOLTIP_PADDING * 2;
+        int tooltipHeight = lines.size() * 12 + TOOLTIP_PADDING * 2;
+
+        int tooltipX = x + 10;
+        int tooltipY = y - 10;
+
+        if(tooltipX + tooltipWidth > width) {
+            tooltipX = x - tooltipWidth - 10;
+        }
+        if(tooltipY + tooltipHeight > height) {
+            tooltipY = y - tooltipHeight + 10;
+        }
+        if(tooltipX < 0) {
+            tooltipX = 5;
+        }
+        if(tooltipY < 0) {
+            tooltipY = 5;
+        }
+
+        Vector4f tooltipRadius = new Vector4f(4, 4, 4, 4);
+        RenderUtility.drawRoundedRect(context, tooltipX, tooltipY, tooltipWidth, tooltipHeight, tooltipRadius, TOOLTIP_BACKGROUND);
+        RenderUtility.drawRoundedRectOutline(context, tooltipX, tooltipY, tooltipWidth, tooltipHeight, tooltipRadius.x, 1, TOOLTIP_BORDER);
+
+        for(int i = 0; i < lines.size(); i++) {
+            TextRendererUtility.renderText(
+                    context,
+                    lines.get(i),
+                    ColorUtility.Colors.WHITE,
+                    tooltipX + TOOLTIP_PADDING,
+                    tooltipY + TOOLTIP_PADDING + i * 12,
+                    false
+            );
+        }
+    }
+
+    private List<String> wrapText(String text, int maxWidth) {
+        List<String> lines = new ArrayList<>();
+        String[] words = text.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+
+        for(String word : words) {
+            String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+
+            if(TextRendererUtility.getTextWidth(testLine) <= maxWidth) {
+                currentLine = new StringBuilder(testLine);
+            } else {
+                if(currentLine.length() > 0) {
+                    lines.add(currentLine.toString());
+                    currentLine = new StringBuilder(word);
+                } else {
+                    lines.add(word);
+                }
+            }
+        }
+
+        if(currentLine.length() > 0) {
+            lines.add(currentLine.toString());
+        }
+
+        return lines;
     }
 
     @Override

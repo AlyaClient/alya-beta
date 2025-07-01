@@ -14,13 +14,13 @@
  *
  */
 
-package dev.thoq.module.impl.utility;
+package dev.thoq.module.impl.world;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.event.IEventListener;
-import dev.thoq.event.impl.TickEvent;
+import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.misc.ChatUtility;
@@ -58,7 +58,7 @@ public class NukerModule extends Module {
         addSetting(clearStatsOnToggle);
     }
 
-    private final IEventListener<TickEvent> tickEvent = event -> {
+    private final IEventListener<MotionEvent> tickEvent = event -> {
         String mode = ((ModeSetting) getSetting("Mode")).getValue();
         switch(mode) {
             case "Instant": {
@@ -215,6 +215,14 @@ public class NukerModule extends Module {
                 if(currentBedBreaking != null) {
                     bedBreakingTicks++;
 
+                    double dx = currentBedBreaking.getX() + 0.5 - mc.player.getX();
+                    double dy = currentBedBreaking.getY() + 0.5 - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));
+                    double dz = currentBedBreaking.getZ() + 0.5 - mc.player.getZ();
+                    double yaw = Math.atan2(dz, dx);
+                    double pitch = -Math.atan2(dy, Math.sqrt(dx * dx + dz * dz));
+                    mc.player.setYaw((float) Math.toDegrees(yaw) - 90f);
+                    mc.player.setPitch((float) Math.toDegrees(pitch));
+
                     Block currentBlock = mc.world.getBlockState(currentBedBreaking).getBlock();
                     if(isNotBedBlock(currentBlock)) {
                         currentBedBreaking = null;
@@ -227,10 +235,20 @@ public class NukerModule extends Module {
                     if(bedBreakingTicks >= 3) {
                         mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
+                        Direction face = Direction.UP;
+                        double relativeY = mc.player.getY() - currentBedBreaking.getY();
+                        if(relativeY > 0.5) {
+                            face = Direction.DOWN;
+                        } else if(Math.abs(dx) > Math.abs(dz)) {
+                            face = dx > 0 ? Direction.WEST : Direction.EAST;
+                        } else {
+                            face = dz > 0 ? Direction.NORTH : Direction.SOUTH;
+                        }
+
                         PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
                                 PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
                                 currentBedBreaking,
-                                Direction.UP
+                                face
                         );
                         mc.getNetworkHandler().sendPacket(stopBreaking);
 
@@ -254,16 +272,34 @@ public class NukerModule extends Module {
 
                             if(isNotBedBlock(block)) continue;
 
+                            double dx = blockPos.getX() + 0.5 - mc.player.getX();
+                            double dy = blockPos.getY() + 0.5 - (mc.player.getY() + mc.player.getEyeHeight(mc.player.getPose()));
+                            double dz = blockPos.getZ() + 0.5 - mc.player.getZ();
+                            double yaw = Math.atan2(dz, dx);
+                            double pitch = -Math.atan2(dy, Math.sqrt(dx * dx + dz * dz));
+                            mc.player.setYaw((float) Math.toDegrees(yaw) - 90f);
+                            mc.player.setPitch((float) Math.toDegrees(pitch));
+
                             currentBedBreaking = blockPos;
                             bedBreakingTicks = 0;
 
                             mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
+                            Direction face = Direction.UP;
+                            double relativeY = mc.player.getY() - blockPos.getY();
+                            if(relativeY > 0.5) {
+                                face = Direction.DOWN;
+                            } else if(Math.abs(dx) > Math.abs(dz)) {
+                                face = dx > 0 ? Direction.WEST : Direction.EAST;
+                            } else {
+                                face = dz > 0 ? Direction.NORTH : Direction.SOUTH;
+                            }
+
                             PlayerActionC2SPacket startBreaking = new PlayerActionC2SPacket(
                                     PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
                                     blockPos,
-                                    Direction.UP
-                            );
+                                    face
+                                );
                             mc.getNetworkHandler().sendPacket(startBreaking);
 
                             return;

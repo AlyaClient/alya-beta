@@ -29,7 +29,7 @@ public class VerusSpeed {
             return;
 
         if(forwardOnly)
-            MoveUtility.setSpeed(0.34f, true);
+            MoveUtility.setSpeed(0.29f, true);
         else
             MoveUtility.setSpeed(0.26f, true);
 

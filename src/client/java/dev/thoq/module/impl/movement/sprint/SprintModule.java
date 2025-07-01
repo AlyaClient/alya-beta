@@ -22,6 +22,7 @@ import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.player.MoveUtility;
+import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class SprintModule extends Module {
@@ -34,13 +35,14 @@ public class SprintModule extends Module {
 
     @SuppressWarnings("unused")
     private final IEventListener<TickEvent> tickEvent = event -> {
-        if(!isEnabled() || mc.player == null || mc.options == null || !event.isPre()) return;
+        if(mc.getNetworkHandler() == null || mc.player == null || mc.options == null || !event.isPre()) return;
 
         boolean omniSprintEnabled = ((BooleanSetting) getSetting("OmniSprint")).getValue();
-        boolean movingForwards = mc.options.forwardKey.isPressed() || !mc.options.backKey.isPressed();
+        boolean movingForwards = mc.options.forwardKey.isPressed();
 
         if(MoveUtility.isMoving()) {
             if(omniSprintEnabled) {
+                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_SPRINTING));
                 mc.player.setSprinting(true);
             } else if(movingForwards) {
                 mc.player.setSprinting(true);

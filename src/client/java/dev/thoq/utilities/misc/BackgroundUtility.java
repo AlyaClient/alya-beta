@@ -24,12 +24,7 @@ import net.minecraft.util.Identifier;
 import java.util.Objects;
 
 public class BackgroundUtility {
-    public enum Version {
-        TEXT,
-        NO_TEXT
-    }
-
-    public static void drawBackground(DrawContext context, Version version) {
+    public static void drawBackground(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
         int screenWidth = client.getWindow().getScaledWidth();
         int screenHeight = client.getWindow().getScaledHeight();
@@ -48,13 +43,7 @@ public class BackgroundUtility {
         int posX = (screenWidth - renderWidth) / 2;
         int posY = (screenHeight - renderHeight) / 2;
 
-        Identifier texture;
-
-        if(Objects.requireNonNull(version) == Version.TEXT) {
-            texture = Identifier.of("rye", "main-menu/rye_bg_text.png");
-        } else {
-            texture = Identifier.of("rye", "main-menu/rye_bg.png");
-        }
+        Identifier texture = Identifier.of("rye", "main-menu/rye_bg.png");
 
         RenderUtility.drawImage(
                 texture,

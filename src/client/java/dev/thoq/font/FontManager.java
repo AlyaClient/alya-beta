@@ -18,7 +18,6 @@ package dev.thoq.font;
 import dev.thoq.Rye;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.*;
-import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.TextureManager;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -99,6 +98,4 @@ public class FontManager {
             return MC.textRenderer; // Return vanilla renderer if it fails instead of crashing. (no balls approach)
         }
     }
-
-
 }
