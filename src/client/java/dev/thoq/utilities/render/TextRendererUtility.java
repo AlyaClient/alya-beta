@@ -16,13 +16,16 @@
 
 package dev.thoq.utilities.render;
 
+import dev.thoq.font.FontManager;
 import dev.thoq.utilities.render.ColorUtility.Colors;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class TextRendererUtility {
+
     static MinecraftClient client = MinecraftClient.getInstance();
+    static TextRenderer renderer = FontManager.getFont("figtree", 11);
 
     /**
      * Renders a text string on the screen at the specified position with a designated color and optional shadow.
@@ -42,7 +45,6 @@ public class TextRendererUtility {
             int posY,
             boolean shadow
     ) {
-        TextRenderer renderer = client.textRenderer;
         context.drawText(
                 renderer,
                 text,
@@ -71,7 +73,6 @@ public class TextRendererUtility {
             int posY,
             boolean shadow
     ) {
-        TextRenderer renderer = client.textRenderer;
         context.drawText(
                 renderer,
                 text,
@@ -89,7 +90,6 @@ public class TextRendererUtility {
      * @return The width of the text in pixels
      */
     public static int getTextWidth(String text) {
-        TextRenderer renderer = client.textRenderer;
         return renderer.getWidth(text);
     }
 
@@ -99,6 +99,6 @@ public class TextRendererUtility {
      * @return The height of the font in pixels.
      */
     public static int getTextHeight() {
-        return MinecraftClient.getInstance().textRenderer.fontHeight;
+        return renderer.fontHeight;
     }
 }
