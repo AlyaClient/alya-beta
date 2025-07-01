@@ -46,7 +46,7 @@ public class DropDownClickGUI extends Screen {
     private final Map<ModuleCategory, DragUtility> categoryDragUtils = new EnumMap<>(ModuleCategory.class);
 
     private static final int SETTING_HEIGHT = 25;
-    private static final int SETTING_INDENT = 10;
+    private static final int SETTING_INDENT = 2;
     private static final int CATEGORY_HEIGHT = 24;
     private static final int MODULE_HEIGHT = 25;
     private static final int PANEL_WIDTH = 160;
@@ -91,6 +91,7 @@ public class DropDownClickGUI extends Screen {
         initializeModules();
     }
 
+
     private void initializeModules() {
         for(List<Module> modules : categorizedModules.values())
             modules.clear();
@@ -100,6 +101,10 @@ public class DropDownClickGUI extends Screen {
         for(Module module : repository.getModules()) {
             ModuleCategory category = module.getCategory();
             categorizedModules.get(category).add(module);
+        }
+
+        for(List<Module> modules : categorizedModules.values()) {
+            modules.sort((m1, m2) -> m1.getDisplayName().compareToIgnoreCase(m2.getDisplayName()));
         }
     }
 
