@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Manages loading anc caching of TrueType fonts for rendering in the client.
+ * Manages loading and caching of TrueType fonts for rendering in the client.
  *
  * @author RareHyperIon
  * @since 01/07/2025
@@ -74,7 +74,7 @@ public class FontManager {
 
         final TrueTypeFontLoader loader = new TrueTypeFontLoader(
                 Identifier.of(Rye.MOD_ID, fontName + ".ttf"),
-                size, 2.0F, // Don't change oversampling, it will ruin the text rendering.
+                size, 2.0F, // Don't change oversampling, it will ruin the text rendering. (believe him)
                 TrueTypeFontLoader.Shift.NONE,
                 ""
         );
@@ -99,7 +99,7 @@ public class FontManager {
             return renderer;
         } catch (final IOException exception) {
             exception.printStackTrace(System.err);
-            return MC.textRenderer; // Return vanilla renderer if it fails instead of crashing.
+            return MC.textRenderer; // Return vanilla renderer if it fails instead of crashing. (no balls approach)
         }
     }
 

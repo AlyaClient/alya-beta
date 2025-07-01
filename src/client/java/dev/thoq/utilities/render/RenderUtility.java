@@ -16,21 +16,13 @@
 
 package dev.thoq.utilities.render;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTextureView;
 import me.x150.renderer.render.ExtendedDrawContext;
 import me.x150.renderer.util.Color;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
-import net.minecraft.client.texture.AbstractTexture;
-import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.util.Identifier;
-import org.joml.Matrix3x2f;
 import org.joml.Vector4f;
-import org.lwjgl.opengl.GL11;
 
 @SuppressWarnings("unused")
 public class RenderUtility {
