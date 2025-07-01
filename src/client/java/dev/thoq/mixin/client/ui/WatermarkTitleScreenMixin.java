@@ -44,12 +44,13 @@ public class WatermarkTitleScreenMixin {
     private void renderRyeLogo(LogoDrawer logoDrawer, DrawContext context, int width, float alpha) {
         // don't draw the minecraft logo
 
-        int x = context.getScaledWindowWidth() / 2;
+        String text = "Rye";
+        int x = context.getScaledWindowWidth() / 2 - TextRendererUtility.getXlTextWidth(text) / 2;
         int y = Math.round(context.getScaledWindowHeight() / 4.5f);
 
         TextRendererUtility.renderXlText(
                 context,
-                "Rye",
+                text,
                 ColorUtility.Colors.WHITE,
                 x,
                 y,
@@ -59,17 +60,24 @@ public class WatermarkTitleScreenMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;III)V"))
     private void replaceVersionText(DrawContext context, net.minecraft.client.font.TextRenderer textRenderer, String text, int x, int y, int color) {
-        String ryeVersion = String.format("%s Client %s %s", RyeClient.getName(), RyeClient.getType(), RyeClient.getEdition());
+        // String ryeVersion = String.format("%s Client %s %s", RyeClient.getName(), RyeClient.getType(), RyeClient.getEdition());
 
         // we ignore demo and modded
 
-        context.drawTextWithShadow(textRenderer, ryeVersion, x, y, color);
+        // I think I want to stop this
+        // its cleaner
+        // context.drawTextWithShadow(textRenderer, ryeVersion, x, y, color);
     }
 
-    @Inject(method = "init", at = @At("TAIL"))
-    private void modifySplashTexts(CallbackInfo ci) {
+    @Inject(method = "init", at = @At("HEAD"))
+    private void disableSplashText(CallbackInfo ci) {
         this.splashText = null;
     }
+
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/SplashTextRenderer;render(Lnet/minecraft/client/gui/DrawContext;ILnet/minecraft/client/font/TextRenderer;F)V"))
+    private void cancelSplashTextRendering(SplashTextRenderer splashTextRenderer, DrawContext context, int width, net.minecraft.client.font.TextRenderer textRenderer, float alpha) {
+    }
+
 
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/AccessibilityOnboardingButtons;createLanguageButton(ILnet/minecraft/client/gui/widget/ButtonWidget$PressAction;Z)Lnet/minecraft/client/gui/widget/TextIconButtonWidget;", shift = At.Shift.AFTER), cancellable = true)
     private void skipLanguageButtonSetup(CallbackInfo ci) {

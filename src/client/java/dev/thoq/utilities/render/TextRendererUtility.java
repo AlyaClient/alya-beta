@@ -24,7 +24,7 @@ import net.minecraft.client.gui.DrawContext;
 public class TextRendererUtility {
 
     static TextRenderer renderer = FontManager.getFont("sf_pro_rounded_regular", 11);
-    static TextRenderer rendererXl = FontManager.getFont("sf_pro_rounded_regular", 40);
+    static TextRenderer rendererXl = FontManager.getFont("sf_pro_rounded_regular", 50);
 
     /**
      * Renders a text string on the screen at the specified position with a designated color and optional shadow.
@@ -118,6 +118,16 @@ public class TextRendererUtility {
      */
     public static int getTextWidth(String text) {
         return renderer.getWidth(text);
+    }
+
+    /**
+     * Calculates the width of the given extra-large text string using the renderer.
+     *
+     * @param text The text whose width is to be measured.
+     * @return The width of the text in pixels.
+     */
+    public static int getXlTextWidth(String text) {
+        return rendererXl.getWidth(text);
     }
 
     /**
