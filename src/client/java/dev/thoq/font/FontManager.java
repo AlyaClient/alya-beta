@@ -83,16 +83,13 @@ public class FontManager {
             final FontLoader.Loadable loadable = loader.build().orThrow();
             final Font font = loadable.load(RESOURCE_MANAGER);
 
-            final Identifier storageId = Identifier.of(Rye.MOD_ID, "fonts");
+            final Identifier storageId = Identifier.of(Rye.MOD_ID, String.format("%s_font", key));
             final FontStorage storage = new FontStorage(TEXTURE_MANAGER, storageId);
 
             storage.setFonts(
                     List.of(new Font.FontFilterPair(font, FontFilterType.FilterMap.NO_FILTER)),
                     Collections.emptySet()
             );
-
-            final AbstractTexture texture = TEXTURE_MANAGER.getTexture(storageId);
-            texture.setFilter(true, true);
 
             final TextRenderer renderer = new TextRenderer(id -> storage, true);
             FONT_CACHE.put(key, renderer);
