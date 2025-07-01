@@ -32,6 +32,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
 import org.joml.Vector4f;
 
 import java.util.ArrayList;
@@ -118,8 +120,8 @@ public class DropDownClickGUI extends Screen {
                     y + PADDING + 2,
                     10,
                     10,
-                    225,
-                    225,
+                    10,
+                    10,
                     context
             );
 

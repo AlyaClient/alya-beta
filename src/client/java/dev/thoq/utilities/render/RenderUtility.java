@@ -17,15 +17,26 @@
 package dev.thoq.utilities.render;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.GpuTextureView;
 import me.x150.renderer.render.ExtendedDrawContext;
 import me.x150.renderer.util.Color;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.render.state.TexturedQuadGuiElementRenderState;
+import net.minecraft.client.texture.AbstractTexture;
+import net.minecraft.client.texture.TextureSetup;
 import net.minecraft.util.Identifier;
+import org.joml.Matrix3x2f;
 import org.joml.Vector4f;
+import org.lwjgl.opengl.GL11;
 
 @SuppressWarnings("unused")
 public class RenderUtility {
+
+    private static final MinecraftClient MC = MinecraftClient.getInstance();
+
     /**
      * Draws a filled rounded rectangle with the specified position, dimensions, corner radius, and color.
      *
@@ -248,16 +259,8 @@ public class RenderUtility {
             int imageHeight,
             DrawContext context
     ) {
-
-        // minecraft:pipeline/cutout
-        // so this works, and I had to try a bunch
-        // because Mojang moved `.getGuiTextured()` and there
-        // was no documentation,
-        // FUCK YOU MOJANG >:(
-        RenderPipeline renderPipeline = RenderPipelines.getAll().get(27);
-
         context.drawTexture(
-                renderPipeline,
+                RenderPipelines.GUI_TEXTURED, // Should've looked harder.
                 texture,
                 posX, posY,
                 0, 0,
