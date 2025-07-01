@@ -17,6 +17,5 @@
 package dev.thoq.config.setting;
 
 public class Settings {
-    public static final boolean SHOW_SPLASH_TEXTS = false;
     public static final boolean SHOW_PANORAMA = false;
 }

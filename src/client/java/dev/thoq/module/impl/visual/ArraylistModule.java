@@ -195,7 +195,7 @@ public class ArraylistModule extends Module {
                     textColor,
                     x,
                     currentY,
-                    true
+                    false
             );
             event.getContext().disableScissor();
 

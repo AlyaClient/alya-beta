@@ -18,14 +18,13 @@ package dev.thoq.utilities.render;
 
 import dev.thoq.font.FontManager;
 import dev.thoq.utilities.render.ColorUtility.Colors;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class TextRendererUtility {
 
-    static MinecraftClient client = MinecraftClient.getInstance();
-    static TextRenderer renderer = FontManager.getFont("figtree", 11);
+    static TextRenderer renderer = FontManager.getFont("sf_pro_rounded_regular", 11);
+    static TextRenderer rendererXl = FontManager.getFont("sf_pro_rounded_regular", 40);
 
     /**
      * Renders a text string on the screen at the specified position with a designated color and optional shadow.
@@ -47,6 +46,34 @@ public class TextRendererUtility {
     ) {
         context.drawText(
                 renderer,
+                text,
+                posX,
+                posY,
+                ColorUtility.getColor(color),
+                shadow
+        );
+    }
+
+    /**
+     * Renders an extra-large text string on the screen at the specified position with a designated color and optional shadow.
+     *
+     * @param context The drawing context used for rendering.
+     * @param text The text to be rendered.
+     * @param color The color of the text, specified as an enum value from {@link Colors}.
+     * @param posX The X-coordinate where the text should be rendered.
+     * @param posY The Y-coordinate where the text should be rendered.
+     * @param shadow A boolean value indicating whether to render the text with a shadow effect.
+     */
+    public static void renderXlText(
+            DrawContext context,
+            String text,
+            Colors color,
+            int posX,
+            int posY,
+            boolean shadow
+    ) {
+        context.drawText(
+                rendererXl,
                 text,
                 posX,
                 posY,
