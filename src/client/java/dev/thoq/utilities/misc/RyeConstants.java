@@ -18,7 +18,7 @@ package dev.thoq.utilities.misc;
 
 public class RyeConstants {
     public static final String NAME = "Rye";
-    public static final String VERSION = "0.0.50";
+    public static final String VERSION = "0.0.52";
     public static final String KIND = "Beta";
     public static final String BUILD_NUMBER = "712025.5";
 }

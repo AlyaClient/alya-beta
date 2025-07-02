@@ -39,6 +39,8 @@ public class ESPModule extends Module {
         String mode = ((ModeSetting) getSetting("Mode")).getValue();
         MinecraftClient mc = MinecraftClient.getInstance();
 
+        setPrefix(mode);
+
         switch(mode) {
             case "2D": {
                 BoundingBoxESP.render(event.getContext(), mc);

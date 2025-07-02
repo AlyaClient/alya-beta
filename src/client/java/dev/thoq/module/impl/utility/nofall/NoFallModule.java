@@ -37,7 +37,10 @@ public class NoFallModule extends Module {
     private final IEventListener<MotionEvent> motionEvent = event -> {
         if(!isEnabled() || mc.player == null || !event.isPre()) return;
 
-        switch(((ModeSetting) getSetting("Mode")).getValue()) {
+        String mode = ((ModeSetting) getSetting("Mode")).getValue();
+        setPrefix(mode);
+
+        switch(mode) {
             case "Vanilla": {
                 VanillaNoFall.vanillaNoFall(mc);
                 break;

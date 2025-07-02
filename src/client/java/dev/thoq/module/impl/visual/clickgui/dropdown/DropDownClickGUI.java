@@ -91,7 +91,6 @@ public class DropDownClickGUI extends Screen {
         initializeModules();
     }
 
-
     private void initializeModules() {
         for(List<Module> modules : categorizedModules.values())
             modules.clear();
@@ -320,108 +319,90 @@ public class DropDownClickGUI extends Screen {
                                             y + 2,
                                             false
                                     );
-
                                 }
                                 case MultipleBooleanSetting multipleBooleanSetting -> {
                                     int dropdownWidth = PANEL_WIDTH - TextRendererUtility.getTextWidth(setting.getName() + ": ") - PADDING * 6 - SETTING_INDENT;
                                     int dropdownX = categoryX + PANEL_WIDTH - dropdownWidth - PADDING * 3;
                                     int dropdownY = y + PADDING + 2;
-                                    int dropdownHeight = 18;
+                                    int dropdownHeight = 14;
 
-                                    RenderUtility.drawRoundedRect(context, dropdownX, dropdownY, dropdownWidth, dropdownHeight, new Vector4f(4, 4, 4, 4), 0xFF333333);
+                                    RenderUtility.drawRoundedRect(context, dropdownX, dropdownY, dropdownWidth, dropdownHeight, new Vector4f(4, 4, 4, 4), BACKGROUND_COLOR);
 
                                     List<String> enabledOptions = multipleBooleanSetting.getEnabledOptions();
-                                    String displayText = enabledOptions.size() + " selected";
-                                    if (enabledOptions.size() == 1) {
-                                        displayText = enabledOptions.getFirst();
-                                    } else if (enabledOptions.isEmpty()) {
-                                        displayText = "None";
+                                    String displayText = enabledOptions.isEmpty() ? "None" : String.join(", ", enabledOptions);
+
+                                    if(TextRendererUtility.getTextWidth(displayText) > dropdownWidth - 20) {
+                                        displayText = "Mult";
                                     }
 
                                     TextRendererUtility.renderText(
                                             context,
                                             displayText,
                                             ColorUtility.getColor(ColorUtility.Colors.WHITE),
-                                            dropdownX + 8,
-                                            dropdownY + 5,
+                                            dropdownX + 5,
+                                            dropdownY + 3,
                                             false
                                     );
 
                                     RenderUtility.drawRoundedRect(context,
-                                            dropdownX + dropdownWidth - 15,
-                                            dropdownY + 7,
+                                            dropdownX + dropdownWidth - 12,
+                                            dropdownY + 5,
                                             8,
                                             5,
                                             new Vector4f(1, 1, 1, 1),
                                             ColorUtility.getColor(ColorUtility.Colors.WHITE));
 
-                                    if (multipleBooleanSetting.isExpanded()) {
+                                    if(multipleBooleanSetting.isExpanded()) {
                                         List<String> options = multipleBooleanSetting.getOptions();
-                                        int optionHeight = 18;
-                                        int optionsY = dropdownY + dropdownHeight + 3;
-
-                                        int maxAvailableHeight = height - optionsY - 50;
-                                        int visibleOptions = Math.min(options.size(), maxAvailableHeight / optionHeight);
-                                        int expandedHeight = visibleOptions * optionHeight;
+                                        int optionHeight = 14;
+                                        int totalOptionsHeight = options.size() * optionHeight;
+                                        int optionsY = dropdownY + dropdownHeight + 2;
 
                                         RenderUtility.drawRoundedRect(context,
                                                 dropdownX,
                                                 optionsY,
                                                 dropdownWidth,
-                                                expandedHeight,
+                                                totalOptionsHeight,
                                                 new Vector4f(4, 4, 4, 4),
-                                                0xFF222222);
+                                                BACKGROUND_COLOR);
 
-                                        for (int i = 0; i < visibleOptions; i++) {
+                                        for(int i = 0; i < options.size(); i++) {
                                             String option = options.get(i);
                                             boolean isEnabled = multipleBooleanSetting.isEnabled(option);
-                                            int optionY = optionsY + i * optionHeight;
+                                            int optionY = optionsY + (i * optionHeight);
 
-                                            if (isEnabled) {
+                                            if(isEnabled) {
                                                 RenderUtility.drawRoundedRect(context,
-                                                        dropdownX,
-                                                        optionY,
-                                                        dropdownWidth,
-                                                        optionHeight,
-                                                        new Vector4f(0, 0, 0, 0),
-                                                        0x30FFFFFF);
-                                            }
-
-                                            int checkboxSize = 12;
-                                            int checkboxX = dropdownX + 8;
-                                            int checkboxY = optionY + (optionHeight - checkboxSize) / 2;
-
-                                            RenderUtility.drawRoundedRect(context,
-                                                    checkboxX,
-                                                    checkboxY,
-                                                    checkboxSize,
-                                                    checkboxSize,
-                                                    new Vector4f(2, 2, 2, 2),
-                                                    0xFF555555);
-
-                                            if (isEnabled) {
-                                                int innerSize = 8;
-                                                int innerX = checkboxX + (checkboxSize - innerSize) / 2;
-                                                int innerY = checkboxY + (checkboxSize - innerSize) / 2;
-
-                                                RenderUtility.drawRoundedRect(context,
-                                                        innerX,
-                                                        innerY,
-                                                        innerSize,
-                                                        innerSize,
-                                                        new Vector4f(1, 1, 1, 1),
+                                                        dropdownX + 2,
+                                                        optionY + 2,
+                                                        dropdownWidth - 4,
+                                                        optionHeight - 4,
+                                                        new Vector4f(3, 3, 3, 3),
                                                         Theme.getCurrentTheme().getPrimaryColorInt());
+
+                                                int checkboxSize = 8;
+                                                int checkboxX = dropdownX + dropdownWidth - checkboxSize - 5;
+                                                int checkboxY = optionY + (optionHeight - checkboxSize) / 2;
+                                                RenderUtility.drawRoundedRect(context,
+                                                        checkboxX,
+                                                        checkboxY,
+                                                        checkboxSize,
+                                                        checkboxSize,
+                                                        new Vector4f(2, 2, 2, 2),
+                                                        0xFFFFFFFF);
                                             }
 
                                             TextRendererUtility.renderText(
                                                     context,
                                                     option,
-                                                    ColorUtility.getColor(ColorUtility.Colors.WHITE),
-                                                    checkboxX + checkboxSize + 8,
-                                                    optionY + (optionHeight - 8) / 2,
+                                                    ColorUtility.getColor(isEnabled ? ColorUtility.Colors.WHITE : ColorUtility.Colors.LIGHT_GRAY),
+                                                    dropdownX + 5,
+                                                    optionY + 3,
                                                     false
                                             );
                                         }
+
+                                        y += totalOptionsHeight + 2;
                                     }
                                 }
                                 default -> {
@@ -546,7 +527,7 @@ public class DropDownClickGUI extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-        scrollOffset -= (int)(verticalAmount * 20);
+        scrollOffset -= (int) (verticalAmount * 20);
         scrollOffset = Math.max(0, scrollOffset);
         return true;
     }
@@ -589,6 +570,32 @@ public class DropDownClickGUI extends Screen {
 
                                         updateNumberSettingFromMouse((int) mouseX);
                                         return true;
+                                    }
+                                } else if(setting instanceof MultipleBooleanSetting multipleBooleanSetting) {
+                                    int dropdownWidth = PANEL_WIDTH - TextRendererUtility.getTextWidth(setting.getName() + ": ") - PADDING * 6 - SETTING_INDENT;
+                                    int dropdownX = categoryX + PANEL_WIDTH - dropdownWidth - PADDING * 3;
+                                    int dropdownY = y + PADDING + 2;
+                                    int dropdownHeight = 14;
+
+                                    if(isMouseOver((int) mouseX, (int) mouseY, dropdownX, dropdownY, dropdownWidth, dropdownHeight)) {
+                                        multipleBooleanSetting.toggleExpanded();
+                                        return true;
+                                    }
+
+                                    if(multipleBooleanSetting.isExpanded()) {
+                                        List<String> options = multipleBooleanSetting.getOptions();
+                                        int optionHeight = 14;
+                                        int optionsY = dropdownY + dropdownHeight + 2;
+
+                                        for(int i = 0; i < options.size(); i++) {
+                                            String option = options.get(i);
+                                            int optionY = optionsY + (i * optionHeight);
+
+                                            if(isMouseOver((int) mouseX, (int) mouseY, dropdownX, optionY, dropdownWidth, optionHeight)) {
+                                                multipleBooleanSetting.toggle(option);
+                                                return true;
+                                            }
+                                        }
                                     }
                                 }
 
@@ -734,39 +741,7 @@ public class DropDownClickGUI extends Screen {
                                         numberSetting.decrement(false);
                                     }
                                     case MultipleBooleanSetting multipleBooleanSetting -> {
-                                        if(isMouseOver(mouseX, mouseY, controlX, controlY, controlWidth, controlHeight + 16)) {
-                                            multipleBooleanSetting.toggleExpanded();
-
-                                            if(multipleBooleanSetting.isExpanded()) {
-                                                List<String> options = multipleBooleanSetting.getOptions();
-                                                int optionHeight = 18;
-
-                                                int maxAvailableHeight = height - controlY - controlHeight - 3 - 50;
-                                                int visibleOptions = Math.min(options.size(), maxAvailableHeight / optionHeight);
-                                                int dropdownHeight = visibleOptions * optionHeight;
-
-                                                if(controlY + controlHeight + dropdownHeight > height - 50) {
-                                                    scrollOffset += Math.min(30, dropdownHeight / 3);
-                                                }
-                                            }
-                                        } else if(multipleBooleanSetting.isExpanded()) {
-                                            List<String> options = multipleBooleanSetting.getOptions();
-                                            int optionHeight = 18;
-                                            int optionsY = controlY + controlHeight + 16 + 3;
-
-                                            int maxAvailableHeight = height - optionsY - 50;
-                                            int visibleOptions = Math.min(options.size(), maxAvailableHeight / optionHeight);
-
-                                            for(int i = 0; i < visibleOptions; i++) {
-                                                String option = options.get(i);
-                                                int optionY = optionsY + i * optionHeight;
-
-                                                if(isMouseOver(mouseX, mouseY, controlX, optionY, controlWidth, optionHeight)) {
-                                                    multipleBooleanSetting.toggle(option);
-                                                    break;
-                                                }
-                                            }
-                                        }
+                                        multipleBooleanSetting.toggleExpanded();
                                     }
                                     default -> {
                                     }

@@ -57,7 +57,11 @@ public class SpeedModule extends Module {
         if(!isEnabled() || !event.isPre()) return;
         GameOptions options = mc.options;
 
-        switch(((ModeSetting) getSetting("Mode")).getValue()) {
+        String mode = ((ModeSetting) getSetting("Mode")).getValue();
+
+        setPrefix(mode);
+
+        switch(mode) {
             case "Normal": {
                 float speed = ((Setting<Float>) getSetting("speed")).getValue();
                 boolean bHop = ((BooleanSetting) getSetting("BHop")).getValue();
@@ -72,6 +76,7 @@ public class SpeedModule extends Module {
                 boolean verusDamageBoost = ((BooleanSetting) getSetting("Damage boost")).getValue();
 
                 verusSpeed.verusSpeed(mc, options, verusDamageBoost);
+
                 break;
             }
 
