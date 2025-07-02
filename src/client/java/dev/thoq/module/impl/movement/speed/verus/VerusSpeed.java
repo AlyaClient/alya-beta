@@ -37,7 +37,7 @@ public class VerusSpeed {
             mc.player.jump();
 
         if(verusDamageBoost && mc.player.hurtTime > 0) {
-            MoveUtility.setSpeed((double) mc.player.hurtTime / 2, true);
+            MoveUtility.setSpeed((double) mc.player.hurtTime / 4, true);
         }
     }
 }

@@ -107,4 +107,3 @@ public final class MotionEvent extends Event {
         return this.player;
     }
 }
-

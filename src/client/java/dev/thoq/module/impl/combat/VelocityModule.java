@@ -44,25 +44,26 @@ public class VelocityModule extends Module {
 
         String mode = ((ModeSetting) getSetting("Mode")).getValue();
 
-        if(event.getPacket() instanceof EntityVelocityUpdateS2CPacket) {
+        if(mc.player.hurtTime > 0 && event.isPre()) {
             switch(mode) {
                 case "Standard": {
                     float xz = ((NumberSetting<Float>) getSetting("Horizontal")).getValue();
                     float y = ((NumberSetting<Float>) getSetting("Vertical")).getValue();
 
-                    if(mc.player.hurtTime > 0) {
-                        ChatUtility.sendDebug("player velocity >modified<");
-                        mc.player.setVelocity(
-                                mc.player.getVelocity().x * xz,
-                                mc.player.getVelocity().y * y,
-                                mc.player.getVelocity().z * xz
-                        );
-                    }
+                    ChatUtility.sendDebug("player velocity >modified<");
+                    mc.player.setVelocity(
+                            mc.player.getVelocity().x * xz,
+                            mc.player.getVelocity().y * y,
+                            mc.player.getVelocity().z * xz
+                    );
+
+                    event.cancel();
+
                     break;
                 }
 
                 case "Jump Reset": {
-                    if(mc.player.hurtTime > 0 && mc.player.isOnGround()) {
+                    if(mc.player.isOnGround()) {
                         mc.player.jump();
                     }
 

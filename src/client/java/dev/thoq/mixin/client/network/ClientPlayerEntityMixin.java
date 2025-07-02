@@ -20,16 +20,20 @@ import dev.thoq.RyeClient;
 import dev.thoq.event.impl.MotionEvent;
 import net.minecraft.client.network.ClientPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixin {
+    @Unique
+    private MotionEvent motionEvent;
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"), cancellable = true)
     private void onSendMovementPackets(CallbackInfo ci) {
-        ClientPlayerEntity player = (ClientPlayerEntity)(Object)this;
+        ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
 
         double x = player.getX();
         double y = player.getY();
@@ -38,18 +42,28 @@ public class ClientPlayerEntityMixin {
         float pitch = player.getPitch();
         boolean onGround = player.isOnGround();
 
-        MotionEvent event = new MotionEvent(x, y, z, yaw, pitch, onGround);
+        motionEvent = new MotionEvent(x, y, z, yaw, pitch, onGround);
 
-        RyeClient.getEventBus().dispatch(event);
+        RyeClient.getEventBus().dispatch(motionEvent);
 
         // TODO: correctly cancel
-        if(event.isCanceled())
+        if(motionEvent.isCanceled())
             ci.cancel();
+    }
+
+    @Redirect(method = {"sendMovementPackets", "tick"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getYaw()F"))
+    private float getYaw(ClientPlayerEntity player) {
+        return motionEvent.getYaw();
+    }
+
+    @Redirect(method = {"sendMovementPackets", "tick"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getPitch()F"))
+    private float getPitch(ClientPlayerEntity player) {
+        return motionEvent.getPitch();
     }
 
     @Inject(method = "sendMovementPackets", at = @At("TAIL"))
     private void onSendMovementPacketsPost(CallbackInfo ci) {
-        ClientPlayerEntity player = (ClientPlayerEntity)(Object)this;
+        ClientPlayerEntity player = (ClientPlayerEntity) (Object) this;
 
         double x = player.getX();
         double y = player.getY();
