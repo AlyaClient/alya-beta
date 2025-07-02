@@ -18,7 +18,7 @@ package dev.thoq.module.impl.visual.clickgui;
 
 import dev.thoq.RyeClient;
 import dev.thoq.config.KeybindManager;
-import dev.thoq.config.setting.impl.ModeSetting;
+import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.visual.clickgui.dropdown.DropDownClickGUI;
@@ -27,21 +27,20 @@ import org.lwjgl.glfw.GLFW;
 
 public class ClickGUIModule extends Module {
 
-    private final ModeSetting guiMode = new ModeSetting("GUIMode", "Choose between dropdown and window GUI", "Dropdown", "Dropdown");
+    private final BooleanSetting showTooltips = new BooleanSetting("ShowTooltips", "Show tooltips when hovering over modules and settings", true);
 
     public ClickGUIModule() {
         super("ClickGUI", "Click GUI", "Toggle modules with a graphical interface", ModuleCategory.VISUAL);
 
         KeybindManager.getInstance().bind(this, GLFW.GLFW_KEY_RIGHT_SHIFT);
         RyeClient.getEventBus().subscribe(this);
-        addSetting(guiMode);
+
+        addSetting(showTooltips);
     }
 
     @Override
     protected void onEnable() {
-        if(guiMode.getValue().equals("Dropdown")) {
-            MinecraftClient.getInstance().setScreen(new DropDownClickGUI());
-            super.setEnabled(false);
-        }
+        MinecraftClient.getInstance().setScreen(new DropDownClickGUI(showTooltips.getValue()));
+        super.setEnabled(false);
     }
 }
