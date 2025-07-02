@@ -47,7 +47,10 @@ public class LongJumpModule extends Module {
     private final IEventListener<TickEvent> tickEvent = event -> {
         if(!isEnabled() || mc.player == null || !event.isPre()) return;
 
-        switch(((ModeSetting) getSetting("Mode")).getValue()) {
+        String mode = ((ModeSetting) getSetting("Mode")).getValue();
+        setPrefix(mode);
+
+        switch(mode) {
             case "Verus": {
                 String kind = ((ModeSetting) getSetting("Kind")).getValue();
                 verusLongJump.verusLongJump(mc, (ModeSetting) getSetting("Kind"));

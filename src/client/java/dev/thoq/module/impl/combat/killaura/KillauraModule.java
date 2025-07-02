@@ -111,6 +111,8 @@ public class KillauraModule extends Module {
         } else {
             cps.setVisibilityCondition(() -> true);
         }
+
+        setPrefix(rotationType.getValue());
     };
 
     private final IEventListener<MotionEvent> motionEvent = event -> {

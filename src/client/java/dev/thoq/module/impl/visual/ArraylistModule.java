@@ -95,6 +95,22 @@ public class ArraylistModule extends Module {
         return Theme.interpolateColorInt(currentTheme.getPrimaryColor(), currentTheme.getSecondaryColor(), factor);
     }
 
+    /**
+     * Gets the full display name for a module including any prefixes
+     * Format: ModuleName [ModulePrefix]
+     */
+    private String getModuleDisplayName(Module module) {
+        StringBuilder displayName = new StringBuilder();
+
+        displayName.append(module.getDisplayName());
+
+        if(module.getPrefix() != null && !module.getPrefix().isEmpty()) {
+            displayName.append(" ").append(module.getPrefix());
+        }
+
+        return displayName.toString();
+    }
+
     @SuppressWarnings("unused")
     private final IEventListener<Render2DEvent> renderEvents = event -> {
         Collection<Module> allModules = ModuleRepository.getInstance().getModules();
@@ -107,9 +123,14 @@ public class ArraylistModule extends Module {
             }
         }
 
+
         animatingModules.sort((module1, module2) -> {
-            int width1 = TextRendererUtility.getTextWidth(module1.getDisplayName());
-            int width2 = TextRendererUtility.getTextWidth(module2.getDisplayName());
+            String displayName1 = getModuleDisplayName(module1);
+            String displayName2 = getModuleDisplayName(module2);
+
+            int width1 = TextRendererUtility.getTextWidth(displayName1);
+            int width2 = TextRendererUtility.getTextWidth(displayName2);
+
             return Integer.compare(width2, width1);
         });
 
@@ -128,12 +149,13 @@ public class ArraylistModule extends Module {
 
         List<Integer> moduleWidths = new ArrayList<>();
         for(Module module : animatingModules) {
-            moduleWidths.add(TextRendererUtility.getTextWidth(module.getDisplayName()));
+            String displayName = getModuleDisplayName(module);
+            int width = TextRendererUtility.getTextWidth(displayName);
+            moduleWidths.add(width);
         }
 
         for(int i = 0; i < animatingModules.size(); i++) {
             Module module = animatingModules.get(i);
-            String name = module.getDisplayName();
             int textWidth = moduleWidths.get(i);
             float animValue = getAnimationValue(module);
 
@@ -205,17 +227,34 @@ public class ArraylistModule extends Module {
             textColor = (textColor & 0x00FFFFFF) | (textAlpha << 24);
 
             event.getContext().enableScissor(moduleLeft, moduleTop, moduleRight, moduleBottom);
-            TextRendererUtility.renderText(
-                    event.getContext(),
-                    name,
-                    textColor,
-                    x,
-                    currentY,
-                    false
-            );
+
+            renderModuleText(event, module, textColor, x, currentY, animValue);
+
             event.getContext().disableScissor();
 
             currentY += (int) ((mc.textRenderer.fontHeight + padding * 2) * animValue);
         }
     };
+
+    /**
+     * Renders the module text with proper prefix coloring
+     * Format: [GlobalPrefix]ModuleName [ModulePrefix]
+     */
+    private void renderModuleText(Render2DEvent event, Module module, int textColor, int x, int currentY, float animValue) {
+        int currentX = x;
+
+        TextRendererUtility.renderText(event.getContext(), module.getDisplayName(), textColor, currentX, currentY, false);
+        currentX += TextRendererUtility.getTextWidth(module.getDisplayName());
+
+        if(module.getPrefix() != null && !module.getPrefix().isEmpty()) {
+            TextRendererUtility.renderText(event.getContext(), " ", textColor, currentX, currentY, false);
+            currentX += TextRendererUtility.getTextWidth(" ");
+
+            int modulePrefixColor = ColorUtility.getColor(ColorUtility.Colors.LIGHT_GRAY);
+            int prefixAlpha = (int) (255 * animValue);
+            modulePrefixColor = (modulePrefixColor & 0x00FFFFFF) | (prefixAlpha << 24);
+
+            TextRendererUtility.renderText(event.getContext(), module.getPrefix(), modulePrefixColor, currentX, currentY, false);
+        }
+    }
 }

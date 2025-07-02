@@ -20,10 +20,12 @@ import dev.thoq.config.setting.impl.MultipleBooleanSetting;
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.event.impl.PacketSendEvent;
+import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.utility.disabler.cubecraft.CubecraftDisabler;
 import dev.thoq.module.impl.utility.disabler.omnisprint.OmniSprintDisabler;
+import io.netty.util.internal.SuppressJava6Requirement;
 
 public class DisablerModule extends Module {
     private final OmniSprintDisabler omniSprintDisabler = new OmniSprintDisabler();
@@ -36,6 +38,14 @@ public class DisablerModule extends Module {
 
         addSetting(disabler);
     }
+
+    @SuppressWarnings("unused")
+    private final IEventListener<TickEvent> tickEvent = event -> {
+        if(disabler.getEnabledOptions().size() > 1)
+            setPrefix("Multi");
+        else
+            setPrefix(disabler.getEnabledOptions().getFirst());
+    };
 
     @SuppressWarnings({"unused"})
     private final IEventListener<PacketSendEvent> packetSendEvent = event -> {

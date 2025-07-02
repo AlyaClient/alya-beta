@@ -31,6 +31,7 @@ public abstract class Module {
     private final String description;
     private final ModuleCategory category;
     private boolean enabled;
+    private String prefix = "";
     protected final Map<String, Setting<?>> settings = new HashMap<>();
     protected final MinecraftClient mc = MinecraftClient.getInstance();
 
@@ -111,5 +112,21 @@ public abstract class Module {
     }
 
     protected void onDisable() {
+    }
+
+    /**
+     * Sets a prefix for this module that will be displayed in the arraylist
+     * @param prefix The prefix to display before the module name
+     */
+    public void setPrefix(String prefix) {
+        this.prefix = prefix != null ? prefix : "";
+    }
+
+    /**
+     * Gets the current prefix for this module
+     * @return The current prefix, or empty string if none is set
+     */
+    public String getPrefix() {
+        return prefix;
     }
 }

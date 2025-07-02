@@ -59,6 +59,8 @@ public class FlightModule extends Module {
         GameOptions options = mc.options;
         String mode = ((ModeSetting) getSetting("Mode")).getValue();
 
+        setPrefix(mode);
+
         float speed = ((NumberSetting<Float>) getSetting("Speed")).getValue();
         boolean verticalEnabled = ((BooleanSetting) getSetting("Vertical")).getValue();
         boolean preventVanillaKick = ((BooleanSetting) getSetting("Anti-Kick")).getValue();
