@@ -22,16 +22,19 @@ import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
+import dev.thoq.event.impl.PacketSendEvent;
 import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.combat.AttackDelayModule;
+import dev.thoq.utilities.misc.ChatUtility;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.PassiveEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -131,13 +134,8 @@ public class KillauraModule extends Module {
         if(rotate.getValue() && currentTarget != null) {
             calculateRotations();
 
-            if(rotationMode.getValue().equals("Server")) {
-                event.setYaw(targetYaw);
-                event.setPitch(targetPitch);
-            } else {
-                mc.player.setYaw(targetYaw);
-                mc.player.setPitch(targetPitch);
-            }
+            event.setYaw(targetYaw);
+            event.setPitch(targetPitch);
         }
 
         if(canAttack() && isValidHit())
@@ -289,21 +287,7 @@ public class KillauraModule extends Module {
             return targets.stream().anyMatch(this::canHitTarget);
         }
 
-        Vec3d playerEyes = mc.player.getEyePos();
-        Vec3d targetPos = getTargetPosition(currentTarget);
-
-        Vec3d direction = targetPos.subtract(playerEyes).normalize();
-
-        float currentYaw = rotationMode.getValue().equals("Server") ? targetYaw : mc.player.getYaw();
-        float currentPitch = rotationMode.getValue().equals("Server") ? targetPitch : mc.player.getPitch();
-
-        Vec3d lookDirection = getLookDirection(currentYaw, currentPitch);
-
-        double dotProduct = direction.dotProduct(lookDirection);
-        double angleRadians = Math.acos(MathHelper.clamp(dotProduct, -1.0, 1.0));
-        double angleDegrees = Math.toDegrees(angleRadians);
-
-        return angleDegrees <= 90.0;
+        return canHitTarget(currentTarget);
     }
 
     private boolean canHitTarget(Entity target) {
@@ -311,17 +295,42 @@ public class KillauraModule extends Module {
 
         Vec3d playerEyes = mc.player.getEyePos();
         Vec3d targetPos = getTargetPosition(target);
+        double distance = playerEyes.distanceTo(targetPos);
+
+        if(distance > reach.getValue()) return false;
+
         Vec3d direction = targetPos.subtract(playerEyes).normalize();
 
         float currentYaw = rotationMode.getValue().equals("Server") ? targetYaw : mc.player.getYaw();
         float currentPitch = rotationMode.getValue().equals("Server") ? targetPitch : mc.player.getPitch();
 
         Vec3d lookDirection = getLookDirection(currentYaw, currentPitch);
+
         double dotProduct = direction.dotProduct(lookDirection);
         double angleRadians = Math.acos(MathHelper.clamp(dotProduct, -1.0, 1.0));
         double angleDegrees = Math.toDegrees(angleRadians);
 
-        return angleDegrees <= 90.0;
+        double maxAngle = Math.max(5.0, 45.0 - (distance * 8.0));
+        maxAngle = Math.min(maxAngle, 45.0);
+
+        if(angleDegrees > maxAngle) return false;
+
+        Vec3d playerVelocity = mc.player.getVelocity();
+        double playerSpeed = Math.sqrt(playerVelocity.x * playerVelocity.x + playerVelocity.z * playerVelocity.z);
+
+        if(playerSpeed > 0.3) {
+            Vec3d movementDirection = new Vec3d(playerVelocity.x, 0, playerVelocity.z).normalize();
+            Vec3d toTarget = new Vec3d(direction.x, 0, direction.z).normalize();
+
+            double movementDot = movementDirection.dotProduct(toTarget);
+            double movementAngle = Math.toDegrees(Math.acos(MathHelper.clamp(movementDot, -1.0, 1.0)));
+
+            if(movementAngle > 120.0 && playerSpeed > 0.5) {
+                return false;
+            }
+        }
+
+        return !mc.player.isOnGround() || !(target.getY() > mc.player.getY() + 2.5);
     }
 
     private Vec3d getLookDirection(float yaw, float pitch) {
@@ -343,7 +352,7 @@ public class KillauraModule extends Module {
     private boolean canAttack() {
         if(targets.isEmpty() || mc.player == null) return false;
 
-        if(currentTarget != null && mc.player.distanceTo(currentTarget) > reach.getValue()) {
+        if(currentTarget != null && mc.player.distanceTo(currentTarget) > swingDistance.getValue()) {
             return false;
         }
 
@@ -385,12 +394,22 @@ public class KillauraModule extends Module {
 
         if(attackMode.getValue().equals("Multi")) {
             for(Entity target : targets) {
-                if(mc.player.distanceTo(target) <= reach.getValue()) {
-                    attackEntity(target);
+                double distanceToTarget = mc.player.distanceTo(target);
+                if(distanceToTarget <= swingDistance.getValue()) {
+                    mc.player.swingHand(Hand.MAIN_HAND);
+                    if(distanceToTarget <= reach.getValue()) {
+                        mc.interactionManager.attackEntity(mc.player, target);
+                    }
                 }
             }
-        } else if(currentTarget != null && mc.player.distanceTo(currentTarget) <= reach.getValue()) {
-            attackEntity(currentTarget);
+        } else if(currentTarget != null) {
+            double distanceToTarget = mc.player.distanceTo(currentTarget);
+            if(distanceToTarget <= swingDistance.getValue()) {
+                mc.player.swingHand(Hand.MAIN_HAND);
+                if(distanceToTarget <= reach.getValue()) {
+                    mc.interactionManager.attackEntity(mc.player, currentTarget);
+                }
+            }
         }
 
         if(!noHitDelay.getValue()) {
@@ -415,12 +434,22 @@ public class KillauraModule extends Module {
 
         double distanceToTarget = mc.player.distanceTo(target);
 
-        if(distanceToTarget <= swingDistance.getValue()) {
-            mc.player.swingHand(Hand.MAIN_HAND);
-        }
+        ChatUtility.sendDebug("Distance to target: " + distanceToTarget);
+        ChatUtility.sendDebug("Swing distance: " + swingDistance.getValue());
+        ChatUtility.sendDebug("Reach distance: " + reach.getValue());
 
-        if(distanceToTarget <= reach.getValue()) {
-            mc.interactionManager.attackEntity(mc.player, target);
+        if(distanceToTarget <= swingDistance.getValue()) {
+            ChatUtility.sendDebug("Within swing distance - swinging hand");
+            mc.player.swingHand(Hand.MAIN_HAND);
+
+            if(distanceToTarget <= reach.getValue()) {
+                ChatUtility.sendDebug("Within reach distance - attacking");
+                mc.interactionManager.attackEntity(mc.player, target);
+            } else {
+                ChatUtility.sendDebug("Not within reach distance - only swinging");
+            }
+        } else {
+            ChatUtility.sendDebug("Not within swing distance - no action");
         }
     }
 
