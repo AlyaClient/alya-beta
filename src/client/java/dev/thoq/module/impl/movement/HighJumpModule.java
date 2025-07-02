@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.module.impl.movement.highjump;
+package dev.thoq.module.impl.movement;
 
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.event.IEventListener;
@@ -22,7 +22,6 @@ import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.player.MoveUtility;
-import net.minecraft.predicate.entity.MovementPredicate;
 
 public class HighJumpModule extends Module {
     private final NumberSetting<Float> height = new NumberSetting<>("Height", "Height of the jump", 1.0f, 0.1f, 10.0f);

@@ -22,6 +22,7 @@ import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
+import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.combat.AttackDelayModule;
@@ -80,7 +81,6 @@ public class KillauraModule extends Module {
     public KillauraModule() {
         super("Killaura", "Kill Aura", "Automatically attack entities", ModuleCategory.COMBAT);
 
-        cps.setVisibilityCondition(() -> !noHitDelay.getValue());
         rotationType.setVisibilityCondition(rotate::getValue);
         rotationMode.setVisibilityCondition(rotate::getValue);
         rotationSpeed.setVisibilityCondition(() -> rotate.getValue() && rotationType.getValue().equals("Smooth"));
@@ -103,6 +103,15 @@ public class KillauraModule extends Module {
         addSetting(raycast);
         addSetting(noHitDelay);
     }
+
+    private final IEventListener<TickEvent> tickEvent = event -> {
+        AttackDelayModule attackDelayModule = RyeClient.INSTANCE.getModuleRepository().getModule(AttackDelayModule.class);
+        if(attackDelayModule.isEnabled() && attackDelayModule.isNewPvpDelay() || noHitDelay.getValue()) {
+            cps.setVisibilityCondition(() -> false);
+        } else {
+            cps.setVisibilityCondition(() -> true);
+        }
+    };
 
     private final IEventListener<MotionEvent> motionEvent = event -> {
         if(mc.player == null || mc.world == null || !event.isPre()) return;
@@ -338,13 +347,24 @@ public class KillauraModule extends Module {
 
         if(noHitDelay.getValue()) return true;
 
-        long currentTime = System.currentTimeMillis();
-        long baseDelay = 1000L / cps.getValue();
-        double randomFactor = 0.8 + (random.nextDouble() * 0.4);
-        long actualDelay = Math.round(baseDelay * randomFactor);
-        actualDelay = Math.max(actualDelay, 50L);
+        AttackDelayModule attackDelayModule = RyeClient.INSTANCE.getModuleRepository().getModule(AttackDelayModule.class);
+        if(attackDelayModule != null && attackDelayModule.isEnabled()) {
+            if(attackDelayModule.isNewPvpDelay()) {
+                return mc.player.getAttackCooldownProgress(0.0f) >= 1.0f;
+            }
+        }
 
-        return currentTime - lastAttackTime >= actualDelay;
+        if(cps.isVisible()) {
+            long currentTime = System.currentTimeMillis();
+            long baseDelay = 1000L / cps.getValue();
+            double randomFactor = 0.8 + (random.nextDouble() * 0.4);
+            long actualDelay = Math.round(baseDelay * randomFactor);
+            actualDelay = Math.max(actualDelay, 50L);
+
+            return currentTime - lastAttackTime >= actualDelay;
+        } else {
+            return mc.player.getAttackCooldownProgress(0.0f) >= 1.0f;
+        }
     }
 
     private void performAttack() {
