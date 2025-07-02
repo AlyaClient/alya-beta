@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.module.impl.movement.scaffold;
+package dev.thoq.module.impl.movement;
 
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;

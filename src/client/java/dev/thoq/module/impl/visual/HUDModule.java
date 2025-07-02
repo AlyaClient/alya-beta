@@ -22,7 +22,7 @@ import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.Render2DEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
-import dev.thoq.module.impl.utility.NukerModule;
+import dev.thoq.module.impl.world.NukerModule;
 import dev.thoq.module.impl.combat.ReachModule;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.RenderUtility;
@@ -160,7 +160,7 @@ public class HUDModule extends Module {
                         ColorUtility.Colors.WHITE,
                         x,
                         y,
-                        true
+                        false
                 );
             }
 
@@ -175,7 +175,7 @@ public class HUDModule extends Module {
                     themeColor,
                     x + firstPartWidth,
                     y,
-                    true
+                    false
             );
 
             int firstCharWidth = TextRendererUtility.getTextWidth("§l" + firstChar);
@@ -187,7 +187,7 @@ public class HUDModule extends Module {
                     ColorUtility.Colors.WHITE,
                     x + firstPartWidth + firstCharWidth,
                     y,
-                    true
+                    false
             );
         } else {
             TextRendererUtility.renderText(
@@ -196,7 +196,7 @@ public class HUDModule extends Module {
                     ColorUtility.Colors.WHITE,
                     x,
                     y,
-                    true
+                    false
             );
         }
     }

@@ -15,6 +15,7 @@
     "network.ClientPlayNetworkHandlerMixin",
     "performance.ChunkRenderingOptimizationMixin",
     "performance.EntityCullingOptimizationMixin",
+    "ui.CustomButtonMixin",
     "ui.ScreenMixin",
     "ui.WatermarkTitleScreenMixin"
   ],

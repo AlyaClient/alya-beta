@@ -14,7 +14,7 @@
  *
  */
 
-package dev.thoq.module.impl.movement.jumpcooldown;
+package dev.thoq.module.impl.movement;
 
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.event.IEventListener;

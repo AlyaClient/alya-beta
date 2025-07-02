@@ -14,11 +14,15 @@
  *
  */
 
-package dev.thoq.utilities.misc;
+package dev.thoq.module.impl.utility.disabler.cubecraft;
 
-public class RyeConstants {
-    public static final String NAME = "Rye";
-    public static final String VERSION = "0.0.50";
-    public static final String KIND = "Beta";
-    public static final String BUILD_NUMBER = "712025.5";
+import dev.thoq.event.impl.MotionEvent;
+import net.minecraft.client.MinecraftClient;
+
+public class CubecraftDisabler {
+    public void cubecraftDisabler(MotionEvent event, MinecraftClient mc) {
+        if(mc.player == null) return;
+
+        event.setOnGround(mc.player.age % 2 == 0);
+    }
 }

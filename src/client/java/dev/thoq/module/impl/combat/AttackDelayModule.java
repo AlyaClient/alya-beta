@@ -22,9 +22,8 @@ import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 
-// todo: finish module
 public class AttackDelayModule extends Module {
-    private final ModeSetting modeSetting = new ModeSetting("Delay", "The delay to use", "1.16", "1.7", "1.8", "1.16");
+    private final ModeSetting modeSetting = new ModeSetting("Delay", "The delay to use", "1.16.5", "1.7", "1.8", "1.16.5");
 
     public AttackDelayModule() {
         super("AttackDelay", "Attack Delay", "Change the attack delay", ModuleCategory.COMBAT);
@@ -48,8 +47,8 @@ public class AttackDelayModule extends Module {
                 }
                 break;
             }
-            case "1.16": {
-                // this is vanilla
+            case "1.16.5": {
+                // Don't reset attack ticks - respect vanilla weapon cooldown
                 break;
             }
         }
@@ -61,9 +60,14 @@ public class AttackDelayModule extends Module {
         String mode = modeSetting.getValue();
 
         return switch(mode) {
-            case "1.7" -> true;
-            case "1.8" -> mc.player.getAttackCooldownProgress(0.0f) >= 0.1f;
+            case "1.7" -> true; // no delay
+            case "1.8" -> mc.player.getAttackCooldownProgress(0.0f) >= 0.1f; // Minimal delay
+            case "1.16.5" -> mc.player.getAttackCooldownProgress(0.0f) >= 1.0f; // Full weapon cooldown
             default -> mc.player.getAttackCooldownProgress(0.0f) >= 1.0f;
         };
+    }
+
+    public boolean isNewPvpDelay() {
+        return modeSetting.getValue().equals("1.16.5");
     }
 }
