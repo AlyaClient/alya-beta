@@ -23,8 +23,6 @@ import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.SubModule;
 import dev.thoq.utilities.player.MoveUtility;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
 
 public class NormalSpeed extends SubModule {
 
@@ -50,20 +48,5 @@ public class NormalSpeed extends SubModule {
         else
             MoveUtility.setSpeed(this.speed.getValue());
     };
-
-    public void normalSpeed(MinecraftClient mc, GameOptions options, float speed, boolean bHop, boolean strafe) {
-        if(mc.player == null) return;
-
-        if(options.jumpKey.isPressed())
-            speed = speed / 2;
-
-        if(bHop && mc.player.isOnGround() && MoveUtility.isMoving())
-            mc.player.jump();
-
-        if(strafe)
-            MoveUtility.setSpeed(speed, true);
-        else
-            MoveUtility.setSpeed(speed);
-    }
 
 }

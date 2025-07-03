@@ -86,6 +86,13 @@ public class ModeSetting extends Setting<String> {
         return "mode";
     }
 
+    @Override
+    public void setValue(final String value) {
+        if(this.changeCallback != null) this.changeCallback.accept(true);
+        super.setValue(value);
+        if(this.changeCallback != null) this.changeCallback.accept(false);
+    }
+
     public void add(final String mode) {
         this.modes.add(mode);
     }

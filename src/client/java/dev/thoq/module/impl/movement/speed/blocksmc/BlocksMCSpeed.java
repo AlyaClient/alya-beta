@@ -23,6 +23,7 @@ import dev.thoq.module.SubModule;
 import dev.thoq.utilities.player.MoveUtility;
 
 public class BlocksMCSpeed extends SubModule {
+
     public BlocksMCSpeed(final Module parent) {
         super("BlocksMC", parent);
     }
