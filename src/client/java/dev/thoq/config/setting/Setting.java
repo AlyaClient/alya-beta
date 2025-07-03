@@ -22,7 +22,7 @@ public class Setting<T> {
     private final String name;
     private final String description;
     private T value;
-    private final T defaultValue;
+    private T defaultValue;
     private final T minValue;
     private final T maxValue;
     private VisibilityCondition visibilityCondition = () -> true;
@@ -52,6 +52,10 @@ public class Setting<T> {
 
     public T getValue() {
         return value;
+    }
+
+    public void setDefaultValue(final T value) {
+        this.defaultValue = value;
     }
 
     public void setValue(T value) {
