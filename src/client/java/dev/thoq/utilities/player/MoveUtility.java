@@ -22,6 +22,8 @@ import net.minecraft.client.network.ClientPlayerEntity;
 @SuppressWarnings("unused")
 public class MoveUtility {
     private static final double VANILLA_PLAYER_FALL_MOTION = -0.0784000015258789;
+    private static final double VANILLA_PLAYER_SPEED = 0.11681545167924458;
+    private static final double VANILLA_PLAYER_SPRINT_SPEED = 0.1523673105277881;
 
     /**
      * Sets the player's movement speed
@@ -196,5 +198,23 @@ public class MoveUtility {
      */
     public static double getVanillaFallingSpeed() {
         return VANILLA_PLAYER_FALL_MOTION;
+    }
+
+    /**
+     * Retrieves the default movement speed value for a vanilla player.
+     *
+     * @return The standard speed value for vanilla player movement.
+     */
+    public static double getVanillaPlayerSpeed() {
+        return VANILLA_PLAYER_SPEED;
+    }
+
+    /**
+     * Retrieves the default sprinting speed value for a vanilla player.
+     *
+     * @return The standard sprint speed defined for vanilla player mechanics.
+     */
+    public static double getVanillaPlayerSprintSpeed() {
+        return VANILLA_PLAYER_SPRINT_SPEED;
     }
 }

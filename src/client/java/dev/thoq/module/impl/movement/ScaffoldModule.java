@@ -16,6 +16,7 @@
 
 package dev.thoq.module.impl.movement;
 
+import dev.thoq.RyeClient;
 import dev.thoq.config.setting.impl.BooleanSetting;
 import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
@@ -37,7 +38,6 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
@@ -50,6 +50,7 @@ public class ScaffoldModule extends Module {
     private final BooleanSetting swing = new BooleanSetting("Swing", "Swing arm when placing blocks", true);
     private final BooleanSetting rotate = new BooleanSetting("Rotate", "Rotate towards block placement", true);
     private final BooleanSetting tower = new BooleanSetting("Tower", "Enable tower mode when jumping", true);
+    private final BooleanSetting keepY = new BooleanSetting("KeepY", "Keep same Y position when placing blocks", false);
 
     private final NumberSetting<Integer> searchRange = new NumberSetting<>("Search Range", "Block search radius", 3, 1, 6);
     private final NumberSetting<Integer> bruteForceRayCastIntensity = new NumberSetting<>("Brute Force Intensity", "Intensity of rotation calculation", 5, 1, 10);
@@ -62,8 +63,8 @@ public class ScaffoldModule extends Module {
 
     private BlockCache blockCache, lastBlockCache;
     private int startSlot, slot, lastSlot;
-    private long lastPlaceTime = 0;
     private float yaw, pitch;
+    private double keepYLevel = -1;
 
     public ScaffoldModule() {
         super("Scaffold", "Automatically bridges for you", ModuleCategory.WORLD);
@@ -76,7 +77,8 @@ public class ScaffoldModule extends Module {
         addSetting(switchItemMode);
         addSetting(swing);
         addSetting(swingMode.setVisibilityCondition(swing::getValue));
-        addSetting(tower);
+        addSetting(keepY.setVisibilityCondition(() -> !tower.getValue()));
+        addSetting(tower.setVisibilityCondition(() -> !keepY.getValue()));
         addSetting(towerMode.setVisibilityCondition(tower::getValue));
         addSetting(towerSpeed.setVisibilityCondition(() -> tower.getValue() && towerMode.getValue().equals("Vanilla")));
     }
@@ -89,6 +91,10 @@ public class ScaffoldModule extends Module {
         startSlot = mc.player.getInventory().getSelectedSlot();
         slot = lastSlot = -1;
         blockCache = lastBlockCache = null;
+
+        if(keepY.getValue()) {
+            keepYLevel = Math.floor(mc.player.getY()) - 1;
+        }
 
         yaw = getYaw() + 180;
         pitch = 80;
@@ -105,33 +111,35 @@ public class ScaffoldModule extends Module {
                 mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(startSlot));
             }
         }
+
+        keepYLevel = -1;
     }
 
     @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> motionEvent = event -> {
         if(mc.player == null || mc.world == null) return;
 
-        slot = findBlockSlot();
-
-        if(sprint.getValue() && MoveUtility.isMoving()) {
-            mc.player.setSprinting(true);
-            MoveUtility.setSpeed(0.2873);
-        } else {
-            mc.player.setSprinting(false);
-            MoveUtility.setSpeed(0.2);
-        }
-
-        if(slot != -1) {
-            if(switchItemMode.getValue().equals("Client") && mc.player.getInventory().getSelectedSlot() != slot) {
-                mc.player.getInventory().setSelectedSlot(slot);
-            }
-            if(switchItemMode.getValue().equals("Server") && lastSlot != slot && mc.getNetworkHandler() != null) {
-                mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
-                lastSlot = slot;
-            }
-        }
-
         if(event.isPre()) {
+            slot = findBlockSlot();
+
+            if(sprint.getValue() && MoveUtility.isMoving()) {
+                mc.player.setSprinting(true);
+                MoveUtility.setSpeed(MoveUtility.getVanillaPlayerSprintSpeed());
+            } else {
+                mc.player.setSprinting(false);
+                MoveUtility.setSpeed(MoveUtility.getVanillaPlayerSpeed());
+            }
+
+            if(slot != -1) {
+                if(switchItemMode.getValue().equals("Client") && mc.player.getInventory().getSelectedSlot() != slot) {
+                    mc.player.getInventory().setSelectedSlot(slot);
+                }
+                if(switchItemMode.getValue().equals("Server") && lastSlot != slot && mc.getNetworkHandler() != null) {
+                    mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
+                    lastSlot = slot;
+                }
+            }
+
             blockCache = getBlockCache();
             if(blockCache != null) lastBlockCache = blockCache;
 
@@ -150,19 +158,19 @@ public class ScaffoldModule extends Module {
                 mc.player.setVelocity(mc.player.getVelocity().x * 0.91f, mc.player.getVelocity().y, mc.player.getVelocity().z * 0.91f);
             }
 
-            if(tower.getValue() && mc.options.jumpKey.isPressed() && blockCache != null) {
+            if(!keepY.getValue() && tower.getValue() && mc.options.jumpKey.isPressed() && blockCache != null) {
                 handleTower();
             }
-        }
 
-        if(event.isPost() && lastBlockCache != null && slot != -1) {
-            placeBlock();
+            if(lastBlockCache != null && slot != -1) {
+                placeBlock();
+            }
         }
     };
 
     @SuppressWarnings("unused")
     private final IEventListener<PacketSendEvent> packetSendEvent = event -> {
-        if(event.getPacket() instanceof UpdateSelectedSlotC2SPacket packet) {
+        if(event.getPacket() instanceof UpdateSelectedSlotC2SPacket packet && event.isPre()) {
             if(switchItemMode.getValue().equals("Server")) {
                 startSlot = packet.getSelectedSlot();
                 event.cancel();
@@ -251,11 +259,16 @@ public class ScaffoldModule extends Module {
 
     private float getDirectionYaw(Direction direction) {
         switch(direction) {
-            case NORTH: return 0;
-            case SOUTH: return 180;
-            case WEST: return 90;
-            case EAST: return 270;
-            default: return getYaw();
+            case NORTH:
+                return 0;
+            case SOUTH:
+                return 180;
+            case WEST:
+                return 90;
+            case EAST:
+                return 270;
+            default:
+                return getYaw();
         }
     }
 
@@ -315,7 +328,9 @@ public class ScaffoldModule extends Module {
     private BlockCache getBlockCache() {
         if(mc.player == null || mc.world == null) return null;
 
-        BlockPos belowBlockPos = BlockPos.ofFloored(mc.player.getPos().subtract(0, 1, 0));
+        double targetY = keepY.getValue() ? keepYLevel : mc.player.getY() - 1;
+        BlockPos belowBlockPos = new BlockPos((int) Math.floor(mc.player.getX()), (int) Math.floor(targetY), (int) Math.floor(mc.player.getZ()));
+
         if(!mc.world.getBlockState(belowBlockPos).isAir()) return null;
 
         for(int x = 0; x < searchRange.getValue(); x++) {
