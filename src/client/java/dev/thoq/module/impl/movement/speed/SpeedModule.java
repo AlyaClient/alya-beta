@@ -42,11 +42,13 @@ public class SpeedModule extends Module {
 
     @Override
     protected void onEnable() {
+        super.onEnable();
         if(this.mc.player != null) this.wasSprinting = this.mc.player.isSprinting();
     }
 
     @Override
     protected void onDisable() {
+        super.onDisable();
         if(this.mc.player != null) this.mc.player.setSprinting(this.wasSprinting);
         TimerUtility.resetTimer();
     }

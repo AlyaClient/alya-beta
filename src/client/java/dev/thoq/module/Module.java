@@ -57,10 +57,12 @@ public abstract class Module {
         this.addSetting(this.mode);
 
         this.mode.addCallback((Boolean before) -> {
-            if(before) {
-                this.submodules.get(this.mode.getValue()).onDisable();
-            } else {
-                this.submodules.get(this.mode.getValue()).onEnable();
+            if(this.isEnabled()) {
+                if(before) {
+                    this.submodules.get(this.mode.getValue()).onDisable();
+                } else {
+                    this.submodules.get(this.mode.getValue()).onEnable();
+                }
             }
         });
 

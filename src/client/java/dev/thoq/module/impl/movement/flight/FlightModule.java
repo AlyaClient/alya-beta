@@ -37,11 +37,13 @@ public class FlightModule extends Module {
 
     @Override
     protected void onEnable() {
+        super.onEnable();
         if(mc.player != null) wasSprinting = mc.player.isSprinting();
     }
 
     @Override
     protected void onDisable() {
+        super.onDisable();
         if(mc.player == null) return;
 
         mc.player.setSprinting(wasSprinting);

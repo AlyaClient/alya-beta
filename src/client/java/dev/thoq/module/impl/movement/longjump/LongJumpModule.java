@@ -31,6 +31,7 @@ public class LongJumpModule extends Module {
 
     @Override
     protected void onDisable() {
+        super.onDisable();
         MoveUtility.setMotionY(0);
     }
 }
