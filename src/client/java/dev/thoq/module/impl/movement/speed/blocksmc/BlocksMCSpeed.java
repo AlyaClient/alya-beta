@@ -14,62 +14,42 @@
  *
  */
 
-package dev.thoq.module.impl.movement.speed.ncp;
+package dev.thoq.module.impl.movement.speed.blocksmc;
 
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.MotionEvent;
-import dev.thoq.mixin.client.accessors.LivingEntityJumpAccessor;
 import dev.thoq.module.Module;
 import dev.thoq.module.SubModule;
-import dev.thoq.utilities.misc.ChatUtility;
 import dev.thoq.utilities.player.MoveUtility;
 
-public class NCPSpeed extends SubModule {
-    static int ticksRunning = 0;
-
-    public NCPSpeed(final Module parent) {
-        super("NCP", parent);
+public class BlocksMCSpeed extends SubModule {
+    public BlocksMCSpeed(final Module parent) {
+        super("BlocksMC", parent);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> onMotion = event -> {
         if(!event.isPre()) return;
         if(this.mc.player == null) return;
 
         boolean damaged = mc.player.hurtTime > 0;
         boolean isOnGround = mc.player.isOnGround();
-        LivingEntityJumpAccessor livingEntityJumpAccessor = (LivingEntityJumpAccessor) mc.player;
-
-        livingEntityJumpAccessor.setJumpingCooldown(0);
 
         if(this.mc.options.jumpKey.isPressed())
             return;
 
-        if(!MoveUtility.isMoving())
-            reset();
-
         if(MoveUtility.isMoving()) {
-            ticksRunning++;
-
-            ChatUtility.sendDebug(">ticksRunning<: " + ticksRunning);
-
             if(isOnGround) {
                 MoveUtility.setSpeed(0.28335f, false);
+                mc.player.jump();
             } else {
                 MoveUtility.setSpeed(0.28f, false);
             }
 
-            if(isOnGround) {
-                mc.player.jump();
-                reset();
-            } else if(MoveUtility.isMoving() && ticksRunning == 6 && !damaged) {
-                MoveUtility.setMotionY(-0.186567865);
-                ChatUtility.sendDebug("PULLED");
+            if(damaged) {
+                MoveUtility.setSpeed(0.3, true);
             }
         }
     };
 
-
-    public void reset() {
-        ticksRunning = 0;
-    }
 }
