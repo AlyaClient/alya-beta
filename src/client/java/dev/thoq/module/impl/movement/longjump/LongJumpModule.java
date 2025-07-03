@@ -22,7 +22,6 @@ import dev.thoq.module.impl.movement.longjump.verus.VerusFireballLongJump;
 import dev.thoq.module.impl.movement.longjump.verus.VerusPacketLongjump;
 import dev.thoq.utilities.player.MoveUtility;
 
-@SuppressWarnings("SwitchStatementWithTooFewBranches")
 public class LongJumpModule extends Module {
 
     public LongJumpModule() {
@@ -34,5 +33,4 @@ public class LongJumpModule extends Module {
     protected void onDisable() {
         MoveUtility.setMotionY(0);
     }
-
 }

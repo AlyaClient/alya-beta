@@ -23,8 +23,11 @@ import dev.thoq.module.impl.movement.flight.vanilla.NormalFlight;
 import dev.thoq.module.impl.movement.flight.verus.VerusDamageFly;
 import dev.thoq.module.impl.movement.flight.verus.VerusGlideFly;
 import dev.thoq.module.impl.movement.flight.verus.VerusPacketFlight;
+import net.minecraft.client.option.GameOptions;
 
+@SuppressWarnings("unchecked")
 public class FlightModule extends Module {
+
     private boolean wasSprinting = false;
 
     public FlightModule() {
@@ -34,13 +37,11 @@ public class FlightModule extends Module {
 
     @Override
     protected void onEnable() {
-        super.onEnable();
         if(mc.player != null) wasSprinting = mc.player.isSprinting();
     }
 
     @Override
     protected void onDisable() {
-        super.onDisable();
         if(mc.player == null) return;
 
         mc.player.setSprinting(wasSprinting);
@@ -49,6 +50,7 @@ public class FlightModule extends Module {
         if(mc.player.getAbilities().flying && !mc.player.isCreative()) {
             mc.player.getAbilities().flying = false;
         }
+
         mc.player.getAbilities().setFlySpeed(0.05f);
     }
 }

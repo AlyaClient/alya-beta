@@ -22,8 +22,6 @@ import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.SubModule;
 import dev.thoq.utilities.player.MoveUtility;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
 
 public class VerusSpeed extends SubModule {
 

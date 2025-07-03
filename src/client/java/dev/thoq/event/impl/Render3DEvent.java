@@ -14,11 +14,23 @@
  *
  */
 
-package dev.thoq.utilities.misc;
+package dev.thoq.event.impl;
 
-public class RyeConstants {
-    public static final String NAME = "Rye";
-    public static final String VERSION = "0.1.18";
-    public static final String KIND = "Beta";
-    public static final String BUILD_NUMBER = "070225.3";
+import dev.thoq.event.Event;
+
+public class Render3DEvent extends Event {
+
+    private float ticks;
+
+    public Render3DEvent(float ticks) {
+        this.ticks = ticks;
+    }
+
+    public float getPartialTicks() {
+        return ticks;
+    }
+
+    public void setTicks(float ticks) {
+        this.ticks = ticks;
+    }
 }

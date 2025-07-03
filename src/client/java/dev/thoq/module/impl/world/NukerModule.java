@@ -42,6 +42,7 @@ public class NukerModule extends Module {
     private final NumberSetting<Integer> bedDelay = new NumberSetting<>("Break Delay", "Delay between breaking beds (ticks)", 5, 1, 20);
     private final BooleanSetting teleportToPlayerOverride = new BooleanSetting("PlayerPort", "Teleport to players instead of blocks", false);
     private final BooleanSetting clearStatsOnToggle = new BooleanSetting("ClearStats", "Clear stats on toggle", false);
+    private final BooleanSetting requireClick = new BooleanSetting("RequireClick", "Require a click to run", true);
     private int teleportCooldown = 0;
     private static int blocksDestroyed = 0;
     private BlockPos currentBedBreaking = null;
@@ -56,6 +57,7 @@ public class NukerModule extends Module {
         addSetting(bedDelay.setVisibilityCondition(() -> "Bed".equals(modeSetting.getValue())));
         addSetting(teleportToPlayerOverride.setVisibilityCondition(() -> "American".equals(modeSetting.getValue())));
         addSetting(clearStatsOnToggle);
+        addSetting(requireClick.setVisibilityCondition(() -> modeSetting.getValue().equals("RemoteBomb")));
     }
 
     private final IEventListener<MotionEvent> tickEvent = event -> {
@@ -161,7 +163,7 @@ public class NukerModule extends Module {
             case "RemoteBomb": {
                 if(mc.player == null || mc.player.getGameMode() == null || mc.world == null || mc.getNetworkHandler() == null || !event.isPre()) return;
 
-                if(mc.options.attackKey.isPressed()) {
+                if(mc.options.attackKey.isPressed() || !requireClick.getValue()) {
                     BlockHitResult hitResult = RaycastUtility.raycast(mc, 1000.0);
 
                     if(hitResult != null) {

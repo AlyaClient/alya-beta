@@ -28,11 +28,12 @@ import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.RenderUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
 import dev.thoq.utilities.render.Theme;
-import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @SuppressWarnings({"FieldCanBeLocal", "SameParameterValue", "unused"})
 public class HUDModule extends Module {
@@ -45,6 +46,11 @@ public class HUDModule extends Module {
     private static final int END_Y_POSITION = 30;
     private static String lastDynamicText = "";
     private final ModeSetting themeSetting;
+    private int targetModuleCount = 0;
+    private float currentModuleCount = 0;
+    private long expansionStartTime = 0;
+    private boolean isExpanding = false;
+    private static final long EXPANSION_DURATION = 300;
 
     public HUDModule() {
         super("HUD", "Shows Heads Up Display", ModuleCategory.VISUAL);
@@ -76,23 +82,52 @@ public class HUDModule extends Module {
         boolean nukerEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Nuker").isEnabled();
         boolean reachEnabled = RyeClient.INSTANCE.getModuleRepository().getModuleByName("Reach").isEnabled();
 
-        Mode mode = Mode.NORMAL;
+        List<String> dynamicTexts = new ArrayList<>();
+        String bps = RyeClient.getBps();
 
-        if(flightEnabled) mode = Mode.FLIGHT;
-        if(speedEnabled) mode = Mode.SPEED;
-        if(scaffoldEnabled) mode = Mode.SCAFFOLD;
-        if(killauraEnabled) mode = Mode.KILLAURA;
-        if(nukerEnabled) mode = Mode.NUKER;
-        if(reachEnabled) mode = Mode.REACH;
+        if(flightEnabled || speedEnabled) {
+            String speedFlightMsg = String.format("Going %s b/s", bps);
+            dynamicTexts.add(speedFlightMsg);
+        }
+
+        if(scaffoldEnabled) {
+            int scaffoldSlot = mc.player.getInventory().getSelectedSlot();
+            int blocksRemaining = mc.player.getInventory().getStack(scaffoldSlot).getCount();
+            String scaffoldMsg = String.format("%s Remaining", blocksRemaining);
+            dynamicTexts.add(scaffoldMsg);
+        }
+
+        if(killauraEnabled) {
+            String killauraMsg = String.format("%.1f/%.1f ♡",
+                    mc.player.getHealth() / 2, mc.player.getMaxHealth() / 2);
+            dynamicTexts.add(killauraMsg);
+        }
+
+        if(nukerEnabled) {
+            String nukerMsg = String.format("%s blocks destroyed", NukerModule.getBlocksDestroyed());
+            dynamicTexts.add(nukerMsg);
+        }
+
+        if(reachEnabled) {
+            String reachMsg = String.format("Reached %.1f blocks", ReachModule.getLastReach());
+            dynamicTexts.add(reachMsg);
+        }
+
+        int newModuleCount = dynamicTexts.size();
+        if(newModuleCount != targetModuleCount) {
+            targetModuleCount = newModuleCount;
+            startExpansionAnimation();
+        }
+
+        updateExpansionAnimation();
 
         String time = RyeClient.getTime();
         String fps = RyeClient.getFps();
-        String bps = RyeClient.getBps();
         String name = mc.player.getName().getString();
 
         String clientName = createAnimatedClientName();
 
-        boolean shouldShowDynamic = mode != Mode.NORMAL;
+        boolean shouldShowDynamic = !dynamicTexts.isEmpty();
 
         if(shouldShowDynamic && !wasVisible) {
             startShowAnimation();
@@ -103,9 +138,8 @@ public class HUDModule extends Module {
         wasVisible = shouldShowDynamic;
 
         if(shouldShowDynamic || isAnimatingOut) {
-            String dynamicText = getString(mode, bps);
-            drawAnimatedDynamicRect(
-                    dynamicText,
+            drawAnimatedDynamicModules(
+                    dynamicTexts,
                     event
             );
         }
@@ -143,6 +177,27 @@ public class HUDModule extends Module {
         );
     };
 
+    private void startExpansionAnimation() {
+        expansionStartTime = System.currentTimeMillis();
+        isExpanding = true;
+    }
+
+    private void updateExpansionAnimation() {
+        if(!isExpanding) return;
+
+        long elapsed = System.currentTimeMillis() - expansionStartTime;
+        float progress = Math.min(elapsed / (float) EXPANSION_DURATION, 1.0f);
+
+        float easedProgress = 1.0f - (float) Math.pow(1.0f - progress, 3);
+
+        currentModuleCount = currentModuleCount + (targetModuleCount - currentModuleCount) * easedProgress;
+
+        if(progress >= 1.0f) {
+            currentModuleCount = targetModuleCount;
+            isExpanding = false;
+        }
+    }
+
     private String createAnimatedClientName() {
         return "§r§l" + RyeClient.getName() + "§r";
     }
@@ -152,8 +207,8 @@ public class HUDModule extends Module {
         float animationFactor = (float) (Math.sin(time * 2.0) + 1.0) / 2.0f;
 
         String[] parts = text.split("§theme");
-        if (parts.length > 1) {
-            if (!parts[0].isEmpty()) {
+        if(parts.length > 1) {
+            if(!parts[0].isEmpty()) {
                 TextRendererUtility.renderText(
                         event.getContext(),
                         parts[0],
@@ -220,11 +275,11 @@ public class HUDModule extends Module {
         return 1.0f - (float) Math.pow(1.0f - progress, 3);
     }
 
-    private void drawAnimatedDynamicRect(
-            String displayText,
+    private void drawAnimatedDynamicModules(
+            List<String> dynamicTexts,
             Render2DEvent event
     ) {
-        if(mc.player == null) return;
+        if(mc.player == null || dynamicTexts.isEmpty()) return;
 
         float progress = getAnimationProgress();
 
@@ -256,11 +311,6 @@ public class HUDModule extends Module {
                 new SimpleDateFormat("hh:mm a").format(new Date())
         ));
 
-        final int hudWidth = hudTextWidth + hudPadding;
-        final int dynamicPadding = 15;
-        final int dynamicTextWidth = TextRendererUtility.getTextWidth(displayText);
-        final int dynamicWidth = dynamicTextWidth + dynamicPadding;
-        final int centeredX = 2 + (hudWidth - dynamicWidth) / 2;
         final int hudBottomY = 2 + mc.textRenderer.fontHeight + hudPadding;
         final int startY = hudBottomY - 10;
         final int animatedY = (int) (startY + (END_Y_POSITION - startY) * animatedProgress);
@@ -268,15 +318,48 @@ public class HUDModule extends Module {
         int alpha = (int) (255 * animatedProgress);
         int baseBackgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
 
+        String displayText = getString(dynamicTexts);
+
+        final int dynamicPadding = 15;
+        final int dynamicTextWidth = TextRendererUtility.getTextWidth(displayText);
+        final int dynamicWidth = dynamicTextWidth + dynamicPadding;
+        final int screenWidth = mc.getWindow().getScaledWidth();
+        final int hudX = 2;
+        final int maxAllowedX = screenWidth - dynamicWidth;
+        final int alignedX = Math.min(hudX, maxAllowedX);
+
         drawDynamicRect(
                 displayText,
                 event,
-                centeredX,
+                alignedX,
                 animatedY,
                 dynamicPadding,
                 baseBackgroundColor,
                 alpha
         );
+    }
+
+    private @NotNull String getString(List<String> dynamicTexts) {
+        int modulesToShow = Math.min(dynamicTexts.size(), (int) Math.ceil(currentModuleCount));
+
+        StringBuilder combinedText = new StringBuilder();
+        for(int i = 0; i < modulesToShow; i++) {
+            if(i > 0) combinedText.append(" | ");
+
+            String moduleText = dynamicTexts.get(i);
+
+            if(i >= (int) currentModuleCount) {
+                float partialProgress = currentModuleCount - (int) currentModuleCount;
+                int charactersToShow = (int) (moduleText.length() * partialProgress);
+                if(charactersToShow > 0) {
+                    combinedText.append(moduleText, 0, Math.min(charactersToShow, moduleText.length()));
+                }
+            } else {
+                combinedText.append(moduleText);
+            }
+        }
+
+        return combinedText.toString();
     }
 
     private int applyAlpha(int color, int alpha) {
@@ -302,6 +385,8 @@ public class HUDModule extends Module {
         int textWidth = TextRendererUtility.getTextWidth(displayText);
         int textHeight = TextRendererUtility.getTextHeight();
 
+        lastDynamicText = displayText;
+
         RenderUtility.drawRect(
                 event.getContext(),
                 xPosition,
@@ -322,59 +407,5 @@ public class HUDModule extends Module {
                 yPosition + padding / 2,
                 true
         );
-    }
-
-    private static @NotNull String getString(
-            Mode hudMode,
-            String bps
-    ) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-        if(mc.player == null) throw new IllegalStateException("Minecraft player is null!");
-
-        switch(hudMode) {
-            case SPEED:
-            case FLIGHT:
-                String speedFlightMsg = String.format("Going %s b/s", RyeClient.getBps());
-                lastDynamicText = speedFlightMsg;
-
-                return speedFlightMsg;
-
-            case SCAFFOLD:
-                int scaffoldSlot = mc.player.getInventory().getSelectedSlot();
-                int blocksRemaining = mc.player.getInventory().getStack(scaffoldSlot).getCount();
-                String scaffoldMsg = String.format("%s Remaining | Going %s b/s", blocksRemaining, RyeClient.getBps());
-
-                lastDynamicText = scaffoldMsg;
-
-                return scaffoldMsg;
-
-            case KILLAURA:
-                String killauraMsg = String.format("%s | Going %s b/s",
-                        String.format("%.1f/%.1f ♡", mc.player.getHealth() / 2, mc.player.getMaxHealth() / 2),
-                        bps);
-
-                lastDynamicText = killauraMsg;
-
-                return killauraMsg;
-
-            case NUKER:
-                String nukerMsg = String.format("%s blocks destroyed", NukerModule.getBlocksDestroyed());
-
-                lastDynamicText = nukerMsg;
-
-                return nukerMsg;
-
-            case REACH:
-                String reachMsg = String.format("Reached %.1f blocks", ReachModule.getLastReach());
-
-                lastDynamicText = reachMsg;
-
-                return reachMsg;
-
-            case NORMAL:
-            default:
-                if(!lastDynamicText.isEmpty()) return lastDynamicText;
-                else return "Dynamic HUD Encountered an error!";
-        }
     }
 }

@@ -151,7 +151,8 @@ public class RyeClient implements ClientModInitializer {
                         new HighJumpModule(),
                         new AmbienceModule(),
                         new DiscordRPCModule(),
-                        new DisablerModule()
+                        new DisablerModule(),
+                        new CapeModule()
                 );
     }
 
