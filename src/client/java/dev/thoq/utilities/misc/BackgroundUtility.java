@@ -21,8 +21,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 
-import java.util.Objects;
-
 public class BackgroundUtility {
     public static void drawBackground(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
