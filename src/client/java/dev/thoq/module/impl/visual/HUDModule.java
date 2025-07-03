@@ -28,6 +28,7 @@ import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.RenderUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
 import dev.thoq.utilities.render.Theme;
+import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,6 +46,11 @@ public class HUDModule extends Module {
     private static final int END_Y_POSITION = 30;
     private static String lastDynamicText = "";
     private final ModeSetting themeSetting;
+    private int targetModuleCount = 0;
+    private float currentModuleCount = 0;
+    private long expansionStartTime = 0;
+    private boolean isExpanding = false;
+    private static final long EXPANSION_DURATION = 300;
 
     public HUDModule() {
         super("HUD", "Shows Heads Up Display", ModuleCategory.VISUAL);
@@ -107,6 +113,14 @@ public class HUDModule extends Module {
             dynamicTexts.add(reachMsg);
         }
 
+        int newModuleCount = dynamicTexts.size();
+        if(newModuleCount != targetModuleCount) {
+            targetModuleCount = newModuleCount;
+            startExpansionAnimation();
+        }
+
+        updateExpansionAnimation();
+
         String time = RyeClient.getTime();
         String fps = RyeClient.getFps();
         String name = mc.player.getName().getString();
@@ -124,17 +138,8 @@ public class HUDModule extends Module {
         wasVisible = shouldShowDynamic;
 
         if(shouldShowDynamic || isAnimatingOut) {
-            String textToDisplay;
-            if(isAnimatingOut) {
-                textToDisplay = lastDynamicText;
-            } else {
-                String combinedDynamicText = String.join(" | ", dynamicTexts);
-                lastDynamicText = combinedDynamicText;
-                textToDisplay = combinedDynamicText;
-            }
-
-            drawAnimatedDynamicRect(
-                    textToDisplay,
+            drawAnimatedDynamicModules(
+                    dynamicTexts,
                     event
             );
         }
@@ -171,6 +176,27 @@ public class HUDModule extends Module {
                 yPosition + padding / 2
         );
     };
+
+    private void startExpansionAnimation() {
+        expansionStartTime = System.currentTimeMillis();
+        isExpanding = true;
+    }
+
+    private void updateExpansionAnimation() {
+        if(!isExpanding) return;
+
+        long elapsed = System.currentTimeMillis() - expansionStartTime;
+        float progress = Math.min(elapsed / (float) EXPANSION_DURATION, 1.0f);
+
+        float easedProgress = 1.0f - (float) Math.pow(1.0f - progress, 3);
+
+        currentModuleCount = currentModuleCount + (targetModuleCount - currentModuleCount) * easedProgress;
+
+        if(progress >= 1.0f) {
+            currentModuleCount = targetModuleCount;
+            isExpanding = false;
+        }
+    }
 
     private String createAnimatedClientName() {
         return "§r§l" + RyeClient.getName() + "§r";
@@ -249,11 +275,11 @@ public class HUDModule extends Module {
         return 1.0f - (float) Math.pow(1.0f - progress, 3);
     }
 
-    private void drawAnimatedDynamicRect(
-            String displayText,
+    private void drawAnimatedDynamicModules(
+            List<String> dynamicTexts,
             Render2DEvent event
     ) {
-        if(mc.player == null) return;
+        if(mc.player == null || dynamicTexts.isEmpty()) return;
 
         float progress = getAnimationProgress();
 
@@ -285,23 +311,22 @@ public class HUDModule extends Module {
                 new SimpleDateFormat("hh:mm a").format(new Date())
         ));
 
-        final int hudWidth = hudTextWidth + hudPadding;
-        final int dynamicPadding = 15;
-        final int dynamicTextWidth = TextRendererUtility.getTextWidth(displayText);
-        final int dynamicWidth = dynamicTextWidth + dynamicPadding;
-
-        final int hudX = 2;
-        final int screenWidth = mc.getWindow().getScaledWidth();
-        final int maxAllowedX = screenWidth - dynamicWidth;
-
-        final int alignedX = Math.min(hudX, maxAllowedX);
-
         final int hudBottomY = 2 + mc.textRenderer.fontHeight + hudPadding;
         final int startY = hudBottomY - 10;
         final int animatedY = (int) (startY + (END_Y_POSITION - startY) * animatedProgress);
 
         int alpha = (int) (255 * animatedProgress);
         int baseBackgroundColor = ColorUtility.getColor(ColorUtility.Colors.PANEL);
+
+        String displayText = getString(dynamicTexts);
+
+        final int dynamicPadding = 15;
+        final int dynamicTextWidth = TextRendererUtility.getTextWidth(displayText);
+        final int dynamicWidth = dynamicTextWidth + dynamicPadding;
+        final int screenWidth = mc.getWindow().getScaledWidth();
+        final int hudX = 2;
+        final int maxAllowedX = screenWidth - dynamicWidth;
+        final int alignedX = Math.min(hudX, maxAllowedX);
 
         drawDynamicRect(
                 displayText,
@@ -312,6 +337,29 @@ public class HUDModule extends Module {
                 baseBackgroundColor,
                 alpha
         );
+    }
+
+    private @NotNull String getString(List<String> dynamicTexts) {
+        int modulesToShow = Math.min(dynamicTexts.size(), (int) Math.ceil(currentModuleCount));
+
+        StringBuilder combinedText = new StringBuilder();
+        for(int i = 0; i < modulesToShow; i++) {
+            if(i > 0) combinedText.append(" | ");
+
+            String moduleText = dynamicTexts.get(i);
+
+            if(i >= (int) currentModuleCount) {
+                float partialProgress = currentModuleCount - (int) currentModuleCount;
+                int charactersToShow = (int) (moduleText.length() * partialProgress);
+                if(charactersToShow > 0) {
+                    combinedText.append(moduleText, 0, Math.min(charactersToShow, moduleText.length()));
+                }
+            } else {
+                combinedText.append(moduleText);
+            }
+        }
+
+        return combinedText.toString();
     }
 
     private int applyAlpha(int color, int alpha) {
