@@ -16,6 +16,10 @@
 
 package dev.thoq.module.impl.movement.longjump.verus;
 
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.TickEvent;
+import dev.thoq.module.Module;
+import dev.thoq.module.SubModule;
 import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Items;
@@ -24,11 +28,15 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 
-public class VerusFireballLongJump {
+public class VerusFireballLongJump extends SubModule {
     private static boolean hasThrown = false;
     private static int originalSlot = -1;
 
-    public void verusFireballLongJump(MinecraftClient mc) {
+    public VerusFireballLongJump(final Module parent) {
+        super("VerusFireball", parent);
+    }
+
+    private final IEventListener<TickEvent> onTick = event -> {
         if (mc.player == null || mc.getNetworkHandler() == null) return;
 
         int fireballSlot = findFireballSlot(mc);
@@ -54,6 +62,18 @@ public class VerusFireballLongJump {
 
             hasThrown = true;
         }
+    };
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+        this.reset();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        this.reset();
     }
 
     private int findFireballSlot(MinecraftClient mc) {

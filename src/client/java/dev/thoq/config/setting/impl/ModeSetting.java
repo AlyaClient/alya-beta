@@ -18,8 +18,10 @@ package dev.thoq.config.setting.impl;
 
 import dev.thoq.config.setting.Setting;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * A setting that allows cycling through a list of predefined options.
@@ -27,6 +29,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class ModeSetting extends Setting<String> {
     private final List<String> modes;
+    private Consumer<Boolean> changeCallback = null;
 
     /**
      * Creates a new mode setting.
@@ -38,11 +41,11 @@ public class ModeSetting extends Setting<String> {
      */
     public ModeSetting(String name, String description, String defaultValue, String... modes) {
         super(name, description, defaultValue);
-        this.modes = Arrays.asList(modes);
+        this.modes = new ArrayList<>(Arrays.asList(modes));
 
-        if(!this.modes.contains(defaultValue)) {
-            throw new IllegalArgumentException("Default value must be one of the modes");
-        }
+//        if(!this.modes.contains(defaultValue)) {
+//            throw new IllegalArgumentException("Default value must be one of the modes");
+//        }
     }
 
     /**
@@ -61,7 +64,9 @@ public class ModeSetting extends Setting<String> {
         String currentValue = getValue();
         int currentIndex = modes.indexOf(currentValue);
         int nextIndex = (currentIndex + 1) % modes.size();
+        if(this.changeCallback != null) this.changeCallback.accept(true);
         setValue(modes.get(nextIndex));
+        if(this.changeCallback != null) this.changeCallback.accept(false);
     }
 
     /**
@@ -80,4 +85,13 @@ public class ModeSetting extends Setting<String> {
     public String getType() {
         return "mode";
     }
+
+    public void add(final String mode) {
+        this.modes.add(mode);
+    }
+
+    public void addCallback(final Consumer<Boolean> runnable) {
+        this.changeCallback = runnable;
+    }
+
 }

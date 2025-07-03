@@ -18,6 +18,7 @@ package dev.thoq.module;
 
 import dev.thoq.RyeClient;
 import dev.thoq.config.setting.Setting;
+import dev.thoq.config.setting.impl.ModeSetting;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.Collection;
@@ -34,6 +35,9 @@ public abstract class Module {
     protected final Map<String, Setting<?>> settings = new HashMap<>();
     protected final MinecraftClient mc = MinecraftClient.getInstance();
 
+    private final HashMap<String, SubModule> submodules = new HashMap<>();
+    protected final ModeSetting mode = new ModeSetting("Mode", "Da mode", "");
+
     protected Module(String name, String displayName, String description, ModuleCategory category) {
         this.name = name;
         this.displayName = displayName;
@@ -46,6 +50,30 @@ public abstract class Module {
         this.displayName = name;
         this.description = description;
         this.category = category;
+    }
+
+    protected void addSubmodules(final SubModule... modules) {
+        this.addSetting(this.mode);
+
+        this.mode.addCallback((Boolean before) -> {
+            if(before) {
+                this.submodules.get(this.mode.getValue()).onDisable();
+            } else {
+                this.submodules.get(this.mode.getValue()).onEnable();
+            }
+        });
+
+        for(final SubModule module : modules) {
+            this.submodules.put(module.name, module);
+            this.mode.add(module.name);
+
+            for(final Setting<?> setting : module.settings) {
+                this.settings.put(setting.getName().toLowerCase(), setting); // This setting system is so scuffed. D:
+            }
+        }
+
+        this.mode.setValue(modules[0].name);
+        this.mode.setDefaultValue(modules[0].name);
     }
 
     public Map<String, Object> saveState() {
@@ -108,8 +136,16 @@ public abstract class Module {
     }
 
     protected void onEnable() {
+        if(!this.submodules.isEmpty()) {
+            System.out.println(this.submodules.toString());
+            System.out.println(this.mode.getValue() + "    |    " + this.mode.getDefaultValue());
+            this.submodules.get(this.mode.getValue()).onEnable();
+        }
     }
 
     protected void onDisable() {
+        if(!this.submodules.isEmpty()) {
+            this.submodules.get(this.mode.getValue()).onDisable();
+        }
     }
 }

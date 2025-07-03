@@ -16,7 +16,10 @@
 
 package dev.thoq.module.impl.movement.flight.verus;
 
+import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.MotionEvent;
+import dev.thoq.module.Module;
+import dev.thoq.module.SubModule;
 import dev.thoq.utilities.misc.ChatUtility;
 import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
@@ -29,9 +32,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
-public class VerusPacketFlight {
+public class VerusPacketFlight extends SubModule {
 
-    public void sendVerusPackets(MinecraftClient mc, MotionEvent event) {
+    public VerusPacketFlight(final Module parent) {
+        super("VerusPacket", parent);
+    }
+
+    private final IEventListener<MotionEvent> onMotion = event -> {
+        if(!event.isPre()) return;
         if(mc.player == null || mc.getNetworkHandler() == null) return;
 
         ChatUtility.sendDebug("Sending funny packets...");
@@ -46,17 +54,14 @@ public class VerusPacketFlight {
         event.setPitch(90f);
 
         mc.getNetworkHandler().sendPacket(placePacket);
-    }
-
-    public void verusFlight(MinecraftClient mc, GameOptions options) {
-        if(mc.player == null) return;
 
         MoveUtility.setMotionY(0);
 
-        if(options.forwardKey.isPressed()) {
+        if(this.mc.options.forwardKey.isPressed()) {
             MoveUtility.setSpeed(0.33);
         } else {
             MoveUtility.setSpeed(0);
         }
-    }
+    };
+
 }

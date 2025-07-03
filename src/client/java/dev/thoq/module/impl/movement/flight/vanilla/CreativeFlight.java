@@ -16,22 +16,37 @@
 
 package dev.thoq.module.impl.movement.flight.vanilla;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.GameOptions;
+import dev.thoq.config.setting.impl.BooleanSetting;
+import dev.thoq.config.setting.impl.NumberSetting;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.MotionEvent;
+import dev.thoq.module.Module;
+import dev.thoq.module.SubModule;
 import net.minecraft.util.math.Vec3d;
 
-public class CreativeFlight {
-    public void creativeFlight(MinecraftClient mc, GameOptions options, float speed, boolean verticalEnabled) {
-        if(mc.player == null) return;
+public class CreativeFlight extends SubModule {
 
-        mc.player.getAbilities().flying = true;
-        mc.player.getAbilities().setFlySpeed(speed * 0.05f);
+    private final NumberSetting<Float> speed = new NumberSetting<>("Speed", "Flight speed multiplier", 1.5F, 0.1F, 10.0F);
+    private final BooleanSetting verticalEnabled = new BooleanSetting("Vertical", "Enable Vertical movement", true);
 
-        if(!verticalEnabled) {
-            if(options.jumpKey.isPressed() || options.sneakKey.isPressed()) {
-                Vec3d vel = mc.player.getVelocity();
-                mc.player.setVelocity(vel.x, 0, vel.z);
+    public CreativeFlight(final Module parent) {
+        super("Creative", parent);
+        this.addSettings(this.speed, this.verticalEnabled);
+    }
+
+    private final IEventListener<MotionEvent> onMotion = event -> {
+        if(!event.isPre()) return;
+        if(this.mc.player == null) return;
+
+        this.mc.player.getAbilities().flying = true;
+        this.mc.player.getAbilities().setFlySpeed(this.speed.getValue() * 0.05F);
+
+        if(!this.verticalEnabled.getValue()) {
+            if(this.mc.options.jumpKey.isPressed() || this.mc.options.sneakKey.isPressed()) {
+                Vec3d vel = this.mc.player.getVelocity();
+                this.mc.player.setVelocity(vel.x, 0, vel.z);
             }
         }
-    }
+    };
+
 }

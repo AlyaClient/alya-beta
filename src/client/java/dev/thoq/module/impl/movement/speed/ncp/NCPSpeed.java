@@ -16,17 +16,26 @@
 
 package dev.thoq.module.impl.movement.speed.ncp;
 
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.mixin.client.accessors.LivingEntityJumpAccessor;
+import dev.thoq.module.Module;
+import dev.thoq.module.SubModule;
 import dev.thoq.utilities.misc.ChatUtility;
 import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 
-public class NCPSpeed {
+public class NCPSpeed extends SubModule {
     static int ticksRunning = 0;
 
-    public void ncpSpeed(MinecraftClient mc, GameOptions options) {
-        if(mc.player == null) return;
+    public NCPSpeed(final Module parent) {
+        super("NCP", parent);
+    }
+
+    private final IEventListener<MotionEvent> onMotion = event -> {
+        if(!event.isPre()) return;
+        if(this.mc.player == null) return;
 
         boolean damaged = mc.player.hurtTime > 0;
         boolean isOnGround = mc.player.isOnGround();
@@ -34,7 +43,7 @@ public class NCPSpeed {
 
         livingEntityJumpAccessor.setJumpingCooldown(0);
 
-        if(options.jumpKey.isPressed())
+        if(this.mc.options.jumpKey.isPressed())
             return;
 
         if(!MoveUtility.isMoving())
@@ -59,7 +68,8 @@ public class NCPSpeed {
                 ChatUtility.sendDebug("PULLED");
             }
         }
-    }
+    };
+
 
     public void reset() {
         ticksRunning = 0;

@@ -16,18 +16,27 @@
 
 package dev.thoq.module.impl.movement.longjump.verus;
 
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.TickEvent;
+import dev.thoq.module.Module;
+import dev.thoq.module.SubModule;
 import dev.thoq.utilities.player.MoveUtility;
 import dev.thoq.utilities.player.PlayerUtility;
 import dev.thoq.utilities.player.TimerUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
-public class VerusPacketLongjump {
+public class VerusPacketLongjump extends SubModule {
+
     static boolean jumped = false;
     static boolean damaged = false;
     static boolean waitingForGround = false;
 
-    public void verusPacketLongjump(MinecraftClient mc) {
+    public VerusPacketLongjump(final Module parent) {
+        super("VerusPacket", parent);
+    }
+
+    private final IEventListener<TickEvent> onTick = event -> {
         if(mc.player == null) return;
 
         if(!damaged && !waitingForGround) {
@@ -72,6 +81,18 @@ public class VerusPacketLongjump {
             mc.player.networkHandler.sendPacket(packet);
             mc.player.fallDistance = 0;
         }
+    };
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+        this.reset();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        this.reset();
     }
 
     public void reset() {

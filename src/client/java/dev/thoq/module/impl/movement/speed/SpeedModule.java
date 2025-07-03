@@ -16,82 +16,33 @@
 
 package dev.thoq.module.impl.movement.speed;
 
-import dev.thoq.config.setting.impl.BooleanSetting;
-import dev.thoq.config.setting.impl.ModeSetting;
-import dev.thoq.config.setting.Setting;
-import dev.thoq.config.setting.impl.NumberSetting;
-import dev.thoq.event.IEventListener;
-import dev.thoq.event.impl.MotionEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.movement.speed.ncp.NCPSpeed;
 import dev.thoq.module.impl.movement.speed.normal.NormalSpeed;
 import dev.thoq.module.impl.movement.speed.verus.VerusSpeed;
 import dev.thoq.utilities.player.TimerUtility;
-import net.minecraft.client.option.GameOptions;
 
-@SuppressWarnings("unchecked")
 public class SpeedModule extends Module {
-    private final NormalSpeed normalSpeed = new NormalSpeed();
-    private final VerusSpeed verusSpeed = new VerusSpeed();
-    private final NCPSpeed ncpSpeed = new NCPSpeed();
+
     private boolean wasSprinting = false;
 
     public SpeedModule() {
         super("Speed", "Become faster than the average American", ModuleCategory.MOVEMENT);
-
-        ModeSetting mode = new ModeSetting("Mode", "Speed mode", "Normal", "Normal", "Verus", "NCP");
-        NumberSetting<Float> speed = new NumberSetting<>("Speed", "Zoom speed multiplier", 1.5f, 0.1f, 10.0f);
-        BooleanSetting bHop = new BooleanSetting("BHop", "Enable BHop?", true);
-        BooleanSetting strafe = new BooleanSetting("Strafe", "Enable Strafe?", true);
-        BooleanSetting verusDamageBoost = new BooleanSetting("Damage boost", "Boost speed when damaged", true);
-
-        addSetting(mode);
-        addSetting(speed.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
-        addSetting(bHop.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
-        addSetting(strafe.setVisibilityCondition(() -> "Normal".equals(mode.getValue())));
-        addSetting(verusDamageBoost.setVisibilityCondition(() -> "Verus".equals(mode.getValue())));
+        this.addSubmodules(new NormalSpeed(this), new NCPSpeed(this), new VerusSpeed(this));
     }
-
-    private final IEventListener<MotionEvent> motionEvent = event -> {
-        if(!isEnabled() || !event.isPre()) return;
-        GameOptions options = mc.options;
-
-        switch(((ModeSetting) getSetting("Mode")).getValue()) {
-            case "Normal": {
-                float speed = ((Setting<Float>) getSetting("speed")).getValue();
-                boolean bHop = ((BooleanSetting) getSetting("BHop")).getValue();
-                boolean strafe = ((BooleanSetting) getSetting("Strafe")).getValue();
-
-                normalSpeed.normalSpeed(mc, options, speed, bHop, strafe);
-
-                break;
-            }
-
-            case "Verus": {
-                boolean verusDamageBoost = ((BooleanSetting) getSetting("Damage boost")).getValue();
-
-                verusSpeed.verusSpeed(mc, options, verusDamageBoost);
-                break;
-            }
-
-            case "NCP": {
-                ncpSpeed.ncpSpeed(mc, options);
-
-                break;
-            }
-        }
-    };
 
     @Override
     protected void onEnable() {
-        if(mc.player != null) wasSprinting = mc.player.isSprinting();
+        super.onEnable();
+        if(this.mc.player != null) this.wasSprinting = this.mc.player.isSprinting();
     }
 
     @Override
     protected void onDisable() {
-        if(mc.player != null) mc.player.setSprinting(wasSprinting);
+        super.onDisable();
+        if(this.mc.player != null) this.mc.player.setSprinting(this.wasSprinting);
         TimerUtility.resetTimer();
-        ncpSpeed.reset();
     }
+
 }

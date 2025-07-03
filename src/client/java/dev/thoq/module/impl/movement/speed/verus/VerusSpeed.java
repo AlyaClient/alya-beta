@@ -16,16 +16,30 @@
 
 package dev.thoq.module.impl.movement.speed.verus;
 
+import dev.thoq.config.setting.impl.BooleanSetting;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.MotionEvent;
+import dev.thoq.module.Module;
+import dev.thoq.module.SubModule;
 import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 
-public class VerusSpeed {
-    public void verusSpeed(MinecraftClient mc, GameOptions options, boolean verusDamageBoost) {
-        if(mc.player == null) return;
-        boolean forwardOnly = options.forwardKey.isPressed() && !options.backKey.isPressed() && !options.leftKey.isPressed() && !options.rightKey.isPressed();
+public class VerusSpeed extends SubModule {
 
-        if(options.jumpKey.isPressed())
+    private final BooleanSetting verusDamageBoost = new BooleanSetting("Damage boost", "Boost speed when damaged", true);
+
+    public VerusSpeed(final Module parent) {
+        super("Verus", parent);
+        this.addSettings(this.verusDamageBoost);
+    }
+
+    private final IEventListener<MotionEvent> onMotion = event -> {
+        if(!event.isPre()) return;
+        if(this.mc.player == null) return;
+        boolean forwardOnly = this.mc.options.forwardKey.isPressed() && !this.mc.options.backKey.isPressed() && !this.mc.options.leftKey.isPressed() && !this.mc.options.rightKey.isPressed();
+
+        if(this.mc.options.jumpKey.isPressed())
             return;
 
         if(forwardOnly)
@@ -33,11 +47,12 @@ public class VerusSpeed {
         else
             MoveUtility.setSpeed(0.26f, true);
 
-        if(MoveUtility.isMoving() && mc.player.isOnGround())
-            mc.player.jump();
+        if(MoveUtility.isMoving() && this.mc.player.isOnGround())
+            this.mc.player.jump();
 
-        if(verusDamageBoost && mc.player.hurtTime > 0) {
-            MoveUtility.setSpeed((double) mc.player.hurtTime / 2, true);
+        if(this.verusDamageBoost.getValue() && this.mc.player.hurtTime > 0) {
+            MoveUtility.setSpeed((double) this.mc.player.hurtTime / 2, true);
         }
-    }
+    };
+
 }
