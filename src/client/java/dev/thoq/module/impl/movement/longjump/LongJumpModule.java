@@ -16,70 +16,22 @@
 
 package dev.thoq.module.impl.movement.longjump;
 
-import dev.thoq.config.setting.impl.ModeSetting;
-import dev.thoq.event.IEventListener;
-import dev.thoq.event.impl.TickEvent;
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
-import dev.thoq.module.impl.movement.longjump.verus.VerusLongJump;
 import dev.thoq.module.impl.movement.longjump.verus.VerusFireballLongJump;
 import dev.thoq.module.impl.movement.longjump.verus.VerusPacketLongjump;
 import dev.thoq.utilities.player.MoveUtility;
 
-@SuppressWarnings("SwitchStatementWithTooFewBranches")
 public class LongJumpModule extends Module {
-    private final VerusFireballLongJump verusFireballLongJump = new VerusFireballLongJump();
-    private final VerusPacketLongjump verusPacketLongjump = new VerusPacketLongjump();
-    private final VerusLongJump verusLongJump = new VerusLongJump();
 
     public LongJumpModule() {
         super("LongJump", "Long Jump", "Makes you jump further", ModuleCategory.MOVEMENT);
-
-        ModeSetting mode = new ModeSetting("Mode", "Speed mode", "Verus", "Verus");
-        ModeSetting verusMode = new ModeSetting("Kind", "Kind of LongJump to use", "Fireball", "Fireball", "Packet");
-
-        verusMode.setVisibilityCondition(() -> "Verus".equals(((ModeSetting) getSetting("Mode")).getValue()));
-
-        addSetting(mode);
-        addSetting(verusMode);
-    }
-
-    private final IEventListener<TickEvent> tickEvent = event -> {
-        if(!isEnabled() || mc.player == null || !event.isPre()) return;
-
-        String mode = ((ModeSetting) getSetting("Mode")).getValue();
-        setPrefix(mode);
-
-        switch(mode) {
-            case "Verus": {
-                String kind = ((ModeSetting) getSetting("Kind")).getValue();
-                verusLongJump.verusLongJump(mc, (ModeSetting) getSetting("Kind"));
-                
-                if ("Fireball".equals(kind) && isEnabled()) {
-                    if(verusFireballLongJump.hasThrown()) {
-                        super.toggle();
-                    }
-                }
-
-                if ("Packet".equals(kind) && isEnabled()) {
-                    if(verusPacketLongjump.hasJumped()) {
-                        super.toggle();
-                    }
-                }
-
-                break;
-            }
-        }
-    };
-
-    @Override
-    protected void onEnable() {
-        verusLongJump.reset();
+        this.addSubmodules(new VerusFireballLongJump(this), new VerusPacketLongjump(this));
     }
 
     @Override
     protected void onDisable() {
-        verusPacketLongjump.reset();
+        super.onDisable();
         MoveUtility.setMotionY(0);
     }
 }

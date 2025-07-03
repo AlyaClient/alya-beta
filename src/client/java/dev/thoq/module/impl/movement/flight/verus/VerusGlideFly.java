@@ -16,15 +16,29 @@
 
 package dev.thoq.module.impl.movement.flight.verus;
 
+import dev.thoq.config.setting.impl.BooleanSetting;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.MotionEvent;
+import dev.thoq.module.Module;
+import dev.thoq.module.SubModule;
 import dev.thoq.utilities.misc.ChatUtility;
 import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 
-public class VerusGlideFly {
+public class VerusGlideFly extends SubModule {
+
     private static int timeRunning = 0;
     private static boolean messageSent = false;
 
-    public void verusGlideFly(MinecraftClient mc, boolean clip) {
+    private final BooleanSetting clip = new BooleanSetting("Clip", "guh", true);
+
+    public VerusGlideFly(final Module parent) {
+        super("VerusGlide", parent);
+        this.addSettings(this.clip);
+    }
+
+    private final IEventListener<MotionEvent> onMotion = event -> {
+        if(!event.isPre()) return;
         if(mc.player == null) return;
         if(!messageSent) {
             ChatUtility.sendWarning("This fly does *NOT* new Verus, only old cracked versions!");
@@ -37,13 +51,19 @@ public class VerusGlideFly {
 
         timeRunning++;
 
-        if(clip && timeRunning >= 80) {
+        if(clip.getValue() && timeRunning >= 80) {
             mc.player.setPosition(posX, posY + 1, posZ);
             timeRunning = 0;
         }
 
         MoveUtility.setMotionY(-0.02);
         MoveUtility.setSpeed(0.1);
+    };
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        this.reset();
     }
 
     public void reset() {

@@ -16,11 +16,41 @@
 
 package dev.thoq.module.impl.movement.speed.normal;
 
+import dev.thoq.config.setting.impl.BooleanSetting;
+import dev.thoq.config.setting.impl.NumberSetting;
+import dev.thoq.event.IEventListener;
+import dev.thoq.event.impl.MotionEvent;
+import dev.thoq.module.Module;
+import dev.thoq.module.SubModule;
 import dev.thoq.utilities.player.MoveUtility;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GameOptions;
 
-public class NormalSpeed {
+public class NormalSpeed extends SubModule {
+
+    private final NumberSetting<Float> speed = new NumberSetting<>("Speed", "Zoom speed multiplier", 1.5F, 0.5F, 10.0F);
+    private final BooleanSetting bHop = new BooleanSetting("BHop", "Enable BHop?", true);
+    private final BooleanSetting strafe = new BooleanSetting("Strafe", "Enable Strafe?", true);
+
+    public NormalSpeed(final Module parent) {
+        super("Normal", parent);
+        this.addSettings(this.speed, this.bHop, this.strafe);
+    }
+
+    private final IEventListener<MotionEvent> onMotion = event -> {
+        if(!event.isPre()) return;
+        if(this.mc.player == null) return;
+
+        if(this.bHop.getValue() && mc.player.isOnGround() && MoveUtility.isMoving()) {
+            if (!this.mc.options.jumpKey.isPressed()) this.mc.player.jump();
+        }
+
+        if(this.strafe.getValue())
+            MoveUtility.setSpeed(this.speed.getValue(), true);
+        else
+            MoveUtility.setSpeed(this.speed.getValue());
+    };
+
     public void normalSpeed(MinecraftClient mc, GameOptions options, float speed, boolean bHop, boolean strafe) {
         if(mc.player == null) return;
 
@@ -35,4 +65,5 @@ public class NormalSpeed {
         else
             MoveUtility.setSpeed(speed);
     }
+
 }
