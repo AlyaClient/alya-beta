@@ -41,7 +41,9 @@ public class DisablerModule extends Module {
 
     @SuppressWarnings("unused")
     private final IEventListener<TickEvent> tickEvent = event -> {
-        if(disabler.getEnabledOptions().size() > 1)
+        if(disabler.getEnabledOptions().isEmpty())
+            setPrefix("None");
+        else if(disabler.getEnabledOptions().size() > 1)
             setPrefix("Multi");
         else
             setPrefix(disabler.getEnabledOptions().getFirst());

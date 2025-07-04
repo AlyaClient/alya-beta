@@ -134,6 +134,7 @@ public class ScaffoldModule extends Module {
                 if(switchItemMode.getValue().equals("Client") && mc.player.getInventory().getSelectedSlot() != slot) {
                     mc.player.getInventory().setSelectedSlot(slot);
                 }
+
                 if(switchItemMode.getValue().equals("Server") && lastSlot != slot && mc.getNetworkHandler() != null) {
                     mc.getNetworkHandler().sendPacket(new UpdateSelectedSlotC2SPacket(slot));
                     lastSlot = slot;

@@ -56,8 +56,8 @@ public class KillauraModule extends Module {
 
     private final ModeSetting attackMode = new ModeSetting("AttackMode", "Attack mode", "Single", "Single", "Switch", "Multi");
     private final ModeSetting targetMode = new ModeSetting("Target", "Target types", "Players", "Players", "Passive", "Hostile", "All");
-    private final NumberSetting<Double> swingDistance = new NumberSetting<>("SwingDistance", "Distance to start swinging", 4.5, 3.0, 1000.0);
-    private final NumberSetting<Double> reach = new NumberSetting<>("Reach", "Distance to actually attack from", 4.0, 3.0, 1000.0);
+    private final NumberSetting<Double> swingDistance = new NumberSetting<>("SwingDistance", "Distance to start swinging", 4.5, 3.0, 6.0);
+    private final NumberSetting<Double> reach = new NumberSetting<>("Reach", "Distance to actually attack from", 3.0, 3.0, 6.0);
     private final NumberSetting<Integer> cps = new NumberSetting<>("CPS", "Attacks per second", 12, 1, 20);
     private final BooleanSetting noHitDelay = new BooleanSetting("NoHitDelay", "Remove attack delay", false);
     private final BooleanSetting raycast = new BooleanSetting("Raycast", "Check line of sight to target", true);
