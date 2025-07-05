@@ -53,7 +53,7 @@ public class NormalFlight extends SubModule {
         }
 
         if(this.preventVanillaKick.getValue() && !verticalMovement)
-            MoveUtility.setMotionY(MoveUtility.getVanillaFallingSpeed());
+            MoveUtility.setMotionY(MoveUtility.getVanillaFallingSpeed() + 0.05);
         else if(!verticalMovement)
             MoveUtility.setMotionY(0);
 

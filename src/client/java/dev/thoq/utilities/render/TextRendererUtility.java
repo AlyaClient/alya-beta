@@ -24,6 +24,7 @@ import net.minecraft.client.gui.DrawContext;
 public class TextRendererUtility {
 
     static TextRenderer renderer = FontManager.getFont("sf_pro_rounded_regular", 11);
+    static TextRenderer rendererMd = FontManager.getFont("sf_pro_rounded_regular", 15);
     static TextRenderer rendererXl = FontManager.getFont("sf_pro_rounded_regular", 50);
 
     /**
@@ -74,6 +75,34 @@ public class TextRendererUtility {
     ) {
         context.drawText(
                 rendererXl,
+                text,
+                posX,
+                posY,
+                ColorUtility.getColor(color),
+                shadow
+        );
+    }
+
+    /**
+     * Renders a medium (Md) text string on the screen at the specified position with a designated color and optional shadow.
+     *
+     * @param context The drawing context used for rendering the text.
+     * @param text The text to be rendered.
+     * @param color The color of the text, specified as an enum value from {@link Colors}.
+     * @param posX The X-coordinate where the text should be rendered.
+     * @param posY The Y-coordinate where the text should be rendered.
+     * @param shadow A boolean value indicating whether to render the text with a shadow effect.
+     */
+    public static void renderMdText(
+            DrawContext context,
+            String text,
+            Colors color,
+            int posX,
+            int posY,
+            boolean shadow
+    ) {
+        context.drawText(
+                rendererMd,
                 text,
                 posX,
                 posY,
@@ -137,5 +166,23 @@ public class TextRendererUtility {
      */
     public static int getTextHeight() {
         return renderer.fontHeight;
+    }
+
+    /**
+     * Retrieves the height of the extra-large text font used by the renderer.
+     *
+     * @return The height of the extra-large font in pixels.
+     */
+    public static int getXlTextHeight() {
+        return rendererXl.fontHeight;
+    }
+
+    /**
+     * Retrieves the height of the medium (Md) text font used by the renderer.
+     *
+     * @return The height of the medium font in pixels.
+     */
+    public static int getMdTextHeight() {
+        return rendererMd.fontHeight;
     }
 }

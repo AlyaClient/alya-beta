@@ -27,6 +27,7 @@ import net.minecraft.util.Formatting;
 @SuppressWarnings("unused")
 public class ChatUtility {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private static final String RYE = "§5Rye§r";
 
     /**
      * Sends a formatted message to the player
@@ -36,17 +37,17 @@ public class ChatUtility {
      */
     public static void sendMessage(String message, Formatting formatting) {
         if(mc.player != null) {
+            String newMessage = String.format("%s %s", RYE, message.replace("»", "§0»"));
             MutableText text = Text.literal(message).setStyle(Style.EMPTY.withColor(formatting));
             mc.player.sendMessage(text, false);
         }
     }
 
-
     public static void sendDebug(String message) {
         boolean debug = RyeClient.INSTANCE.getModuleRepository().getModule(DebugModule.class).isEnabled();
 
         if(mc.player != null && debug) {
-            MutableText text = Text.literal("DEBUG >> " + message);
+            MutableText text = Text.literal("Debug » " + message);
             mc.player.sendMessage(text, false);
         }
     }
@@ -66,7 +67,7 @@ public class ChatUtility {
      * @param message The error message
      */
     public static void sendError(String message) {
-        sendMessage("Error: " + message, Formatting.RED);
+        sendMessage("Error » " + message, Formatting.RED);
     }
 
     /**
@@ -107,7 +108,7 @@ public class ChatUtility {
     public static void sendPrefixedMessage(String prefix, String message, Formatting prefixFormatting, Formatting messageFormatting) {
         if(mc.player == null) return;
 
-        MutableText prefixText = Text.literal("[" + prefix + "] ").setStyle(Style.EMPTY.withColor(prefixFormatting));
+        MutableText prefixText = Text.literal(RYE + " " + prefix + " » ").setStyle(Style.EMPTY.withColor(prefixFormatting));
         MutableText messageText = Text.literal(message).setStyle(Style.EMPTY.withColor(messageFormatting));
         mc.player.sendMessage(prefixText.append(messageText), false);
     }

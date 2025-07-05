@@ -27,7 +27,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
 public class VerusPacketLongjump extends SubModule {
-
+    private final PlayerUtility playerUtility = new PlayerUtility();
     static boolean jumped = false;
     static boolean damaged = false;
     static boolean waitingForGround = false;
@@ -40,7 +40,7 @@ public class VerusPacketLongjump extends SubModule {
         if(mc.player == null) return;
 
         if(!damaged && !waitingForGround) {
-            PlayerUtility.applyDamage(mc, 3);
+            playerUtility.applyDamage(mc, 3);
             damaged = true;
             waitingForGround = true;
         }

@@ -88,16 +88,14 @@ public class ArraylistModule extends Module {
         float time = System.currentTimeMillis() / 1000.0f;
         float waveOffset = (float) index / Math.max(1, totalModules - 1);
         float phase = time * 2.0f + waveOffset * 4.0f;
-
-        Theme currentTheme = Theme.getCurrentTheme();
         float factor = (float) (Math.sin(phase) + 1.0) / 2.0f;
 
-        return Theme.interpolateColorInt(currentTheme.getPrimaryColor(), currentTheme.getSecondaryColor(), factor);
+        return Theme.getInterpolatedColors(factor);
     }
 
     /**
-     * Gets the full display name for a module including any prefixes
-     * Format: ModuleName [ModulePrefix]
+     * Gets the full display name for a module including any suffixes
+     * Format: ModuleName [Suffix]
      */
     private String getModuleDisplayName(Module module) {
         StringBuilder displayName = new StringBuilder();

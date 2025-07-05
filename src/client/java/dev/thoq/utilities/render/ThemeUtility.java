@@ -21,7 +21,7 @@ import java.awt.*;
 @SuppressWarnings("unused")
 public class ThemeUtility {
     private static Color themeColorFirst = Color.PINK;
-    private static Color themeColorSecond = Color.GREEN;
+    private static Color themeColorSecond = Color.BLUE;
 
     public static Color getThemeColorFirst() {
         return themeColorFirst;

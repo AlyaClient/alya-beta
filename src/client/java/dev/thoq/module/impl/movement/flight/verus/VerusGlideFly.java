@@ -23,7 +23,6 @@ import dev.thoq.module.Module;
 import dev.thoq.module.SubModule;
 import dev.thoq.utilities.misc.ChatUtility;
 import dev.thoq.utilities.player.MoveUtility;
-import net.minecraft.client.MinecraftClient;
 
 public class VerusGlideFly extends SubModule {
 
@@ -37,11 +36,18 @@ public class VerusGlideFly extends SubModule {
         this.addSettings(this.clip);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> onMotion = event -> {
         if(!event.isPre()) return;
         if(mc.player == null) return;
+
+        if(mc.player.isOnGround()) {
+            ChatUtility.sendError("Please be in air before toggling!");
+            return;
+        }
+
         if(!messageSent) {
-            ChatUtility.sendWarning("This fly does *NOT* new Verus, only old cracked versions!");
+            ChatUtility.sendWarning("This fly may not work on new Verus (its iffy), it does work on old cracked versions!");
             messageSent = true;
         }
 
@@ -51,13 +57,13 @@ public class VerusGlideFly extends SubModule {
 
         timeRunning++;
 
-        if(clip.getValue() && timeRunning >= 80) {
-            mc.player.setPosition(posX, posY + 1, posZ);
+        if(clip.getValue() && timeRunning >= 90) {
+            mc.player.setPosition(posX, posY + 2, posZ);
             timeRunning = 0;
         }
 
         MoveUtility.setMotionY(-0.02);
-        MoveUtility.setSpeed(0.1);
+        MoveUtility.setSpeed(0.3, true);
     };
 
     @Override

@@ -18,43 +18,39 @@ package dev.thoq;
 
 import dev.thoq.command.CommandBuilder;
 import dev.thoq.command.CommandRepository;
-import dev.thoq.command.impl.BindCommand;
-import dev.thoq.command.impl.ConfigCommand;
-import dev.thoq.command.impl.SettingsCommand;
-import dev.thoq.command.impl.ToggleCommand;
+import dev.thoq.command.impl.*;
 import dev.thoq.config.KeybindManager;
 import dev.thoq.event.EventBus;
 import dev.thoq.module.ModuleBuilder;
 import dev.thoq.module.ModuleRepository;
 import dev.thoq.module.impl.combat.AttackDelayModule;
 import dev.thoq.module.impl.combat.killaura.KillauraModule;
-import dev.thoq.module.impl.movement.StrafeModule;
-import dev.thoq.module.impl.movement.HighJumpModule;
+import dev.thoq.module.impl.movement.*;
+import dev.thoq.module.impl.utility.antivoid.AntiVoidModule;
 import dev.thoq.module.impl.utility.disabler.DisablerModule;
 import dev.thoq.module.impl.world.TickBaseModule;
 import dev.thoq.module.impl.movement.flight.FlightModule;
 import dev.thoq.module.impl.combat.VelocityModule;
 import dev.thoq.module.impl.movement.longjump.LongJumpModule;
-import dev.thoq.module.impl.movement.ScaffoldModule;
 import dev.thoq.module.impl.movement.speed.SpeedModule;
 import dev.thoq.module.impl.world.NukerModule;
 import dev.thoq.module.impl.combat.ReachModule;
 import dev.thoq.module.impl.utility.fastplace.FastPlaceModule;
 import dev.thoq.module.impl.utility.nofall.NoFallModule;
-import dev.thoq.module.impl.movement.JumpCooldownModule;
-import dev.thoq.module.impl.movement.SprintModule;
 import dev.thoq.module.impl.visual.*;
 import dev.thoq.module.impl.world.TimerModule;
 import dev.thoq.module.impl.visual.clickgui.ClickGUIModule;
 import dev.thoq.module.impl.visual.esp.ESPModule;
 import dev.thoq.utilities.misc.IconLoader;
 import dev.thoq.utilities.misc.RyeConstants;
+import dev.thoq.utilities.render.Theme;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.TimeHelper;
 import net.minecraft.util.math.Vec3d;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -152,7 +148,10 @@ public class RyeClient implements ClientModInitializer {
                         new AmbienceModule(),
                         new DiscordRPCModule(),
                         new DisablerModule(),
-                        new CapeModule()
+                        new CapeModule(),
+                        new AntiGravityModule(),
+                        new AntiVoidModule(),
+                        new TargetStrafeModule()
                 );
     }
 
@@ -162,7 +161,8 @@ public class RyeClient implements ClientModInitializer {
                         new ToggleCommand(),
                         new ConfigCommand(),
                         new BindCommand(),
-                        new SettingsCommand()
+                        new SettingsCommand(),
+                        new VClipCommand()
                 );
     }
 

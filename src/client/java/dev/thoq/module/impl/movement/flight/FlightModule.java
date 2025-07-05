@@ -25,14 +25,19 @@ import dev.thoq.module.impl.movement.flight.verus.VerusGlideFly;
 import dev.thoq.module.impl.movement.flight.verus.VerusPacketFlight;
 import net.minecraft.client.option.GameOptions;
 
-@SuppressWarnings("unchecked")
 public class FlightModule extends Module {
 
     private boolean wasSprinting = false;
 
     public FlightModule() {
         super("Flight", "Become airplane", ModuleCategory.MOVEMENT);
-        this.addSubmodules(new NormalFlight(this), new CreativeFlight(this), new VerusPacketFlight(this), new VerusDamageFly(this), new VerusGlideFly(this));
+        this.addSubmodules(
+                new NormalFlight(this),
+                new CreativeFlight(this),
+                new VerusPacketFlight(this),
+                new VerusDamageFly(this),
+                new VerusGlideFly(this)
+        );
     }
 
     @Override

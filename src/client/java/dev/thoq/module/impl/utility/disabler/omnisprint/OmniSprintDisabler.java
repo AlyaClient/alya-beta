@@ -16,14 +16,21 @@
 
 package dev.thoq.module.impl.utility.disabler.omnisprint;
 
+import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.PacketSendEvent;
-import net.minecraft.client.MinecraftClient;
+import dev.thoq.module.Module;
+import dev.thoq.module.SubModule;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 
-public class OmniSprintDisabler {
+public class OmniSprintDisabler extends SubModule {
     private static boolean serverSprintState = false;
 
-    public void omniSprintDisabler(PacketSendEvent event, MinecraftClient mc) {
+    public OmniSprintDisabler(Module parent) {
+        super("OmniSprint", parent);
+    }
+
+    @SuppressWarnings("unused")
+    private final IEventListener<PacketSendEvent> packetSendEvent = event -> {
         if(mc.player == null || mc.getNetworkHandler() == null) return;
 
         if(event.getPacket() instanceof ClientCommandC2SPacket packet) {
@@ -37,5 +44,5 @@ public class OmniSprintDisabler {
                 event.cancel();
             }
         }
-    }
+    };
 }
