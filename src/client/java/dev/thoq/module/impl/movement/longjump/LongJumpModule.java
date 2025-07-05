@@ -26,7 +26,10 @@ public class LongJumpModule extends Module {
 
     public LongJumpModule() {
         super("LongJump", "Long Jump", "Makes you jump further", ModuleCategory.MOVEMENT);
-        this.addSubmodules(new VerusFireballLongJump(this), new VerusPacketLongjump(this));
+        this.addSubmodules(
+                new VerusFireballLongJump(this),
+                new VerusPacketLongjump(this)
+        );
     }
 
     @Override

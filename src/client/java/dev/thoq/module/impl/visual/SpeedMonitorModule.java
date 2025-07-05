@@ -52,7 +52,7 @@ public class SpeedMonitorModule extends Module {
         final Vector4f radius = new Vector4f(10f, 10f, 10f, 10f);
         final int rectWidth = 200;
         final int rectHeight = 85;
-        final int maxHistorySize = 600;
+        final int maxHistorySize = 100;
 
         handleMouseInput(xPosition, yPosition, rectWidth, rectHeight);
 
