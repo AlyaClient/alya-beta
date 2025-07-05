@@ -511,6 +511,30 @@ public class KillauraModule extends Module {
         isBlocking = false;
     }
 
+    /**
+     * Get the current attack mode for Target Strafe integration
+     * @return Current attack mode
+     */
+    public String getAttackMode() {
+        return attackMode.getValue();
+    }
+
+    /**
+     * Get the current target for Target Strafe integration
+     * @return Current target entity
+     */
+    public Entity getCurrentTarget() {
+        return currentTarget;
+    }
+
+    /**
+     * Check if the module has valid targets
+     * @return true if there are valid targets
+     */
+    public boolean hasTargets() {
+        return !targets.isEmpty();
+    }
+
     @Override
     protected void onEnable() {
         if(mc.player != null) {

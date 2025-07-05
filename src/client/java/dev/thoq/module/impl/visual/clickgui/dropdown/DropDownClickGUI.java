@@ -57,20 +57,18 @@ public class DropDownClickGUI extends Screen {
     private static final int BACKGROUND_COLOR = ColorUtility.getColor(ColorUtility.Colors.GRAY);
     private static final int CATEGORY_COLOR = 0xFF222222;
     private static final int HOVER_COLOR = 0x10FFFFFF;
-    private static final float CORNER_RADIUS = 5.0f;
+    private static final float CORNER_RADIUS = 4f;
     private static final int TOOLTIP_BACKGROUND = 0xFF000000;
     private static final int TOOLTIP_BORDER = 0xFF212121;
     private static final int TOOLTIP_MAX_WIDTH = 200;
     private static final int TOOLTIP_PADDING = 2;
     private static final int TOOLTIP_OFFSET = 10;
-
     private String hoveredTooltip = null;
     private int tooltipX = 0;
     private int tooltipY = 0;
     private final boolean showTooltips;
     private int scrollOffset = 0;
     private ModuleCategory draggingCategory = null;
-
     private boolean draggingNumberSetting = false;
     private NumberSetting<?> currentDraggedNumberSetting = null;
     private int sliderStartX = 0;
@@ -109,10 +107,6 @@ public class DropDownClickGUI extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        if(Theme.get("Rye") == null) {
-            Theme.init();
-        }
-
         hoveredTooltip = null;
 
         for(Map.Entry<ModuleCategory, List<Module>> entry : categorizedModules.entrySet()) {
@@ -170,9 +164,8 @@ public class DropDownClickGUI extends Screen {
                     }
 
                     if(module.isEnabled()) {
-                        Theme currentTheme = Theme.getCurrentTheme();
-                        int primaryColor = currentTheme.getPrimaryColorInt();
-                        int secondaryColor = currentTheme.getSecondaryColorInt();
+                        int primaryColor = Theme.COLOR$1;
+                        int secondaryColor = Theme.COLOR$2;
 
                         primaryColor = primaryColor | 0xFF000000;
                         secondaryColor = secondaryColor | 0xFF000000;
@@ -302,7 +295,7 @@ public class DropDownClickGUI extends Screen {
 
                                     int filledWidth = (int) (sliderWidth * percentage);
                                     if(filledWidth > 0) {
-                                        RenderUtility.drawRoundedRect(context, sliderX, sliderY, filledWidth, sliderHeight, new Vector4f(2, 2, 2, 2), Theme.getCurrentTheme().getPrimaryColorInt());
+                                        RenderUtility.drawRoundedRect(context, sliderX, sliderY, filledWidth, sliderHeight, new Vector4f(2, 2, 2, 2), Theme.COLOR$1);
                                     }
 
                                     int knobSize = 10;
@@ -378,7 +371,8 @@ public class DropDownClickGUI extends Screen {
                                                         dropdownWidth - 4,
                                                         optionHeight - 4,
                                                         new Vector4f(3, 3, 3, 3),
-                                                        Theme.getCurrentTheme().getPrimaryColorInt());
+                                                        Theme.COLOR$1
+                                                );
 
                                                 int checkboxSize = 8;
                                                 int checkboxX = dropdownX + dropdownWidth - checkboxSize - 5;

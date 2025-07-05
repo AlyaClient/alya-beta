@@ -30,6 +30,25 @@ public class RenderUtility {
     private static final MinecraftClient MC = MinecraftClient.getInstance();
 
     /**
+     * Represents the four corners of a rectangle.
+     * <p>
+     * This enum is used to specify which corner of a rectangle is being targeted
+     * for rendering or calculation tasks in graphical operations. The enumeration
+     * includes:
+     * - TOP_LEFT: The top-left corner of a rectangle.
+     * - TOP_RIGHT: The top-right corner of a rectangle.
+     * - BOTTOM_RIGHT: The bottom-right corner of a rectangle.
+     * - BOTTOM_LEFT: The bottom-left corner of a rectangle.
+     * <p>
+     * It is typically utilized in graphical rendering methods to define or modify
+     * specific corners of a rounded rectangle, such as drawing filled or outlined
+     * corners, calculating pixel coverage, or rendering individual corner details.
+     */
+    private enum CornerType {
+        TOP_LEFT, TOP_RIGHT, BOTTOM_RIGHT, BOTTOM_LEFT
+    }
+
+    /**
      * Draws a filled rounded rectangle with the specified position, dimensions, corner radius, and color.
      *
      * @param context The {@code DrawContext} used for rendering the rounded rectangle.
@@ -270,22 +289,76 @@ public class RenderUtility {
     }
 
     public static void drawGradientRoundedRect(DrawContext context, int x, int y, int width, int height, Vector4f radius, int colorLeft, int colorRight) {
-        for (int i = 0; i < width; i++) {
-            float factor = (float) i / width;
+        int cornerSize = (int) Math.max(Math.max(radius.x, radius.y), Math.max(radius.z, radius.w));
+        int segments = Math.max(width / 2, 1);
+
+        for(int i = 0; i < segments; i++) {
+            int segmentStartX = x + (i * width) / segments;
+            int segmentEndX = x + ((i + 1) * width) / segments;
+            int segmentWidth = segmentEndX - segmentStartX;
+
+            float factor = segments > 1 ? (float) i / (segments - 1) : 0.0f;
             int interpolatedColor = ColorUtility.interpolateColor(colorLeft, colorRight, factor);
 
-            Vector4f columnRadius = new Vector4f(0, 0, 0, 0);
-            
-            if (i == 0) {
-                columnRadius.x = radius.x;
-                columnRadius.w = radius.w;
-            }
-            if (i == width - 1) {
-                columnRadius.y = radius.y;
-                columnRadius.z = radius.z;
+            context.fill(segmentStartX, y + (int) Math.max(radius.x, radius.y),
+                    segmentEndX, y + height - (int) Math.max(radius.z, radius.w), interpolatedColor);
+        }
+
+        for(int i = 0; i < segments; i++) {
+            int segmentStartX = x + (i * width) / segments;
+            int segmentEndX = x + ((i + 1) * width) / segments;
+
+            float factor = segments > 1 ? (float) i / (segments - 1) : 0.0f;
+            int interpolatedColor = ColorUtility.interpolateColor(colorLeft, colorRight, factor);
+
+            int topStartX = Math.max(segmentStartX, x + (int) radius.x);
+            int topEndX = Math.min(segmentEndX, x + width - (int) radius.y);
+            if(topStartX < topEndX) {
+                context.fill(topStartX, y, topEndX, y + (int) Math.max(radius.x, radius.y), interpolatedColor);
             }
 
-            drawRoundedRect(context, x + i, y, 1, height, columnRadius, interpolatedColor);
+            int bottomStartX = Math.max(segmentStartX, x + (int) radius.w);
+            int bottomEndX = Math.min(segmentEndX, x + width - (int) radius.z);
+            if(bottomStartX < bottomEndX) {
+                context.fill(bottomStartX, y + height - (int) Math.max(radius.z, radius.w),
+                        bottomEndX, y + height, interpolatedColor);
+            }
+        }
+
+        drawGradientCorner(context, x, y, (int) radius.x, colorLeft, CornerType.TOP_LEFT);
+        drawGradientCorner(context, x + width - (int) radius.y, y, (int) radius.y, colorRight, CornerType.TOP_RIGHT);
+        drawGradientCorner(context, x + width - (int) radius.z, y + height - (int) radius.z, (int) radius.z, colorRight, CornerType.BOTTOM_RIGHT);
+        drawGradientCorner(context, x, y + height - (int) radius.w, (int) radius.w, colorLeft, CornerType.BOTTOM_LEFT);
+    }
+
+    /**
+     * Draws a single corner with anti-aliasing and the specified color.
+     * This method uses the same anti-aliasing technique as your existing drawCorner method.
+     */
+    private static void drawGradientCorner(DrawContext context, int x, int y, int radius, int color, CornerType corner) {
+        if(radius <= 0) return;
+
+        int baseAlpha = (color >> 24) & 0xFF;
+        int red = (color >> 16) & 0xFF;
+        int green = (color >> 8) & 0xFF;
+        int blue = color & 0xFF;
+
+        for(int py = 0; py < radius; py++) {
+            for(int px = 0; px < radius; px++) {
+                float coverage = getPixelCoverage(px, py, radius, corner);
+
+                if(coverage > 0) {
+                    int alpha = (int) (baseAlpha * coverage);
+                    if(alpha > 0) {
+                        int pixelColor = (alpha << 24) | (red << 16) | (green << 8) | blue;
+
+                        int drawX = x + (corner == CornerType.TOP_RIGHT || corner == CornerType.BOTTOM_RIGHT ? radius - px - 1 : px);
+                        int drawY = y + (corner == CornerType.BOTTOM_LEFT || corner == CornerType.BOTTOM_RIGHT ? radius - py - 1 : py);
+
+                        context.fill(drawX, drawY, drawX + 1, drawY + 1, pixelColor);
+                    }
+                }
+            }
         }
     }
 
@@ -293,7 +366,30 @@ public class RenderUtility {
         context.fill((int) x, (int) y, (int) (x + width), (int) (y + height), color);
     }
 
-    private enum CornerType {
-        TOP_LEFT, TOP_RIGHT, BOTTOM_RIGHT, BOTTOM_LEFT
+    /**
+     * Draws a line between two points with specified thickness and color.
+     *
+     * @param context   The {@code DrawContext} used for rendering the line.
+     * @param x         The x-coordinate of the starting point of the line.
+     * @param y         The y-coordinate of the starting point of the line.
+     * @param toX       The*/
+    public static void drawLine(
+            DrawContext context,
+            int x,
+            int y,
+            int toX,
+            int toY,
+            float thickness,
+            int color
+    ) {
+        ExtendedDrawContext.drawLine(
+                context,
+                x,
+                y,
+                toX,
+                toY,
+                thickness,
+                new Color(color)
+        );
     }
 }

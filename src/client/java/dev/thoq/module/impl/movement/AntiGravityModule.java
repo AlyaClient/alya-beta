@@ -14,24 +14,35 @@
  *
  */
 
-package dev.thoq.module.impl.utility.disabler.cubecraft;
+package dev.thoq.module.impl.movement;
 
 import dev.thoq.event.IEventListener;
 import dev.thoq.event.impl.MotionEvent;
-import dev.thoq.event.impl.PacketSendEvent;
 import dev.thoq.module.Module;
-import dev.thoq.module.SubModule;
-import net.minecraft.client.MinecraftClient;
+import dev.thoq.module.ModuleCategory;
+import dev.thoq.utilities.player.TimerUtility;
 
-public class CubecraftDisabler extends SubModule {
-    public CubecraftDisabler(Module parent) {
-        super("Cubecraft", parent);
+public class AntiGravityModule extends Module {
+    public AntiGravityModule() {
+        super("AntiGravity", "Anti-Gravity", "Makes you feel like you're on the moon", ModuleCategory.MOVEMENT);
     }
 
     @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> motionEvent = event -> {
         if(mc.player == null) return;
 
-        event.setOnGround(mc.player.age % 2 == 0);
+        if(event.isPre()) {
+            if(mc.player.isOnGround())
+                TimerUtility.setTimerSpeed(0.97);
+            else
+                TimerUtility.setTimerSpeed(0.87658);
+        }
     };
+
+    @Override
+    public void onDisable() {
+        if(mc.player == null) return;
+
+        TimerUtility.resetTimer();
+    }
 }

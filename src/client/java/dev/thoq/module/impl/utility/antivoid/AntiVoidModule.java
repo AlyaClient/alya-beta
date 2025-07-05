@@ -14,22 +14,18 @@
  *
  */
 
-package dev.thoq.module.impl.utility.disabler;
+package dev.thoq.module.impl.utility.antivoid;
 
 import dev.thoq.module.Module;
 import dev.thoq.module.ModuleCategory;
-import dev.thoq.module.impl.utility.disabler.cubecraft.CubecraftDisabler;
-import dev.thoq.module.impl.utility.disabler.omnisprint.OmniSprintDisabler;
-import dev.thoq.module.impl.utility.disabler.spartan.SpartanDisabler;
+import dev.thoq.module.impl.utility.antivoid.position.PositionAntiVoid;
 
-public class DisablerModule extends Module {
-    public DisablerModule() {
-        super("Disabler", "Partially or fully disable some anticheats", ModuleCategory.UTILITY);
+public class AntiVoidModule extends Module {
+    public AntiVoidModule() {
+        super("AntiVoid", "Anti-Void", "Prevents you from falling in the void", ModuleCategory.UTILITY);
 
         this.addSubmodules(
-                new SpartanDisabler(this),
-                new OmniSprintDisabler(this),
-                new CubecraftDisabler(this)
+                new PositionAntiVoid(this)
         );
     }
 

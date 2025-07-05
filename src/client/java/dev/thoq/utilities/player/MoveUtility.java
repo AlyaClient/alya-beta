@@ -217,4 +217,23 @@ public class MoveUtility {
     public static double getVanillaPlayerSprintSpeed() {
         return VANILLA_PLAYER_SPRINT_SPEED;
     }
+
+    /**
+     * Calculates the square of the horizontal speed of the player.
+     * The computation is based on the player's velocity along the X and Z axes.
+     * If the player instance is null, the method will return 0.0.
+     *
+     * @return The squared horizontal speed of the player, or 0.0 if the player is not present.
+     */
+    public static double getSpeed() {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        ClientPlayerEntity player = mc.player;
+
+        if(player == null) return 0.0;
+
+        double motionX = player.getVelocity().x;
+        double motionZ = player.getVelocity().z;
+
+        return motionX * motionX + motionZ * motionZ;
+    }
 }

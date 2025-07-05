@@ -41,7 +41,7 @@ public class VerusSpeed extends SubModule {
             return;
 
         if(forwardOnly)
-            MoveUtility.setSpeed(0.29f, true);
+            MoveUtility.setSpeed(0.285f, true);
         else
             MoveUtility.setSpeed(0.26f, true);
 

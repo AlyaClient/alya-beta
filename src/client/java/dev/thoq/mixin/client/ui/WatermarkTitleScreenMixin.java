@@ -17,6 +17,7 @@
 package dev.thoq.mixin.client.ui;
 
 import dev.thoq.RyeClient;
+import dev.thoq.utilities.misc.RyeConstants;
 import dev.thoq.utilities.render.ColorUtility;
 import dev.thoq.utilities.render.TextRendererUtility;
 import net.minecraft.client.gui.*;
@@ -42,18 +43,30 @@ public class WatermarkTitleScreenMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LogoDrawer;draw(Lnet/minecraft/client/gui/DrawContext;IF)V"))
     private void renderRyeLogo(LogoDrawer logoDrawer, DrawContext context, int width, float alpha) {
-        // don't draw the minecraft logo
-
         String text = "Rye";
-        int x = context.getScaledWindowWidth() / 2 - TextRendererUtility.getXlTextWidth(text) / 2;
-        int y = Math.round(context.getScaledWindowHeight() / 4.5f);
+        String versionText = RyeConstants.VERSION;
+
+        int tX = context.getScaledWindowWidth() / 2 - TextRendererUtility.getXlTextWidth(text) / 2;
+        int tY = Math.round(context.getScaledWindowHeight() / 4.5f);
+
+        int vX = tX + TextRendererUtility.getXlTextWidth(text);
+        int vY = tY - TextRendererUtility.getXlTextHeight() * 3;
 
         TextRendererUtility.renderXlText(
                 context,
                 text,
                 ColorUtility.Colors.WHITE,
-                x,
-                y,
+                tX,
+                tY,
+                false
+        );
+
+        TextRendererUtility.renderText(
+                context,
+                versionText,
+                ColorUtility.Colors.WHITE,
+                vX,
+                vY,
                 false
         );
     }
@@ -64,8 +77,7 @@ public class WatermarkTitleScreenMixin {
 
         // we ignore demo and modded
 
-        // I think I want to stop this
-        // its cleaner
+        // I think I want to stop this-its cleaner
         // context.drawTextWithShadow(textRenderer, ryeVersion, x, y, color);
     }
 

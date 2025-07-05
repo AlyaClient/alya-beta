@@ -14,17 +14,13 @@
  *
  */
 
-package dev.thoq.utilities.render;
+package dev.thoq.utilities.misc;
 
-public class Theme {
-    public static int COLOR$1 = 0xFFB734EB;
-    public static int COLOR$2 = 0xFF8334EB;
+import net.minecraft.util.math.BlockPos;
 
-    public static int getInterpolatedColors(float factor) {
-        return ColorUtility.interpolateColor(
-                COLOR$1,
-                COLOR$2,
-                factor
-        );
+public record DoubleBlockPos(double x, double y, double z) {
+
+    public BlockPos toBlockPos() {
+        return new BlockPos((int) x, (int) y, (int) z);
     }
 }

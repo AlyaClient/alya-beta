@@ -21,6 +21,7 @@ import dev.thoq.module.ModuleCategory;
 import dev.thoq.module.impl.movement.speed.blocksmc.BlocksMCSpeed;
 import dev.thoq.module.impl.movement.speed.ncp.NCPSpeed;
 import dev.thoq.module.impl.movement.speed.normal.NormalSpeed;
+import dev.thoq.module.impl.movement.speed.spartan.SpartanSpeed;
 import dev.thoq.module.impl.movement.speed.verus.VerusSpeed;
 import dev.thoq.utilities.player.TimerUtility;
 
@@ -34,7 +35,8 @@ public class SpeedModule extends Module {
                 new NormalSpeed(this),
                 new NCPSpeed(this),
                 new VerusSpeed(this),
-                new BlocksMCSpeed(this)
+                new BlocksMCSpeed(this),
+                new SpartanSpeed(this)
         );
     }
 
