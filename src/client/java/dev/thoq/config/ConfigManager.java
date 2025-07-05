@@ -24,6 +24,7 @@ import dev.thoq.config.setting.Setting;
 import dev.thoq.config.setting.impl.ModeSetting;
 import dev.thoq.config.setting.impl.NumberSetting;
 import dev.thoq.module.Module;
+import dev.thoq.module.ModuleCategory;
 import dev.thoq.utilities.misc.ChatUtility;
 import net.minecraft.client.MinecraftClient;
 
@@ -64,9 +65,16 @@ public class ConfigManager {
         Map<String, Integer> keybinds = new LinkedHashMap<>();
 
         for(Module module : RyeClient.INSTANCE.getModuleRepository().getModules()) {
+            // Skip visual modules (except for enabled state) as they are handled by VisualManager
+            if (module.getCategory() == ModuleCategory.VISUAL) {
+                Map<String, Object> moduleConfig = new LinkedHashMap<>();
+                moduleConfig.put("enabled", module.isEnabled());
+                modulesConfig.put(module.getName(), moduleConfig);
+                continue;
+            }
+
             switch(module.getName().toLowerCase()) {
                 // these are user preference so do not save them
-                // todo: save user-preference modules to separate local config file
                 case "clickgui",
                      "ambience",
                      "discordrpc",

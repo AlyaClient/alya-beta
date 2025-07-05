@@ -120,6 +120,11 @@ public abstract class Module {
             RyeClient.getEventBus().unsubscribe(this);
             onDisable();
         }
+
+        if(this.category == ModuleCategory.VISUAL && MinecraftClient.getInstance().player != null) {
+            dev.thoq.config.VisualManager.getInstance().updateVisualModuleData(this);
+            dev.thoq.config.VisualManager.getInstance().saveVisualData();
+        }
     }
 
     public void toggle() {
@@ -154,6 +159,7 @@ public abstract class Module {
 
     /**
      * Sets a prefix for this module that will be displayed in the arraylist
+     *
      * @param prefix The prefix to display before the module name
      */
     public void setPrefix(String prefix) {
@@ -162,6 +168,7 @@ public abstract class Module {
 
     /**
      * Gets the current prefix for this module
+     *
      * @return The current prefix, or empty string if none is set
      */
     public String getPrefix() {

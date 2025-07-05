@@ -17,8 +17,8 @@
 package dev.thoq.utilities.render;
 
 public class Theme {
-    public static int COLOR$1 = 0xFFB734EB;
-    public static int COLOR$2 = 0xFF8334EB;
+    public static int COLOR$1 = 0xDDFF00B3;
+    public static int COLOR$2 = 0xDDFF8800;
 
     public static int getInterpolatedColors(float factor) {
         return ColorUtility.interpolateColor(

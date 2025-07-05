@@ -20,6 +20,7 @@ import dev.thoq.command.CommandBuilder;
 import dev.thoq.command.CommandRepository;
 import dev.thoq.command.impl.*;
 import dev.thoq.config.KeybindManager;
+import dev.thoq.config.VisualManager;
 import dev.thoq.event.EventBus;
 import dev.thoq.module.ModuleBuilder;
 import dev.thoq.module.ModuleRepository;
@@ -72,6 +73,7 @@ public class RyeClient implements ClientModInitializer {
     private static double lastBps = 0.0;
     private static final Set<Integer> previouslyPressedKeys = new HashSet<>();
     private static EventBus eventBus;
+    private static boolean wasInGame = false;
 
     @Override
     public void onInitializeClient() {
@@ -79,14 +81,13 @@ public class RyeClient implements ClientModInitializer {
 
         eventBus = new EventBus();
 
-        // DiscordIntegration.initialize();
-
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> IconLoader.setWindowIcon(client.getWindow().getHandle()));
 
         initializeModules();
         initializeCommands();
 
         KeybindManager.getInstance().initialize();
+        VisualManager.getInstance().initialize();
 
         CommandRegistrationCallback.EVENT.register((
                 dispatcher,
@@ -113,6 +114,22 @@ public class RyeClient implements ClientModInitializer {
 
             previouslyPressedKeys.clear();
             previouslyPressedKeys.addAll(currentlyPressed);
+        });
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            boolean isInGame = client.player != null && client.world != null;
+
+            if(isInGame && !wasInGame) {
+                VisualManager.getInstance().applyVisualData();
+                LOGGER.info("Applied visual module data after joining world");
+            }
+
+            if(!isInGame && wasInGame) {
+                VisualManager.getInstance().saveVisualData();
+                LOGGER.info("Saved visual module data after leaving world");
+            }
+
+            wasInGame = isInGame;
         });
     }
 
@@ -151,7 +168,8 @@ public class RyeClient implements ClientModInitializer {
                         new CapeModule(),
                         new AntiGravityModule(),
                         new AntiVoidModule(),
-                        new TargetStrafeModule()
+                        new TargetStrafeModule(),
+                        new SpeedMonitorModule()
                 );
     }
 

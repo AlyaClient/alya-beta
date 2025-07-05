@@ -16,6 +16,8 @@
 
 package dev.thoq.utilities.render;
 
+import net.minecraft.client.MinecraftClient;
+
 /**
  * Utility class for handling dragging operations in GUI elements.
  */
@@ -56,13 +58,13 @@ public class DragUtility {
      * @param mouseY The current mouse Y position
      */
     public void updateDragPosition(int mouseX, int mouseY) {
-        if (dragging) {
+        if(dragging) {
             int deltaX = mouseX - lastMouseX;
             int deltaY = mouseY - lastMouseY;
-            
+
             elementX += deltaX;
             elementY += deltaY;
-            
+
             lastMouseX = mouseX;
             lastMouseY = mouseY;
         }
@@ -72,7 +74,12 @@ public class DragUtility {
      * Stops the current dragging operation.
      */
     public void stopDragging() {
-        this.dragging = false;
+        if(this.dragging) {
+            this.dragging = false;
+            if(MinecraftClient.getInstance().player != null) {
+                dev.thoq.config.VisualManager.getInstance().saveVisualData();
+            }
+        }
     }
 
     /**
