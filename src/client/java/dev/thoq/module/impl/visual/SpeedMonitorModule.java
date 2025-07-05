@@ -30,12 +30,11 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @SuppressWarnings("SameParameterValue")
 public class SpeedMonitorModule extends Module {
-    private final List<Double> bpsHistory = new ArrayList<>();
+    private final double[] bpsHistory = new double[100];
+    private int historyIndex = 0;
+    private int historySize = 0;
     private final DragUtility dragUtility = new DragUtility(4, 37);
 
     public SpeedMonitorModule() {
@@ -52,7 +51,6 @@ public class SpeedMonitorModule extends Module {
         final Vector4f radius = new Vector4f(10f, 10f, 10f, 10f);
         final int rectWidth = 200;
         final int rectHeight = 85;
-        final int maxHistorySize = 100;
 
         handleMouseInput(xPosition, yPosition, rectWidth, rectHeight);
 
@@ -69,10 +67,12 @@ public class SpeedMonitorModule extends Module {
 
         String currentBps = RyeClient.getBps();
         double bpsValue = Double.parseDouble(currentBps);
+        int maxHistorySize = 100;
 
-        bpsHistory.add(bpsValue);
-        if(bpsHistory.size() > maxHistorySize) {
-            bpsHistory.removeFirst();
+        bpsHistory[historyIndex] = bpsValue;
+        historyIndex = (historyIndex + 1) % maxHistorySize;
+        if (historySize < maxHistorySize) {
+            historySize++;
         }
 
         int contentX = xPosition + (padding - 1);
@@ -125,16 +125,19 @@ public class SpeedMonitorModule extends Module {
                 0x44000000
         );
 
-        if(bpsHistory.size() > 1) {
+        if(historySize > 1) {
             double maxBps = 100;
 
-            for(int i = 1; i < bpsHistory.size(); i++) {
-                double prevBps = bpsHistory.get(i - 1);
-                double currBps = bpsHistory.get(i);
+            for(int i = 1; i < historySize; i++) {
+                int prevIndex = (historyIndex - historySize + i - 1 + maxHistorySize) % maxHistorySize;
+                int currIndex = (historyIndex - historySize + i + maxHistorySize) % maxHistorySize;
 
-                int x1 = contentX + (int)((double)(i - 1) / (bpsHistory.size() - 1) * graphWidth);
+                double prevBps = bpsHistory[prevIndex];
+                double currBps = bpsHistory[currIndex];
+
+                int x1 = contentX + (int)((double)(i - 1) / (historySize - 1) * graphWidth);
                 int y1 = graphY + graphHeight - (int)(Math.min(prevBps, maxBps) / maxBps * graphHeight);
-                int x2 = contentX + (int)((double)i / (bpsHistory.size() - 1) * graphWidth);
+                int x2 = contentX + (int)((double)i / (historySize - 1) * graphWidth);
                 int y2 = graphY + graphHeight - (int)(Math.min(currBps, maxBps) / maxBps * graphHeight);
 
                 y1 = Math.max(y1, graphY);
