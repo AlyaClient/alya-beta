@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "tenacity",
+	"id": "alya",
 	"version": "${version}",
-	"name": "Tenacity",
-	"description": "Meow",
+	"name": "Alya",
+	"description": "Meowla",
 	"authors": [
 		"Thoq"
 	],
@@ -12,20 +12,20 @@
 		"sources": "https://github.com/ryeclient/rye-v1"
 	},
 	"license": "MIT",
-	"icon": "assets/tenacity/icon.png",
+	"icon": "assets/alya/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"rip.tenacity.Tenacity"
+			"works.alya.Alya"
 		],
 		"client": [
-			"rip.tenacity.TenacityClient"
+			"works.alya.AlyaClient"
 		]
 	},
 	"mixins": [
-		"tenacity.mixins.json",
+		"alya.mixins.json",
 		{
-			"config": "tenacity.client.mixins.json",
+			"config": "alya.client.mixins.json",
 			"environment": "client"
 		}
 	],
