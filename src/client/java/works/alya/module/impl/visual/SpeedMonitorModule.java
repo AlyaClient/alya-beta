@@ -32,10 +32,12 @@ import org.lwjgl.glfw.GLFW;
 
 @SuppressWarnings("SameParameterValue")
 public class SpeedMonitorModule extends Module {
-    private final double[] bpsHistory = new double[100];
+    private final double[] bpsHistory = new double[1000];
     private int historyIndex = 0;
     private int historySize = 0;
     private final DragUtility dragUtility = new DragUtility(4, 60);
+    private static final int WHITE_COLOR = ColorUtility.getColor(ColorUtility.Colors.WHITE);
+    private static final int MAX_HISTORY_SIZE = 1000;
 
     public SpeedMonitorModule() {
         super("SpeedMonitor", "Speed Monitor", "Shows the average player speed and a graph", ModuleCategory.VISUAL);
@@ -50,8 +52,8 @@ public class SpeedMonitorModule extends Module {
         final int yPosition = dragUtility.getY();
         final Vector4f radius = new Vector4f(10f, 10f, 10f, 10f);
         final Vector4f graphBgRadius = new Vector4f(6f, 6f, 6f, 6f);
-        final int rectWidth = 200;
-        final int rectHeight = 85;
+        final int rectWidth = 170;
+        final int rectHeight = 75;
 
         handleMouseInput(xPosition, yPosition, rectWidth, rectHeight);
 
@@ -68,22 +70,22 @@ public class SpeedMonitorModule extends Module {
 
         String currentBps = AlyaClient.getBps();
         double bpsValue = Double.parseDouble(currentBps);
-        int maxHistorySize = 100;
+        int maxHistorySize = 1000;
 
         bpsHistory[historyIndex] = bpsValue;
         historyIndex = (historyIndex + 1) % maxHistorySize;
-        if (historySize < maxHistorySize) {
+        if(historySize < maxHistorySize) {
             historySize++;
         }
 
         int contentX = xPosition + (padding - 1);
         int contentY = yPosition + (padding * 2) + 2;
         int graphY;
-        int graphHeight = 60 - padding;
+        int graphHeight = 50 - padding;
         int graphWidth = rectWidth - (padding * 2) + 2;
         int cordsY = mc.getWindow().getScaledHeight() - 10;
 
-        Vec3d position =  mc.player.getPos();
+        Vec3d position = mc.player.getPos();
         String cordsText = String.format("XYZ: %.1f %.1f %.1f", position.x, position.y, position.z);
         String averageBps = AlyaClient.getBps();
         String averageText = String.format("Average: %.1f", Double.parseDouble(averageBps));
@@ -129,17 +131,21 @@ public class SpeedMonitorModule extends Module {
         if(historySize > 1) {
             double maxBps = 100;
 
+            int graphWidthMinus1 = graphWidth - 1;
+            int historySizeMinus1 = historySize - 1;
+            int startIndex = (historyIndex - historySize + MAX_HISTORY_SIZE) % MAX_HISTORY_SIZE;
+
             for(int i = 1; i < historySize; i++) {
-                int prevIndex = (historyIndex - historySize + i - 1 + maxHistorySize) % maxHistorySize;
-                int currIndex = (historyIndex - historySize + i + maxHistorySize) % maxHistorySize;
+                int prevIndex = (startIndex + i - 1) % MAX_HISTORY_SIZE;
+                int currIndex = (startIndex + i) % MAX_HISTORY_SIZE;
 
                 double prevBps = bpsHistory[prevIndex];
                 double currBps = bpsHistory[currIndex];
 
-                int x1 = contentX + (int)((double)(i - 1) / (historySize - 1) * graphWidth);
-                int y1 = graphY + graphHeight - (int)(Math.min(prevBps, maxBps) / maxBps * graphHeight);
-                int x2 = contentX + (int)((double)i / (historySize - 1) * graphWidth);
-                int y2 = graphY + graphHeight - (int)(Math.min(currBps, maxBps) / maxBps * graphHeight);
+                int x1 = contentX + ((i - 1) * graphWidthMinus1) / historySizeMinus1;
+                int y1 = graphY + graphHeight - (int) (Math.min(prevBps, maxBps) * graphHeight / maxBps);
+                int x2 = contentX + (i * graphWidthMinus1) / historySizeMinus1;
+                int y2 = graphY + graphHeight - (int) (Math.min(currBps, maxBps) * graphHeight / maxBps);
 
                 y1 = Math.max(y1, graphY);
                 y2 = Math.max(y2, graphY);
@@ -148,29 +154,29 @@ public class SpeedMonitorModule extends Module {
                         event.getContext(),
                         x1, y1, x2, y2,
                         2f,
-                        ColorUtility.getColor(ColorUtility.Colors.WHITE)
+                        WHITE_COLOR
                 );
             }
         }
     };
 
     private void handleMouseInput(int x, int y, int width, int height) {
-        if (mc.mouse == null) return;
+        if(mc.mouse == null) return;
 
         double mouseX = mc.mouse.getX() / mc.getWindow().getScaleFactor();
         double mouseY = mc.mouse.getY() / mc.getWindow().getScaleFactor();
 
         boolean isMouseInside = mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + height;
 
-        if (GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS) {
-            if (isMouseInside && !dragUtility.isDragging()) {
-                dragUtility.startDragging((int)mouseX, (int)mouseY);
+        if(GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS) {
+            if(isMouseInside && !dragUtility.isDragging()) {
+                dragUtility.startDragging((int) mouseX, (int) mouseY);
             }
-            if (dragUtility.isDragging()) {
-                dragUtility.updateDragPosition((int)mouseX, (int)mouseY);
+            if(dragUtility.isDragging()) {
+                dragUtility.updateDragPosition((int) mouseX, (int) mouseY);
             }
         } else {
-            if (dragUtility.isDragging()) {
+            if(dragUtility.isDragging()) {
                 dragUtility.stopDragging();
             }
         }

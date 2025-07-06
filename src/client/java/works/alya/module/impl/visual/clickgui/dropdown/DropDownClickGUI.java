@@ -161,7 +161,7 @@ public class DropDownClickGUI extends Screen {
                     false
             );
 
-            Identifier img = Identifier.of("aly", "icons/category/" + category.toString().toLowerCase() + ".png");
+            Identifier img = Identifier.of("alya", "icons/category/" + category.toString().toLowerCase() + ".png");
             RenderUtility.drawImage(
                     img,
                     categoryX + PANEL_WIDTH - 10 - PADDING,

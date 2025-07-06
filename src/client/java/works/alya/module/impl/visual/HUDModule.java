@@ -54,7 +54,7 @@ public class HUDModule extends Module {
                 event.getContext()
         );
 
-        int lowerHudY = mc.getWindow().getScaledHeight() - 10;
+        int lowerHudY = mc.getWindow().getScaledHeight() - 30;
         Vec3d position = mc.player.getPos();
         String fpsText = String.format("FPS: %s", AlyaClient.getFps());
         String bpsText = String.format("BPS: %s", AlyaClient.getBps());
@@ -69,7 +69,7 @@ public class HUDModule extends Module {
                 false
         );
 
-        lowerHudY += TextRendererUtility.getTextHeight() + 2;
+        lowerHudY += TextRendererUtility.getTextHeight() + 1;
 
         TextRendererUtility.renderText(
                 event.getContext(),
@@ -80,7 +80,7 @@ public class HUDModule extends Module {
                 false
         );
 
-        lowerHudY += TextRendererUtility.getTextHeight() + 2;
+        lowerHudY += TextRendererUtility.getTextHeight() + 1;
 
         TextRendererUtility.renderText(
                 event.getContext(),

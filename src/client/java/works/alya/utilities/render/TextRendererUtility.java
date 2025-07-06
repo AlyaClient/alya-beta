@@ -25,7 +25,7 @@ public class TextRendererUtility {
 
     static TextRenderer renderer = FontManager.getFont("sf_pro_rounded_regular", 11);
     static TextRenderer rendererMd = FontManager.getFont("sf_pro_rounded_regular", 15);
-    static TextRenderer rendererXl = FontManager.getFont("sf_pro_rounded_regular", 50);
+    static TextRenderer rendererXl = FontManager.getFont("sf_pro_rounded_regular", 40);
 
     /**
      * Renders a text string on the screen at the specified position with a designated color and optional shadow.
