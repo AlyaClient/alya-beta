@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "rye",
+	"id": "alya",
 	"version": "${version}",
-	"name": "rye",
-	"description": "Meow",
+	"name": "Alya",
+	"description": "Meowla",
 	"authors": [
 		"Thoq"
 	],
@@ -12,20 +12,20 @@
 		"sources": "https://github.com/ryeclient/rye-v1"
 	},
 	"license": "MIT",
-	"icon": "assets/rye/icon.png",
+	"icon": "assets/alya/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.thoq.Rye"
+			"works.alya.Alya"
 		],
 		"client": [
-			"dev.thoq.RyeClient"
+			"works.alya.AlyaClient"
 		]
 	},
 	"mixins": [
-		"rye.mixins.json",
+		"alya.mixins.json",
 		{
-			"config": "rye.client.mixins.json",
+			"config": "alya.client.mixins.json",
 			"environment": "client"
 		}
 	],

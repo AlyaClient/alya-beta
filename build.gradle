@@ -1,14 +1,14 @@
 /*
- * Copyright (c) Rye Client 2024-2025.
+ * Copyright (c) Alya Client 2024-2025.
  *
- * This file belongs to Rye Client,
+ * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/RyeClient/rye-v1.git
+ * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
  *
- * Rye (and subsequently, its files) are all licensed under the MIT License.
- * Rye should have come with a copy of the MIT License.
+ * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  * MIT License: https://opensource.org/license/mit
  *
@@ -52,7 +52,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"rye" {
+		"alya" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
@@ -76,6 +76,13 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
+	// GraalVM JavaScript for scripting (replacement for Nashorn)
+	include(implementation('org.graalvm.js:js:22.3.1'))
+	include(implementation('org.graalvm.js:js-scriptengine:22.3.1'))
+	include(implementation('org.graalvm.regex:regex:22.3.1'))
+	include(implementation('org.graalvm.sdk:graal-sdk:22.3.1'))
+	include(implementation('org.graalvm.truffle:truffle-api:22.3.1'))
+
 	// LWJGL HarfBuzz bindings
 	include(implementation("org.lwjgl:lwjgl-harfbuzz:3.3.3"))
 
@@ -84,7 +91,7 @@ dependencies {
 	include(implementation("org.lwjgl:lwjgl-harfbuzz:3.3.3:natives-${lwjglNatives}"))
 
 	// i do not want to make a renderer
-	include(modImplementation "io.github.0x3c50.renderer:renderer-fabric:2.1.0")
+	include(modImplementation("io.github.0x3c50.renderer:renderer-fabric:2.1.1"))
 }
 
 processResources {
