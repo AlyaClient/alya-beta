@@ -18,7 +18,7 @@ package works.alya.utilities.misc;
 
 public class AlyaConstants {
     public static final String NAME = "Alya";
-    public static final String VERSION = "6.0";
+    public static final String VERSION = "0.1";
     public static final String KIND = "Beta";
     public static final String BUILD_NUMBER = "07052025.6";
 }
