@@ -52,7 +52,7 @@ loom {
 	splitEnvironmentSourceSets()
 
 	mods {
-		"rye" {
+		"tenacity" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}

@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "rye",
+	"id": "tenacity",
 	"version": "${version}",
-	"name": "rye",
+	"name": "Tenacity",
 	"description": "Meow",
 	"authors": [
 		"Thoq"
@@ -12,20 +12,20 @@
 		"sources": "https://github.com/ryeclient/rye-v1"
 	},
 	"license": "MIT",
-	"icon": "assets/rye/icon.png",
+	"icon": "assets/tenacity/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.thoq.Rye"
+			"rip.tenacity.Tenacity"
 		],
 		"client": [
-			"dev.thoq.RyeClient"
+			"rip.tenacity.TenacityClient"
 		]
 	},
 	"mixins": [
-		"rye.mixins.json",
+		"tenacity.mixins.json",
 		{
-			"config": "rye.client.mixins.json",
+			"config": "tenacity.client.mixins.json",
 			"environment": "client"
 		}
 	],
