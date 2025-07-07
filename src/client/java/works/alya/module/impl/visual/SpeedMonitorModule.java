@@ -32,12 +32,13 @@ import org.lwjgl.glfw.GLFW;
 
 @SuppressWarnings("SameParameterValue")
 public class SpeedMonitorModule extends Module {
-    private final double[] bpsHistory = new double[1000];
+    private final double[] bpsHistory = new double[200];
     private int historyIndex = 0;
     private int historySize = 0;
     private final DragUtility dragUtility = new DragUtility(4, 60);
     private static final int WHITE_COLOR = ColorUtility.getColor(ColorUtility.Colors.WHITE);
-    private static final int MAX_HISTORY_SIZE = 1000;
+    private static final int MAX_HISTORY_SIZE = 200;
+    private static final int MAX_RENDER_POINTS = 100;
 
     public SpeedMonitorModule() {
         super("SpeedMonitor", "Speed Monitor", "Shows the average player speed and a graph", ModuleCategory.VISUAL);
@@ -70,23 +71,16 @@ public class SpeedMonitorModule extends Module {
 
         String currentBps = AlyaClient.getBps();
         double bpsValue = Double.parseDouble(currentBps);
-        int maxHistorySize = 1000;
 
-        bpsHistory[historyIndex] = bpsValue;
-        historyIndex = (historyIndex + 1) % maxHistorySize;
-        if(historySize < maxHistorySize) {
-            historySize++;
-        }
+        updateSpeedHistory(bpsValue);
 
         int contentX = xPosition + (padding - 1);
         int contentY = yPosition + (padding * 2) + 2;
         int graphY;
         int graphHeight = 50 - padding;
         int graphWidth = rectWidth - (padding * 2) + 2;
-        int cordsY = mc.getWindow().getScaledHeight() - 10;
 
         Vec3d position = mc.player.getPos();
-        String cordsText = String.format("XYZ: %.1f %.1f %.1f", position.x, position.y, position.z);
         String averageBps = AlyaClient.getBps();
         String averageText = String.format("Average: %.1f", Double.parseDouble(averageBps));
 
@@ -128,37 +122,55 @@ public class SpeedMonitorModule extends Module {
                 0x44000000
         );
 
-        if(historySize > 1) {
-            double maxBps = 100;
+        renderSpeedGraph(event, contentX, graphY, graphWidth, graphHeight);
+    };
 
-            int graphWidthMinus1 = graphWidth - 1;
-            int historySizeMinus1 = historySize - 1;
-            int startIndex = (historyIndex - historySize + MAX_HISTORY_SIZE) % MAX_HISTORY_SIZE;
+    private void updateSpeedHistory(double bpsValue) {
+        bpsHistory[historyIndex] = bpsValue;
+        historyIndex = (historyIndex + 1) % MAX_HISTORY_SIZE;
+        if(historySize < MAX_HISTORY_SIZE) {
+            historySize++;
+        }
+    }
 
-            for(int i = 1; i < historySize; i++) {
-                int prevIndex = (startIndex + i - 1) % MAX_HISTORY_SIZE;
-                int currIndex = (startIndex + i) % MAX_HISTORY_SIZE;
+    private void renderSpeedGraph(Render2DEvent event, int contentX, int graphY, int graphWidth, int graphHeight) {
+        if(historySize <= 1) return;
 
-                double prevBps = bpsHistory[prevIndex];
-                double currBps = bpsHistory[currIndex];
+        double maxBps = 100;
 
-                int x1 = contentX + ((i - 1) * graphWidthMinus1) / historySizeMinus1;
-                int y1 = graphY + graphHeight - (int) (Math.min(prevBps, maxBps) * graphHeight / maxBps);
-                int x2 = contentX + (i * graphWidthMinus1) / historySizeMinus1;
-                int y2 = graphY + graphHeight - (int) (Math.min(currBps, maxBps) * graphHeight / maxBps);
+        int renderPoints = Math.min(historySize, MAX_RENDER_POINTS);
+        int stepSize = Math.max(1, historySize / renderPoints);
+        int graphWidthMinus1 = graphWidth - 1;
+        int renderPointsMinus1 = renderPoints - 1;
+        int startIndex = (historyIndex - historySize + MAX_HISTORY_SIZE) % MAX_HISTORY_SIZE;
 
-                y1 = Math.max(y1, graphY);
-                y2 = Math.max(y2, graphY);
+        for(int i = 1; i < renderPoints; i++) {
+            int prevDataIndex = (startIndex + (i - 1) * stepSize) % MAX_HISTORY_SIZE;
+            int currDataIndex = (startIndex + i * stepSize) % MAX_HISTORY_SIZE;
 
+            double prevBps = bpsHistory[prevDataIndex];
+            double currBps = bpsHistory[currDataIndex];
+
+            int x1 = contentX + ((i - 1) * graphWidthMinus1) / renderPointsMinus1;
+            int y1 = graphY + graphHeight - (int) (Math.min(prevBps, maxBps) * graphHeight / maxBps);
+            int x2 = contentX + (i * graphWidthMinus1) / renderPointsMinus1;
+            int y2 = graphY + graphHeight - (int) (Math.min(currBps, maxBps) * graphHeight / maxBps);
+
+            y1 = Math.max(y1, graphY);
+            y2 = Math.max(y2, graphY);
+            y1 = Math.min(y1, graphY + graphHeight);
+            y2 = Math.min(y2, graphY + graphHeight);
+
+            if(x1 != x2 || y1 != y2) {
                 RenderUtility.drawLine(
                         event.getContext(),
                         x1, y1, x2, y2,
-                        2f,
+                        1.5f,
                         WHITE_COLOR
                 );
             }
         }
-    };
+    }
 
     private void handleMouseInput(int x, int y, int width, int height) {
         if(mc.mouse == null) return;
@@ -180,5 +192,13 @@ public class SpeedMonitorModule extends Module {
                 dragUtility.stopDragging();
             }
         }
+    }
+
+    @Override
+    protected void onDisable() {
+        historyIndex = 0;
+        historySize = 0;
+
+        super.onDisable();
     }
 }

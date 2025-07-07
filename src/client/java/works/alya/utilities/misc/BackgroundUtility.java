@@ -24,7 +24,7 @@ import net.minecraft.util.Identifier;
 import java.util.Random;
 
 public class BackgroundUtility {
-    private static final int MAX_STARS = 200;
+    private static final int MAX_STARS = 1000;
     private static final Star[] stars = new Star[MAX_STARS];
     private static final Random random = new Random();
     private static boolean initialized = false;
@@ -87,8 +87,8 @@ public class BackgroundUtility {
     private static class FloatingKitty {
         double x, y;
         double velocityX, velocityY;
-        int width = 128;
-        int height = 128;
+        int width = 64;
+        int height = 64;
         boolean initialized = false;
 
         void initialize(int screenWidth, int screenHeight) {
