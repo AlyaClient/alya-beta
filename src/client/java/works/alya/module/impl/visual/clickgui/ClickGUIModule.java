@@ -19,14 +19,18 @@ package works.alya.module.impl.visual.clickgui;
 import works.alya.AlyaClient;
 import works.alya.config.KeybindManager;
 import works.alya.config.setting.impl.BooleanSetting;
+import works.alya.config.setting.impl.ModeSetting;
 import works.alya.module.Module;
 import works.alya.module.ModuleCategory;
+import works.alya.module.impl.visual.clickgui.astolfo.AstolfoClickGUI;
 import works.alya.module.impl.visual.clickgui.dropdown.DropDownClickGUI;
 import net.minecraft.client.MinecraftClient;
 import org.lwjgl.glfw.GLFW;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class ClickGUIModule extends Module {
 
+    private final ModeSetting guiMode = new ModeSetting("GUI Mode", "GUI Mode", "Dropdown", "Dropdown", "Astolfo");
     private final BooleanSetting showTooltips = new BooleanSetting("ShowTooltips", "Show tooltips when hovering over modules and settings", true);
 
     public ClickGUIModule() {
@@ -35,12 +39,24 @@ public class ClickGUIModule extends Module {
         KeybindManager.getInstance().bind(this, GLFW.GLFW_KEY_RIGHT_SHIFT);
         AlyaClient.getEventBus().subscribe(this);
 
+        addSetting(guiMode);
         addSetting(showTooltips);
     }
 
     @Override
     protected void onEnable() {
-        MinecraftClient.getInstance().setScreen(new DropDownClickGUI(showTooltips.getValue()));
+        String mode = ((ModeSetting) getSetting("GUI Mode")).getValue();
+
+        switch(mode) {
+            case "Dropdown":
+                MinecraftClient.getInstance().setScreen(new DropDownClickGUI(showTooltips.getValue()));
+                break;
+            case "Astolfo":
+                MinecraftClient.getInstance().setScreen(new AstolfoClickGUI());
+                break;
+        }
+
+        super.onEnable();
         super.setEnabled(false);
     }
 }

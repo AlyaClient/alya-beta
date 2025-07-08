@@ -123,7 +123,7 @@ public class TextRendererUtility {
     public static void renderDynamicText(
             DrawContext context,
             String text,
-            Colors color,
+            int color,
             int posX,
             int posY,
             boolean shadow,
@@ -136,7 +136,7 @@ public class TextRendererUtility {
                 text,
                 posX,
                 posY,
-                ColorUtility.getColor(color),
+                color,
                 shadow
         );
     }

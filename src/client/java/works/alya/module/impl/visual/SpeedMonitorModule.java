@@ -87,7 +87,7 @@ public class SpeedMonitorModule extends Module {
         TextRendererUtility.renderDynamicText(
                 event.getContext(),
                 "Speed",
-                ColorUtility.Colors.WHITE,
+                0xFFFFFFFF,
                 contentX + padding,
                 contentY,
                 false,
@@ -101,7 +101,7 @@ public class SpeedMonitorModule extends Module {
         TextRendererUtility.renderDynamicText(
                 event.getContext(),
                 averageText,
-                ColorUtility.Colors.WHITE,
+                ColorUtility.getColor(ColorUtility.Colors.WHITE),
                 averageTextX,
                 contentY,
                 false,
