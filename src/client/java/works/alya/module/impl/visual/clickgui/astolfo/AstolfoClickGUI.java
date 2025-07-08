@@ -95,7 +95,7 @@ public class AstolfoClickGUI extends Screen {
 
         for(ModuleCategory category : ModuleCategory.values()) {
             categorizedModules.put(category, new ArrayList<>());
-            expandedCategories.put(category, false);
+            expandedCategories.put(category, true);
         }
 
         ModuleRepository repository = works.alya.AlyaClient.INSTANCE.getModuleRepository();
