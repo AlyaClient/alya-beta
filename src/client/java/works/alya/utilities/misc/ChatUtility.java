@@ -24,6 +24,8 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import javax.swing.tree.ExpandVetoException;
+
 @SuppressWarnings("unused")
 public class ChatUtility {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
@@ -70,6 +72,12 @@ public class ChatUtility {
         sendMessage("Error » " + message, Formatting.RED);
     }
 
+    public static void sendScriptError(Exception error) {
+        sendMessage(String.format(
+                "Alya Scripting: %s",
+                error.getMessage() != null ? error.getMessage() : error.toString()
+        ));
+    }
     /**
      * Sends a success message in green
      *
