@@ -214,9 +214,9 @@ public class DropDownClickGUI extends Screen {
 
                         RenderUtility.drawGradientRoundedRect(
                                 context,
-                                categoryX + 1,
+                                categoryX,
                                 y,
-                                PANEL_WIDTH - 2,
+                                PANEL_WIDTH,
                                 MODULE_HEIGHT,
                                 moduleRadius,
                                 primaryColor,
@@ -229,7 +229,7 @@ public class DropDownClickGUI extends Screen {
                         if(shouldRoundBottom) {
                             hoverRadius = new Vector4f(0f, CORNER_RADIUS,0f , CORNER_RADIUS);
                         }
-                        RenderUtility.drawRoundedRect(context, categoryX + 1, y, PANEL_WIDTH - 2, MODULE_HEIGHT, hoverRadius, HOVER_COLOR);
+                        RenderUtility.drawRoundedRect(context, categoryX, y, PANEL_WIDTH, MODULE_HEIGHT, hoverRadius, HOVER_COLOR);
                     }
 
                     int textColor = module.isEnabled() ?
