@@ -68,17 +68,17 @@ public class LuaAPI {
         LuaTable alyaTable = new LuaTable();
         globals.set("alya", alyaTable);
 
-        registerMinecraftAPI(alyaTable);
+        registerMinecraftAPI(globals);
         registerAlyaAPI(alyaTable);
-        registerRenderAPI(alyaTable);
-        registerUtilityAPI(alyaTable);
-        registerWorldAPI(alyaTable);
-        registerPlayerAPI(alyaTable);
-        registerInventoryAPI(alyaTable);
-        registerMathAPI(alyaTable);
-        registerNetworkAPI(alyaTable);
-        registerSoundAPI(alyaTable);
-        registerEntityAPI(alyaTable);
+        registerRenderAPI(globals);
+        registerUtilityAPI(globals);
+        registerWorldAPI(globals);
+        registerPlayerAPI(globals);
+        registerInventoryAPI(globals);
+        registerMathAPI(globals);
+        registerNetworkAPI(globals);
+        registerSoundAPI(globals);
+        registerEntityAPI(globals);
 
         AlyaClient.getEventBus().subscribe(this);
     }
@@ -101,9 +101,9 @@ public class LuaAPI {
         return false;
     }
 
-    private void registerMinecraftAPI(LuaTable alyaTable) {
+    private void registerMinecraftAPI(Globals globals) {
         LuaTable mcTable = new LuaTable();
-        alyaTable.set("mc", mcTable);
+        globals.set("mc", mcTable);
 
         mcTable.set("getPlayer", new ZeroArgFunction() {
             @Override
@@ -301,9 +301,9 @@ public class LuaAPI {
         });
     }
 
-    private void registerRenderAPI(LuaTable alyaTable) {
+    private void registerRenderAPI(Globals globals) {
         LuaTable renderTable = new LuaTable();
-        alyaTable.set("render", renderTable);
+        globals.set("render", renderTable);
 
         renderTable.set("color", new VarArgFunction() {
             @Override
@@ -376,9 +376,9 @@ public class LuaAPI {
         });
     }
 
-    private void registerUtilityAPI(LuaTable alyaTable) {
+    private void registerUtilityAPI(Globals globals) {
         LuaTable utilTable = new LuaTable();
-        alyaTable.set("util", utilTable);
+        globals.set("util", utilTable);
 
         utilTable.set("log", new OneArgFunction() {
             @Override
@@ -456,9 +456,9 @@ public class LuaAPI {
         });
     }
 
-    private void registerWorldAPI(LuaTable alyaTable) {
+    private void registerWorldAPI(Globals globals) {
         LuaTable worldTable = new LuaTable();
-        alyaTable.set("world", worldTable);
+        globals.set("world", worldTable);
 
         worldTable.set("getBlock", new VarArgFunction() {
             @Override
@@ -558,9 +558,29 @@ public class LuaAPI {
         });
     }
 
-    private void registerPlayerAPI(LuaTable alyaTable) {
+    private void registerPlayerAPI(Globals globals) {
         LuaTable playerTable = new LuaTable();
-        alyaTable.set("player", playerTable);
+        globals.set("player", playerTable);
+
+        playerTable.set("getPlayersInRange", new OneArgFunction() {
+            @Override
+            public LuaValue call(LuaValue arg) {
+                if(mc.player == null || mc.world == null) return LuaValue.NIL;
+
+                double range = arg.checkdouble();
+                List<PlayerEntity> players = new ArrayList<>();
+
+                for(Entity entity : mc.world.getEntities()) {
+                    if(entity instanceof PlayerEntity player && entity != mc.player) {
+                        if(mc.player.distanceTo(player) <= range) {
+                            players.add(player);
+                        }
+                    }
+                }
+
+                return CoerceJavaToLua.coerce(players);
+            }
+        });
 
         playerTable.set("getHealth", new ZeroArgFunction() {
             @Override
@@ -724,9 +744,9 @@ public class LuaAPI {
         });
     }
 
-    private void registerInventoryAPI(LuaTable alyaTable) {
+    private void registerInventoryAPI(Globals globals) {
         LuaTable invTable = new LuaTable();
-        alyaTable.set("inventory", invTable);
+        globals.set("inventory", invTable);
 
         invTable.set("getHeldItem", new ZeroArgFunction() {
             @Override
@@ -809,9 +829,9 @@ public class LuaAPI {
         });
     }
 
-    private void registerMathAPI(LuaTable alyaTable) {
+    private void registerMathAPI(Globals globals) {
         LuaTable mathTable = new LuaTable();
-        alyaTable.set("math", mathTable);
+        globals.set("math", mathTable);
 
         mathTable.set("distance", new VarArgFunction() {
             @Override
@@ -891,9 +911,9 @@ public class LuaAPI {
         });
     }
 
-    private void registerNetworkAPI(LuaTable alyaTable) {
+    private void registerNetworkAPI(Globals globals) {
         LuaTable netTable = new LuaTable();
-        alyaTable.set("network", netTable);
+        globals.set("network", netTable);
 
         netTable.set("sendPacket", new OneArgFunction() {
             @Override
@@ -935,9 +955,9 @@ public class LuaAPI {
         });
     }
 
-    private void registerSoundAPI(LuaTable alyaTable) {
+    private void registerSoundAPI(Globals globals) {
         LuaTable soundTable = new LuaTable();
-        alyaTable.set("sound", soundTable);
+        globals.set("sound", soundTable);
 
         soundTable.set("playSound", new VarArgFunction() {
             @Override
@@ -993,9 +1013,9 @@ public class LuaAPI {
         });
     }
 
-    private void registerEntityAPI(LuaTable alyaTable) {
+    private void registerEntityAPI(Globals globals) {
         LuaTable entityTable = new LuaTable();
-        alyaTable.set("entity", entityTable);
+        globals.set("entity", entityTable);
 
         entityTable.set("getClosestPlayer", new ZeroArgFunction() {
             @Override
@@ -1103,25 +1123,6 @@ public class LuaAPI {
             }
         });
 
-        entityTable.set("getPlayersInRange", new OneArgFunction() {
-            @Override
-            public LuaValue call(LuaValue arg) {
-                if(mc.player == null || mc.world == null) return LuaValue.NIL;
-
-                double range = arg.checkdouble();
-                List<PlayerEntity> players = new ArrayList<>();
-
-                for(Entity entity : mc.world.getEntities()) {
-                    if(entity instanceof PlayerEntity player && entity != mc.player) {
-                        if(mc.player.distanceTo(player) <= range) {
-                            players.add(player);
-                        }
-                    }
-                }
-
-                return CoerceJavaToLua.coerce(players);
-            }
-        });
 
         entityTable.set("getEntitiesInRange", new TwoArgFunction() {
             @Override

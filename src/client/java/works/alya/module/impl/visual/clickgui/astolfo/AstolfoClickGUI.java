@@ -64,10 +64,10 @@ public class AstolfoClickGUI extends Screen {
     static {
         CATEGORY_COLORS.put(ModuleCategory.COMBAT, 0xFFE64D3A);
         CATEGORY_COLORS.put(ModuleCategory.MOVEMENT, 0xFF2ECD6F);
-        CATEGORY_COLORS.put(ModuleCategory.WORLD, 0xFFE65F00);
-        CATEGORY_COLORS.put(ModuleCategory.VISUAL, 0xFF3A9DE6);
-        CATEGORY_COLORS.put(ModuleCategory.UTILITY, 0xffF29D11);
-        CATEGORY_COLORS.put(ModuleCategory.SCRIPTS, 0xFFE67300);
+        CATEGORY_COLORS.put(ModuleCategory.VISUAL, 0xFF8F2DF7);
+        CATEGORY_COLORS.put(ModuleCategory.WORLD, 0xFF3A9DE6);
+        CATEGORY_COLORS.put(ModuleCategory.UTILITY, 0xFFF29D11);
+        CATEGORY_COLORS.put(ModuleCategory.SCRIPTS, 0xFF230057);
     }
 
     private boolean dragging = false;
@@ -78,7 +78,7 @@ public class AstolfoClickGUI extends Screen {
     private int currentDraggedSettingX = 0;
 
     public AstolfoClickGUI() {
-        super(Text.literal("Astolfo Click GUI"));
+        super(Text.literal("Click GUI"));
         initializeModules();
 
         int x = 4;
