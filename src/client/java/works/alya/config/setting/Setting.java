@@ -17,6 +17,7 @@
 package works.alya.config.setting;
 
 import works.alya.config.VisibilityCondition;
+import java.util.function.Consumer;
 
 public class Setting<T> {
     private final String name;
@@ -26,6 +27,7 @@ public class Setting<T> {
     private final T minValue;
     private final T maxValue;
     private VisibilityCondition visibilityCondition = () -> true;
+    private Consumer<Setting<T>> changeCallback = null;
 
     @SuppressWarnings("unused")
     public Setting(String name, String description, T defaultValue) {
@@ -35,8 +37,8 @@ public class Setting<T> {
     public Setting(String name, String description, T defaultValue, T minValue, T maxValue) {
         this.name = name;
         this.description = description;
-        this.value = defaultValue;
         this.defaultValue = defaultValue;
+        this.value = defaultValue;
         this.minValue = minValue;
         this.maxValue = maxValue;
     }
@@ -73,6 +75,19 @@ public class Setting<T> {
         }
 
         this.value = value;
+
+        if(this.changeCallback != null) {
+            this.changeCallback.accept(this);
+        }
+    }
+
+    /**
+     * Sets a callback to be called when the setting value changes.
+     *
+     * @param callback The callback to call when the value changes
+     */
+    public void setChangeCallback(Consumer<Setting<T>> callback) {
+        this.changeCallback = callback;
     }
 
     @SuppressWarnings("unchecked")

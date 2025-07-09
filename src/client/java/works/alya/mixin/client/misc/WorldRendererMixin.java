@@ -17,7 +17,9 @@
 package works.alya.mixin.client.misc;
 
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import org.spongepowered.asm.mixin.Unique;
 import works.alya.AlyaClient;
+import works.alya.config.VisualManager;
 import works.alya.event.impl.Render3DEvent;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderTickCounter;
