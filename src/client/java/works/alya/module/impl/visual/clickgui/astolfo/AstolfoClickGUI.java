@@ -141,7 +141,11 @@ public class AstolfoClickGUI extends Screen {
             for(Module module : modules) {
                 totalHeight += MODULE_HEIGHT;
                 if(expandedModules.getOrDefault(module, false)) {
-                    totalHeight += module.getSettings().size() * SETTING_HEIGHT;
+                    for(Setting setting : module.getSettings()) {
+                        if(setting.isVisible()) {
+                            totalHeight += SETTING_HEIGHT;
+                        }
+                    }
                 }
             }
         }
@@ -160,8 +164,10 @@ public class AstolfoClickGUI extends Screen {
 
                 if(expandedModules.getOrDefault(module, false)) {
                     for(Setting setting : module.getSettings()) {
-                        renderSettingButton(context, setting, panelX, currentY, category);
-                        currentY += SETTING_HEIGHT;
+                        if(setting.isVisible()) {
+                            renderSettingButton(context, setting, panelX, currentY, category);
+                            currentY += SETTING_HEIGHT;
+                        }
                     }
                 }
             }
@@ -294,17 +300,19 @@ public class AstolfoClickGUI extends Screen {
 
                         if(expandedModules.getOrDefault(module, false)) {
                             for(Setting setting : module.getSettings()) {
-                                if(isMouseOver(intMouseX, intMouseY, panelX, currentY, SETTING_HEIGHT)) {
-                                    if(setting instanceof NumberSetting<?> numberSetting && button == 0) {
-                                        currentDraggedNumberSetting = numberSetting;
-                                        currentDraggedSettingX = panelX;
-                                        updateNumberSettingFromMouse(intMouseX);
-                                    } else {
-                                        handleSettingClick(setting, button);
+                                if(setting.isVisible()) {
+                                    if(isMouseOver(intMouseX, intMouseY, panelX, currentY, SETTING_HEIGHT)) {
+                                        if(setting instanceof NumberSetting<?> numberSetting && button == 0) {
+                                            currentDraggedNumberSetting = numberSetting;
+                                            currentDraggedSettingX = panelX;
+                                            updateNumberSettingFromMouse(intMouseX);
+                                        } else {
+                                            handleSettingClick(setting, button);
+                                        }
+                                        return true;
                                     }
-                                    return true;
+                                    currentY += SETTING_HEIGHT;
                                 }
-                                currentY += SETTING_HEIGHT;
                             }
                         }
                     }
