@@ -18,6 +18,7 @@ package works.alya.script.data;
 
 import net.minecraft.client.gui.DrawContext;
 import works.alya.script.interfaces.IRenderCommand;
+import works.alya.utilities.misc.ChatUtility;
 import works.alya.utilities.render.TextRendererUtility;
 
 /**

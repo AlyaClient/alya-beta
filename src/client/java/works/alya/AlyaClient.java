@@ -181,7 +181,8 @@ public class AlyaClient implements ClientModInitializer {
                         new ConfigCommand(),
                         new BindCommand(),
                         new SettingsCommand(),
-                        new VClipCommand()
+                        new VClipCommand(),
+                        new ScriptCommand()
                 );
     }
 

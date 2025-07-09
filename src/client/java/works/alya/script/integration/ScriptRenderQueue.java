@@ -19,13 +19,16 @@ package works.alya.script.integration;
 import works.alya.AlyaClient;
 import works.alya.event.IEventListener;
 import works.alya.event.impl.Render2DEvent;
+import works.alya.script.core.Script;
 import works.alya.script.data.RectRenderCommand;
 import works.alya.script.data.TextRenderCommand;
 import works.alya.script.interfaces.IRenderCommand;
 import net.minecraft.client.gui.DrawContext;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Manages rendering commands from scripts.
@@ -33,9 +36,42 @@ import java.util.List;
  */
 public class ScriptRenderQueue {
     private static final List<IRenderCommand> renderCommands = new ArrayList<>();
+    private static final Map<Script, List<IRenderCommand>> scriptCommandMap = new HashMap<>();
+    private static Script currentScript = null;
+
+    private static final IEventListener<Render2DEvent> render2DListener = event -> processRenderQueue(event.getContext());
 
     static {
-        AlyaClient.getEventBus().register((IEventListener<Render2DEvent>) event -> processRenderQueue(event.getContext()));
+        AlyaClient.getEventBus().subscribe(new Object() {
+            @SuppressWarnings("unused")
+            private final IEventListener<Render2DEvent> render2DEvent = render2DListener;
+        });
+    }
+
+    /**
+     * Sets the current script that is adding commands.
+     *
+     * @param script The current script
+     */
+    public static void setCurrentScript(Script script) {
+        currentScript = script;
+    }
+
+    /**
+     * Clears all rendering commands for a specific script.
+     *
+     * @param script The script to clear commands for
+     */
+    public static void clearCommandsForScript(Script script) {
+        if (script == null) return;
+
+        synchronized(renderCommands) {
+            List<IRenderCommand> commands = scriptCommandMap.get(script);
+            if (commands != null) {
+                renderCommands.removeAll(commands);
+                commands.clear();
+            }
+        }
     }
 
     /**
@@ -48,7 +84,8 @@ public class ScriptRenderQueue {
      * @param shadow Whether to render with shadow
      */
     public static void addTextRenderCommand(String text, int x, int y, int color, boolean shadow) {
-        renderCommands.add(new TextRenderCommand(text, x, y, color, shadow));
+        TextRenderCommand command = new TextRenderCommand(text, x, y, color, shadow);
+        addCommandToScript(command);
     }
 
     /**
@@ -61,7 +98,23 @@ public class ScriptRenderQueue {
      * @param color  The rectangle color
      */
     public static void addRectRenderCommand(float x, float y, float width, float height, int color) {
-        renderCommands.add(new RectRenderCommand(x, y, width, height, color));
+        RectRenderCommand command = new RectRenderCommand(x, y, width, height, color);
+        addCommandToScript(command);
+    }
+
+    /**
+     * Adds a command to the current script's command list.
+     *
+     * @param command The command to add
+     */
+    private static void addCommandToScript(IRenderCommand command) {
+        synchronized(renderCommands) {
+            renderCommands.add(command);
+
+            if (currentScript != null) {
+                scriptCommandMap.computeIfAbsent(currentScript, k -> new ArrayList<>()).add(command);
+            }
+        }
     }
 
     /**
@@ -75,6 +128,7 @@ public class ScriptRenderQueue {
                 command.execute(context);
             }
             renderCommands.clear();
+            scriptCommandMap.values().forEach(List::clear);
         }
     }
 }

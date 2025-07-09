@@ -19,8 +19,6 @@ package works.alya.script.api;
 import org.luaj.vm2.*;
 import org.luaj.vm2.lib.TwoArgFunction;
 import works.alya.AlyaClient;
-import works.alya.event.IEventListener;
-import works.alya.event.impl.MotionEvent;
 import works.alya.module.Module;
 import works.alya.module.ModuleRepository;
 import works.alya.script.core.Script;
@@ -60,14 +58,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Collection;
 
-@SuppressWarnings("CallToPrintStackTrace")
 public class LuaAPI {
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
-    private static LuaFunction motionEventCallback;
-    private static Script currentScript;
+    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private Script currentScript;
 
-    public static void register(Globals globals, Script script) {
+    public void register(Globals globals, Script script) {
         currentScript = script;
+
         LuaTable alyaTable = new LuaTable();
         globals.set("alya", alyaTable);
 
@@ -82,44 +79,15 @@ public class LuaAPI {
         registerNetworkAPI(alyaTable);
         registerSoundAPI(alyaTable);
         registerEntityAPI(alyaTable);
-        registerMotionEventAPI(alyaTable);
+
+        AlyaClient.getEventBus().subscribe(this);
     }
 
-    public static void updateCurrentScript(Script script) {
+    public void updateCurrentScript(Script script) {
         currentScript = script;
     }
 
-    private static void registerMotionEventAPI(LuaTable alyaTable) {
-        LuaTable motionEventTable = new LuaTable();
-
-        IEventListener<MotionEvent> motionListener = event -> {
-            if(motionEventCallback != null && isScriptEnabled()) {
-                try {
-                    motionEventCallback.call(CoerceJavaToLua.coerce(event));
-                } catch(Exception ex) {
-                    ChatUtility.sendError("Error in motion event callback");
-                    ChatUtility.sendScriptError(ex);
-                    ex.printStackTrace();
-                }
-            }
-        };
-
-        AlyaClient.getEventBus().register(motionListener);
-
-        motionEventTable.set("setCallback", new TwoArgFunction() {
-            @Override
-            public LuaValue call(LuaValue arg1, LuaValue arg2) {
-                if(arg2.isfunction()) {
-                    motionEventCallback = arg2.checkfunction();
-                }
-                return NIL;
-            }
-        });
-
-        alyaTable.set("motionEvent", motionEventTable);
-    }
-
-    private static boolean isScriptEnabled() {
+    private boolean isScriptEnabled() {
         if(currentScript == null) return false;
 
         for(Module module : AlyaClient.INSTANCE.getModuleRepository().getModules()) {
@@ -133,7 +101,7 @@ public class LuaAPI {
         return false;
     }
 
-    private static void registerMinecraftAPI(LuaTable alyaTable) {
+    private void registerMinecraftAPI(LuaTable alyaTable) {
         LuaTable mcTable = new LuaTable();
         alyaTable.set("mc", mcTable);
 
@@ -254,7 +222,7 @@ public class LuaAPI {
         });
     }
 
-    private static void registerAlyaAPI(LuaTable alyaTable) {
+    private void registerAlyaAPI(LuaTable alyaTable) {
         alyaTable.set("getModule", new OneArgFunction() {
             @Override
             public LuaValue call(LuaValue arg) {
@@ -333,7 +301,7 @@ public class LuaAPI {
         });
     }
 
-    private static void registerRenderAPI(LuaTable alyaTable) {
+    private void registerRenderAPI(LuaTable alyaTable) {
         LuaTable renderTable = new LuaTable();
         alyaTable.set("render", renderTable);
 
@@ -370,6 +338,9 @@ public class LuaAPI {
                 int y = args.checkint(3);
                 int color = args.optint(4, 0xFFFFFFFF);
                 boolean shadow = args.optboolean(5, false);
+
+                // Set the current script before adding the command
+                ScriptRenderQueue.setCurrentScript(currentScript);
                 ScriptRenderQueue.addTextRenderCommand(text, x, y, color, shadow);
                 return LuaValue.NIL;
             }
@@ -383,6 +354,9 @@ public class LuaAPI {
                 float width = (float) args.checkdouble(3);
                 float height = (float) args.checkdouble(4);
                 int color = args.optint(5, 0xFFFFFFFF);
+
+                // Set the current script before adding the command
+                ScriptRenderQueue.setCurrentScript(currentScript);
                 ScriptRenderQueue.addRectRenderCommand(x, y, width, height, color);
                 return LuaValue.NIL;
             }
@@ -404,7 +378,7 @@ public class LuaAPI {
         });
     }
 
-    private static void registerUtilityAPI(LuaTable alyaTable) {
+    private void registerUtilityAPI(LuaTable alyaTable) {
         LuaTable utilTable = new LuaTable();
         alyaTable.set("util", utilTable);
 
@@ -484,7 +458,7 @@ public class LuaAPI {
         });
     }
 
-    private static void registerWorldAPI(LuaTable alyaTable) {
+    private void registerWorldAPI(LuaTable alyaTable) {
         LuaTable worldTable = new LuaTable();
         alyaTable.set("world", worldTable);
 
@@ -586,7 +560,7 @@ public class LuaAPI {
         });
     }
 
-    private static void registerPlayerAPI(LuaTable alyaTable) {
+    private void registerPlayerAPI(LuaTable alyaTable) {
         LuaTable playerTable = new LuaTable();
         alyaTable.set("player", playerTable);
 
@@ -752,7 +726,7 @@ public class LuaAPI {
         });
     }
 
-    private static void registerInventoryAPI(LuaTable alyaTable) {
+    private void registerInventoryAPI(LuaTable alyaTable) {
         LuaTable invTable = new LuaTable();
         alyaTable.set("inventory", invTable);
 
@@ -837,7 +811,7 @@ public class LuaAPI {
         });
     }
 
-    private static void registerMathAPI(LuaTable alyaTable) {
+    private void registerMathAPI(LuaTable alyaTable) {
         LuaTable mathTable = new LuaTable();
         alyaTable.set("math", mathTable);
 
@@ -919,7 +893,7 @@ public class LuaAPI {
         });
     }
 
-    private static void registerNetworkAPI(LuaTable alyaTable) {
+    private void registerNetworkAPI(LuaTable alyaTable) {
         LuaTable netTable = new LuaTable();
         alyaTable.set("network", netTable);
 
@@ -963,7 +937,7 @@ public class LuaAPI {
         });
     }
 
-    private static void registerSoundAPI(LuaTable alyaTable) {
+    private void registerSoundAPI(LuaTable alyaTable) {
         LuaTable soundTable = new LuaTable();
         alyaTable.set("sound", soundTable);
 
@@ -1021,7 +995,7 @@ public class LuaAPI {
         });
     }
 
-    private static void registerEntityAPI(LuaTable alyaTable) {
+    private void registerEntityAPI(LuaTable alyaTable) {
         LuaTable entityTable = new LuaTable();
         alyaTable.set("entity", entityTable);
 

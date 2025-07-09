@@ -44,6 +44,7 @@ public class ScriptManager {
     private final List<Script> scripts = new ArrayList<>();
     private final Map<String, ScriptModule> scriptModules = new HashMap<>();
     private final File scriptsDir;
+    private final LuaAPI luaAPI = new LuaAPI();
 
     private ScriptManager() {
         scriptsDir = new File(mc.runDirectory, "Alya/scripts");
@@ -110,7 +111,7 @@ public class ScriptManager {
             Globals globals = JsePlatform.standardGlobals();
 
             Script tempScript = new Script(file, file.getName().replace(".lua", ""), "", globals);
-            LuaAPI.register(globals, tempScript);
+            luaAPI.register(globals, tempScript);
             LuaValue chunk = globals.load(reader, file.getName());
             chunk.call();
             String name = globals.get("name").optjstring(file.getName().replace(".lua", ""));
@@ -118,7 +119,7 @@ public class ScriptManager {
 
             Script finalScript = new Script(file, name, description, globals);
 
-            LuaAPI.updateCurrentScript(finalScript);
+            luaAPI.updateCurrentScript(finalScript);
 
             return finalScript;
         }

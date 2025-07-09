@@ -21,7 +21,9 @@ import works.alya.config.setting.impl.BooleanSetting;
 import works.alya.config.setting.impl.ModeSetting;
 import works.alya.config.setting.impl.NumberSetting;
 import works.alya.event.IEventListener;
+import works.alya.event.impl.MotionEvent;
 import works.alya.event.impl.Render2DEvent;
+import works.alya.event.impl.TickEvent;
 import works.alya.module.Module;
 import works.alya.module.ModuleCategory;
 import org.luaj.vm2.LuaValue;
@@ -37,7 +39,7 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 public class ScriptModule extends Module {
-    private final Script script;
+    private Script script = null;
 
     /**
      * Creates a new ScriptModule instance.
@@ -49,8 +51,6 @@ public class ScriptModule extends Module {
         this.script = script;
 
         createSettings();
-
-        registerEventListeners();
     }
 
     /**
@@ -90,15 +90,23 @@ public class ScriptModule extends Module {
     /**
      * Registers event listeners for the script.
      */
-    private void registerEventListeners() {
-        IEventListener<Render2DEvent> render2DListener = event -> {
-            if(isEnabled()) {
-                script.callFunction("onRender2D", CoerceJavaToLua.coerce(event));
-            }
-        };
+    private final IEventListener<Render2DEvent> render2DListener = event -> {
+        if(isEnabled()) {
+            script.callFunction("onRender2D", CoerceJavaToLua.coerce(event));
+        }
+    };
 
-        works.alya.AlyaClient.getEventBus().register(render2DListener);
-    }
+    private final IEventListener<MotionEvent> motionListener = event -> {
+        if(isEnabled()) {
+            script.callFunction("onMotionEvent", CoerceJavaToLua.coerce(event));
+        }
+    };
+
+    private final IEventListener<TickEvent> tickListener = event -> {
+        if(isEnabled()) {
+            script.callFunction("onTickEvent", CoerceJavaToLua.coerce(event));
+        }
+    };
 
     @Override
     protected void onEnable() {
@@ -110,6 +118,9 @@ public class ScriptModule extends Module {
     @Override
     protected void onDisable() {
         script.callFunction("onDisable");
+
+        // Clear any rendering commands from this script
+        ScriptRenderQueue.clearCommandsForScript(script);
 
         super.onDisable();
     }
