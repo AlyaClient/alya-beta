@@ -18,7 +18,10 @@ package works.alya.command.impl;
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.server.command.ServerCommandSource;
+import works.alya.AlyaClient;
 import works.alya.command.AbstractCommand;
+import works.alya.module.Module;
+import works.alya.module.ModuleCategory;
 import works.alya.script.core.ScriptManager;
 import works.alya.utilities.misc.ChatUtility;
 
@@ -36,6 +39,12 @@ public class ScriptCommand extends AbstractCommand {
         builder
                 .then(literal("reload")
                         .executes(context -> {
+                            for(Module module : AlyaClient.INSTANCE.getModuleRepository().getModules()) {
+                                if(module.getCategory().equals(ModuleCategory.SCRIPTS)) {
+                                    module.setEnabled(false);
+                                }
+                            }
+
                             ScriptManager.getInstance().loadScripts();
                             ChatUtility.sendSuccess("§aScripts reloaded successfully!");
                             return 1;
@@ -44,6 +53,7 @@ public class ScriptCommand extends AbstractCommand {
 
     private static LiteralArgumentBuilder<ServerCommandSource> literal(String name) {
         if(name.isEmpty()) throw new IllegalArgumentException("Name cannot be empty!");
+
         return LiteralArgumentBuilder.literal(name);
     }
 }
