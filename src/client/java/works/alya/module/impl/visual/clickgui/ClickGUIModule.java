@@ -41,6 +41,9 @@ public class ClickGUIModule extends Module {
 
         addSetting(guiMode);
         addSetting(showTooltips);
+
+        // Set default value after settings are added
+        guiMode.setDefaultValue("Dropdown");
     }
 
     @Override
@@ -58,5 +61,9 @@ public class ClickGUIModule extends Module {
 
         super.onEnable();
         super.setEnabled(false);
+    }
+
+    public ModeSetting getMode() {
+        return mode;
     }
 }

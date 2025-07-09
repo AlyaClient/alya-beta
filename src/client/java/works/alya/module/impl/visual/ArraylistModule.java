@@ -87,7 +87,7 @@ public class ArraylistModule extends Module {
     private int getWaveColor(int index, int totalModules) {
         float time = System.currentTimeMillis() / 1000.0f;
         float waveOffset = (float) index / Math.max(1, totalModules - 1);
-        float phase = time * 2.0f + waveOffset * 4.0f;
+        float phase = time * 4.0f + waveOffset * 6.0f;
         float factor = (float) (Math.sin(phase) + 1.0) / 2.0f;
 
         return Theme.getInterpolatedColors(factor);
