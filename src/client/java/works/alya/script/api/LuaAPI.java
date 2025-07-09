@@ -339,7 +339,6 @@ public class LuaAPI {
                 int color = args.optint(4, 0xFFFFFFFF);
                 boolean shadow = args.optboolean(5, false);
 
-                // Set the current script before adding the command
                 ScriptRenderQueue.setCurrentScript(currentScript);
                 ScriptRenderQueue.addTextRenderCommand(text, x, y, color, shadow);
                 return LuaValue.NIL;
@@ -355,7 +354,6 @@ public class LuaAPI {
                 float height = (float) args.checkdouble(4);
                 int color = args.optint(5, 0xFFFFFFFF);
 
-                // Set the current script before adding the command
                 ScriptRenderQueue.setCurrentScript(currentScript);
                 ScriptRenderQueue.addRectRenderCommand(x, y, width, height, color);
                 return LuaValue.NIL;
@@ -984,10 +982,10 @@ public class LuaAPI {
                     Identifier soundId = Identifier.of(parts[0], parts[1]);
                     SoundEvent sound = Registries.SOUND_EVENT.get(soundId);
                     if(sound != null) {
-                        mc.world.playSound(null, new BlockPos((int) x, (int) y, (int) z), sound, SoundCategory.MASTER, volume, pitch);
+                        mc.world.playSound(null, new BlockPos((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z)), sound, SoundCategory.MASTER, volume, pitch);
                     }
                 } catch(Exception e) {
-                    ChatUtility.sendError("Invalid sound name: " + soundName);
+                    ChatUtility.sendError("Failed to play sound \"" + soundName + "\": " + e.getMessage());
                     ChatUtility.sendScriptError(e);
                 }
                 return LuaValue.NIL;

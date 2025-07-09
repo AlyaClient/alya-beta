@@ -17,8 +17,8 @@
 package works.alya.utilities.render;
 
 public class Theme {
-    public static int COLOR$1 = 0xEE432473;
-    public static int COLOR$2 = 0xEE7848C2;
+    public static int COLOR$1 = 0xFF5A2F9C;
+    public static int COLOR$2 = 0xFF7848C2;
 
     public static int getInterpolatedColors(float factor) {
         return ColorUtility.interpolateColor(

@@ -17,13 +17,16 @@
 package works.alya.script.core;
 
 import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import works.alya.script.data.NumberSettingData;
 import works.alya.utilities.misc.ChatUtility;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Represents a Lua script in the Alya Client.
@@ -36,6 +39,7 @@ public class Script {
     private final String description;
     private final Globals globals;
     private final Map<String, Object> settings = new HashMap<>();
+    private final Set<String> reportedErrors = new HashSet<>();
 
     /**
      * Creates a new Script instance.
@@ -109,11 +113,34 @@ public class Script {
         if(function.isfunction()) {
             try {
                 function.invoke(LuaValue.varargsOf(args));
+            } catch(LuaError luaError) {
+                String errorMessage = luaError.getMessage();
+                String errorKey = name + ":" + functionName + ":" + errorMessage;
+
+                if(!reportedErrors.contains(errorKey)) {
+                    reportedErrors.add(errorKey);
+                    String formattedError = "Error in script '" + name + "', function '" + functionName + "': " + errorMessage;
+                    ChatUtility.sendError(formattedError);
+                    luaError.printStackTrace();
+                }
             } catch(Exception ex) {
-                ChatUtility.sendError("Error calling function '" + functionName + "' in script '" + name + "'");
-                ex.printStackTrace();
+                String errorKey = name + ":" + functionName + ":" + ex.getClass().getSimpleName();
+
+                if(!reportedErrors.contains(errorKey)) {
+                    reportedErrors.add(errorKey);
+                    ChatUtility.sendError("Error calling function '" + functionName + "' in script '" + name + "'");
+                    ex.printStackTrace();
+                }
             }
         }
+    }
+
+    /**
+     * Clears the reported errors set, allowing errors to be reported again.
+     * This can be useful when reloading scripts or when you want to reset error reporting.
+     */
+    public void clearReportedErrors() {
+        reportedErrors.clear();
     }
 
     /**
