@@ -126,6 +126,14 @@ public class VisualManager {
             LOGGER.error("Failed to get DragUtility from module {}: {}", moduleName, e.getMessage());
         }
 
+        Map<String, Object> settingValues = new HashMap<>();
+        for(works.alya.config.setting.Setting<?> setting : module.getSettings()) {
+            if(!setting.getValue().equals(setting.getDefaultValue())) {
+                settingValues.put(setting.getName(), setting.getValue());
+            }
+        }
+        data.setSettingValues(settingValues);
+
         visualModulesData.put(moduleName, data);
     }
 
@@ -177,7 +185,22 @@ public class VisualManager {
         VisualModuleData data = visualModulesData.get(moduleName);
 
         if(data != null) {
-            module.setEnabled(data.isEnabled());
+            Map<String, Object> settingValues = data.getSettingValues();
+            if(settingValues != null && !settingValues.isEmpty()) {
+                for(works.alya.config.setting.Setting<?> setting : module.getSettings()) {
+                    Object value = settingValues.get(setting.getName());
+                    if(value != null) {
+                        try {
+                            if(!value.equals(setting.getDefaultValue())) {
+                                setting.setValueFromObject(value);
+                            }
+                        } catch(Exception e) {
+                            LOGGER.error("Failed to set value for setting {} in module {}: {}",
+                                    setting.getName(), moduleName, e.getMessage());
+                        }
+                    }
+                }
+            }
 
             try {
                 for(Field field : module.getClass().getDeclaredFields()) {
@@ -194,6 +217,8 @@ public class VisualManager {
             } catch(Exception e) {
                 LOGGER.error("Failed to set DragUtility for module {}: {}", moduleName, e.getMessage());
             }
+
+            module.setEnabled(data.isEnabled());
         }
     }
 
@@ -204,6 +229,7 @@ public class VisualManager {
         private boolean enabled = false;
         private int x = 4;
         private int y = 4;
+        private Map<String, Object> settingValues = new HashMap<>();
 
         public boolean isEnabled() {
             return enabled;
@@ -227,6 +253,14 @@ public class VisualManager {
 
         public void setY(int y) {
             this.y = y;
+        }
+
+        public Map<String, Object> getSettingValues() {
+            return settingValues;
+        }
+
+        public void setSettingValues(Map<String, Object> settingValues) {
+            this.settingValues = settingValues;
         }
     }
 }

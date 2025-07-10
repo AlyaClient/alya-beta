@@ -134,6 +134,16 @@ public abstract class Module {
 
     protected <T> void addSetting(Setting<T> setting) {
         settings.put(setting.getName().toLowerCase(), setting);
+
+        // For visual modules, add a callback to save settings when they change
+        if(this.category == ModuleCategory.VISUAL) {
+            setting.setChangeCallback(changedSetting -> {
+                if(MinecraftClient.getInstance().player != null) {
+                    VisualManager.getInstance().updateVisualModuleData(this);
+                    VisualManager.getInstance().saveVisualData();
+                }
+            });
+        }
     }
 
     public Setting<?> getSetting(String name) {

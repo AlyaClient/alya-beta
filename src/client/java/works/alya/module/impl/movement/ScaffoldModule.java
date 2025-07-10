@@ -311,10 +311,11 @@ public class ScaffoldModule extends Module {
                 break;
             case "Verus":
                 if(mc.player.isOnGround()) {
-                    MoveUtility.setMotionY(-0.1f);
+                    Vec3d position = mc.player.getPos();
+                    mc.player.setPosition(position.x, position.y - 0.1, position.z);
                     mc.player.jump();
                 } else {
-                    MoveUtility.setMotionY(1f);
+                    MoveUtility.setMotionY(1.0f);
                 }
                 break;
             case "Vulcan":

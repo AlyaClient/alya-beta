@@ -42,6 +42,7 @@ import works.alya.module.impl.utility.nofall.NoFallModule;
 import works.alya.module.impl.world.TimerModule;
 import works.alya.module.impl.visual.clickgui.ClickGUIModule;
 import works.alya.module.impl.visual.esp.ESPModule;
+import works.alya.script.core.ScriptManager;
 import works.alya.utilities.misc.IconLoader;
 import works.alya.utilities.misc.AlyaConstants;
 import net.fabricmc.api.ClientModInitializer;
@@ -86,6 +87,8 @@ public class AlyaClient implements ClientModInitializer {
 
         KeybindManager.getInstance().initialize();
         VisualManager.getInstance().initialize();
+
+        ScriptManager.getInstance().init();
 
         CommandRegistrationCallback.EVENT.register((
                 dispatcher,
@@ -178,7 +181,9 @@ public class AlyaClient implements ClientModInitializer {
                         new ConfigCommand(),
                         new BindCommand(),
                         new SettingsCommand(),
-                        new VClipCommand()
+                        new VClipCommand(),
+                        new ScriptCommand(),
+                        new NameCommand()
                 );
     }
 

@@ -14,11 +14,10 @@
  *
  */
 
-package works.alya.utilities.misc;
+package works.alya.script.data;
 
-public class AlyaConstants {
-    public static String NAME = "Alya";
-    public static final String VERSION = "0.1";
-    public static final String KIND = "Beta";
-    public static final String BUILD_NUMBER = "07052025.6";
+/**
+ * Helper class to store number setting data with min/max values.
+ */
+public record NumberSettingData(Object value, Object min, Object max) {
 }

@@ -16,6 +16,7 @@
 
 package works.alya.event;
 
+import works.alya.AlyaClient;
 import works.alya.event.pool.EventSubscriberPool;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ import java.util.List;
 
 @SuppressWarnings("unchecked")
 public final class EventBus {
-    private List<IEventListener<?>> listeners = new ArrayList<>();
+    private final List<IEventListener<?>> listeners = new ArrayList<>();
 
     public <T> void register(IEventListener<T> listener) {
         listeners.add(listener);

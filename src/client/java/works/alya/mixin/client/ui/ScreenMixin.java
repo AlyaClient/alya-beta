@@ -31,7 +31,7 @@ public class ScreenMixin {
     @Inject(method = "renderPanoramaBackground", at = @At("HEAD"), cancellable = true)
     private void interceptPanoramaBackground(DrawContext context, float deltaTicks, CallbackInfo ci) {
         if(!Settings.SHOW_PANORAMA) {
-            BackgroundUtility.drawBackground(context);
+            BackgroundUtility.drawStarField(context);
 
             ci.cancel();
         }

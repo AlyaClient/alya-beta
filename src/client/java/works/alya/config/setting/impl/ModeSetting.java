@@ -42,10 +42,6 @@ public class ModeSetting extends Setting<String> {
     public ModeSetting(String name, String description, String defaultValue, String... modes) {
         super(name, description, defaultValue);
         this.modes = new ArrayList<>(Arrays.asList(modes));
-
-//        if(!this.modes.contains(defaultValue)) {
-//            throw new IllegalArgumentException("Default value must be one of the modes");
-//        }
     }
 
     /**

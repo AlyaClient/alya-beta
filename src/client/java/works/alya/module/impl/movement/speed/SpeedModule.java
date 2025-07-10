@@ -23,6 +23,7 @@ import works.alya.module.impl.movement.speed.ncp.NCPSpeed;
 import works.alya.module.impl.movement.speed.normal.NormalSpeed;
 import works.alya.module.impl.movement.speed.spartan.SpartanSpeed;
 import works.alya.module.impl.movement.speed.verus.VerusSpeed;
+import works.alya.module.impl.movement.speed.vulcan.VulcanSpeed;
 import works.alya.utilities.player.TimerUtility;
 
 public class SpeedModule extends Module {
@@ -36,7 +37,8 @@ public class SpeedModule extends Module {
                 new NCPSpeed(this),
                 new VerusSpeed(this),
                 new BlocksMCSpeed(this),
-                new SpartanSpeed(this)
+                new SpartanSpeed(this),
+                new VulcanSpeed(this)
         );
     }
 

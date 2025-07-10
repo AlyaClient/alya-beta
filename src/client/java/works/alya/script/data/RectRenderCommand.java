@@ -14,17 +14,19 @@
  *
  */
 
-package works.alya.utilities.render;
+package works.alya.script.data;
 
-public class Theme {
-    public static int COLOR$1 = 0xFF5A2F9C;
-    public static int COLOR$2 = 0xFF7848C2;
+import net.minecraft.client.gui.DrawContext;
+import works.alya.script.interfaces.IRenderCommand;
+import works.alya.utilities.render.RenderUtility;
 
-    public static int getInterpolatedColors(float factor) {
-        return ColorUtility.interpolateColor(
-                COLOR$1,
-                COLOR$2,
-                factor
-        );
+/**
+ * Command for rendering rectangles.
+ */
+public record RectRenderCommand(float x, float y, float width, float height, int color) implements IRenderCommand {
+
+    @Override
+    public void execute(DrawContext context) {
+        RenderUtility.drawRect(context, x, y, width, height, color);
     }
 }

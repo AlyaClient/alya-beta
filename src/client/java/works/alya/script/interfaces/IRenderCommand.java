@@ -14,11 +14,13 @@
  *
  */
 
-package works.alya.utilities.misc;
+package works.alya.script.interfaces;
 
-public class AlyaConstants {
-    public static String NAME = "Alya";
-    public static final String VERSION = "0.1";
-    public static final String KIND = "Beta";
-    public static final String BUILD_NUMBER = "07052025.6";
+import net.minecraft.client.gui.DrawContext;
+
+/**
+ * Base interface for render commands.
+ */
+public interface IRenderCommand {
+    void execute(DrawContext context);
 }

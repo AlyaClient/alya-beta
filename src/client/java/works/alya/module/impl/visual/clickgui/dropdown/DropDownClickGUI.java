@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) Alya Client 2024-2025.
  *
@@ -45,7 +46,6 @@ public class DropDownClickGUI extends Screen {
     private final Map<ModuleCategory, DragUtility> categoryDragUtils = new EnumMap<>(ModuleCategory.class);
 
     private static final int SETTING_HEIGHT = 22;
-    private static final int SETTING_INDENT = 2;
     private static final int CATEGORY_HEIGHT = 18;
     private static final int MODULE_HEIGHT = 18;
     private static final int PANEL_WIDTH = 110;
@@ -54,7 +54,7 @@ public class DropDownClickGUI extends Screen {
     private static final int PANEL_SPACING = 8;
     private static final int PADDING = 5;
     private static final int BACKGROUND_COLOR = 0xFF222222;
-    private static final int SETTING_BACKGROUND_COLOR = 0xFF121212;;
+    private static final int SETTING_BACKGROUND_COLOR = 0xFF121212;
     private static final int HOVER_COLOR = 0x30FFFFFF;
     private static final float CORNER_RADIUS = 6f;
     private static final int TOOLTIP_BACKGROUND = 0xFF000000;
@@ -282,7 +282,7 @@ public class DropDownClickGUI extends Screen {
                                 RenderUtility.drawRoundedRect(context, categoryX + 1, y, PANEL_WIDTH - 2, SETTING_HEIGHT, hoverRadius, HOVER_COLOR);
                             }
 
-                            ColorUtility.Colors settingTextColor = ColorUtility.Colors.LIGHT_GRAY;
+                            int settingTextColor = ColorUtility.getColor(ColorUtility.Colors.LIGHT_GRAY);
 
                             TextRendererUtility.renderDynamicText(
                                     context,
@@ -326,7 +326,7 @@ public class DropDownClickGUI extends Screen {
                                     TextRendererUtility.renderDynamicText(
                                             context,
                                             currentMode,
-                                            ColorUtility.Colors.LIGHT_GRAY,
+                                            ColorUtility.getColor(ColorUtility.Colors.LIGHT_GRAY),
                                             dropdownX + 2,
                                             dropdownY + 1,
                                             false,
@@ -368,7 +368,7 @@ public class DropDownClickGUI extends Screen {
                                     TextRendererUtility.renderDynamicText(
                                             context,
                                             valueText,
-                                            ColorUtility.Colors.LIGHT_GRAY,
+                                            ColorUtility.getColor(ColorUtility.Colors.LIGHT_GRAY),
                                             sliderX + sliderWidth / 2 - TextRendererUtility.getTextWidth(valueText) / 2,
                                             y - 2,
                                             false,
@@ -766,25 +766,12 @@ public class DropDownClickGUI extends Screen {
                         for(Setting<?> setting : module.getSettings()) {
                             if(!setting.isVisible()) continue;
 
-                            int controlWidth = PANEL_WIDTH - TextRendererUtility.getTextWidth(setting.getName() + ": ") - PADDING * 6 - SETTING_INDENT;
-                            int controlX = categoryX + PANEL_WIDTH - controlWidth - PADDING * 3;
-                            int controlY = y + PADDING + 2;
-                            int controlHeight = 14;
-
                             if(isMouseOver(mouseX, mouseY, categoryX, y, PANEL_WIDTH, SETTING_HEIGHT)) {
                                 switch(setting) {
-                                    case BooleanSetting booleanSetting -> {
-                                        booleanSetting.toggle();
-                                    }
-                                    case ModeSetting modeSetting -> {
-                                        modeSetting.cycle();
-                                    }
-                                    case NumberSetting numberSetting -> {
-                                        numberSetting.decrement(false);
-                                    }
-                                    case MultipleBooleanSetting multipleBooleanSetting -> {
-                                        multipleBooleanSetting.toggleExpanded();
-                                    }
+                                    case BooleanSetting booleanSetting -> booleanSetting.toggle();
+                                    case ModeSetting modeSetting -> modeSetting.cycle();
+                                    case NumberSetting numberSetting -> numberSetting.decrement(false);
+                                    case MultipleBooleanSetting multipleBooleanSetting -> multipleBooleanSetting.toggleExpanded();
                                     default -> {
                                     }
                                 }
@@ -803,10 +790,6 @@ public class DropDownClickGUI extends Screen {
     private boolean isMouseOver(int mouseX, int mouseY, int x, int y, int width, int height) {
         return mouseX >= x && mouseX <= x + width &&
                 mouseY >= y && mouseY <= y + height;
-    }
-
-    private void renderGradientRoundedRect(DrawContext context, int x, int y, int width, int height, int color1, int color2, Vector4f radius) {
-        RenderUtility.drawGradientRoundedRect(context, x, y, width, height, radius, color1, color2);
     }
 
     @Override
