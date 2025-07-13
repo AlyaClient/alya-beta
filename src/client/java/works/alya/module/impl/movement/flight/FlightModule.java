@@ -18,6 +18,7 @@ package works.alya.module.impl.movement.flight;
 
 import works.alya.module.Module;
 import works.alya.module.ModuleCategory;
+import works.alya.module.impl.movement.flight.anarchy.AnarchyFlight;
 import works.alya.module.impl.movement.flight.ncp.NCPFlight;
 import works.alya.module.impl.movement.flight.vanilla.CreativeFlight;
 import works.alya.module.impl.movement.flight.vanilla.NormalFlight;
@@ -37,7 +38,8 @@ public class FlightModule extends Module {
                 new VerusPacketFlight(this),
                 new VerusDamageFly(this),
                 new VerusGlideFly(this),
-                new NCPFlight(this)
+                new NCPFlight(this),
+                new AnarchyFlight(this)
         );
     }
 

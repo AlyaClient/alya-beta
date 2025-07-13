@@ -16,6 +16,7 @@
 
 package works.alya.module.impl.world;
 
+import org.jetbrains.annotations.NotNull;
 import works.alya.config.setting.impl.BooleanSetting;
 import works.alya.config.setting.impl.ModeSetting;
 import works.alya.config.setting.impl.NumberSetting;
@@ -237,21 +238,7 @@ public class NukerModule extends Module {
                     if(bedBreakingTicks >= 3) {
                         mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
-                        Direction face = Direction.UP;
-                        double relativeY = mc.player.getY() - currentBedBreaking.getY();
-                        if(relativeY > 0.5) {
-                            face = Direction.DOWN;
-                        } else if(Math.abs(dx) > Math.abs(dz)) {
-                            face = dx > 0 ? Direction.WEST : Direction.EAST;
-                        } else {
-                            face = dz > 0 ? Direction.NORTH : Direction.SOUTH;
-                        }
-
-                        PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
-                                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
-                                currentBedBreaking,
-                                face
-                        );
+                        PlayerActionC2SPacket stopBreaking = getPlayerActionC2SPacket(dx, dz);
                         mc.getNetworkHandler().sendPacket(stopBreaking);
 
                         currentBedBreaking = null;
@@ -312,6 +299,25 @@ public class NukerModule extends Module {
             }
         }
     };
+
+    private @NotNull PlayerActionC2SPacket getPlayerActionC2SPacket(double dx, double dz) {
+        Direction face = Direction.UP;
+        double relativeY = mc.player.getY() - currentBedBreaking.getY();
+        if(relativeY > 0.5) {
+            face = Direction.DOWN;
+        } else if(Math.abs(dx) > Math.abs(dz)) {
+            face = dx > 0 ? Direction.WEST : Direction.EAST;
+        } else {
+            face = dz > 0 ? Direction.NORTH : Direction.SOUTH;
+        }
+
+        PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
+                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
+                currentBedBreaking,
+                face
+        );
+        return stopBreaking;
+    }
 
     private boolean isNotBedBlock(Block block) {
         return block != Blocks.RED_BED && block != Blocks.BLACK_BED && block != Blocks.BLUE_BED
