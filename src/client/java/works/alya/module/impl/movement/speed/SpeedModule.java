@@ -18,6 +18,8 @@ package works.alya.module.impl.movement.speed;
 
 import works.alya.module.Module;
 import works.alya.module.ModuleCategory;
+import works.alya.module.impl.movement.flight.anarchy.AnarchyFlight;
+import works.alya.module.impl.movement.speed.anarchy.AnarchySpeed;
 import works.alya.module.impl.movement.speed.blocksmc.BlocksMCSpeed;
 import works.alya.module.impl.movement.speed.ncp.NCPSpeed;
 import works.alya.module.impl.movement.speed.normal.NormalSpeed;
@@ -38,7 +40,8 @@ public class SpeedModule extends Module {
                 new VerusSpeed(this),
                 new BlocksMCSpeed(this),
                 new SpartanSpeed(this),
-                new VulcanSpeed(this)
+                new VulcanSpeed(this),
+                new AnarchySpeed(this)
         );
     }
 
