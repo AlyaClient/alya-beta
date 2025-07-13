@@ -27,6 +27,7 @@ import works.alya.module.ModuleRepository;
 import works.alya.module.impl.combat.AimAssistModule;
 import works.alya.module.impl.combat.AttackDelayModule;
 import works.alya.module.impl.combat.AutoClickerModule;
+import works.alya.module.impl.combat.BacktrackModule;
 import works.alya.module.impl.combat.killaura.KillauraModule;
 import works.alya.module.impl.movement.*;
 import works.alya.module.impl.utility.antivoid.AntiVoidModule;
@@ -174,7 +175,8 @@ public class AlyaClient implements ClientModInitializer {
                         new TargetStrafeModule(),
                         new SpeedMonitorModule(),
                         new AutoClickerModule(),
-                        new AimAssistModule()
+                        new AimAssistModule(),
+                        new BacktrackModule()
                 );
     }
 
