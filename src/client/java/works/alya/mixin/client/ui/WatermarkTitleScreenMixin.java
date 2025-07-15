@@ -16,9 +16,10 @@
 
 package works.alya.mixin.client.ui;
 
+import net.minecraft.util.Identifier;
 import works.alya.AlyaClient;
-import works.alya.utilities.misc.AlyaConstants;
 import works.alya.utilities.render.ColorUtility;
+import works.alya.utilities.render.RenderUtility;
 import works.alya.utilities.render.TextRendererUtility;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.screen.SplashTextRenderer;
@@ -44,33 +45,15 @@ public class WatermarkTitleScreenMixin {
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LogoDrawer;draw(Lnet/minecraft/client/gui/DrawContext;IF)V"))
-    private void renderRyeLogo(LogoDrawer logoDrawer, DrawContext context, int width, float alpha) {
-        String text = "Alya";
-        String versionText = AlyaConstants.VERSION;
+    private void renderAlyaLogo(LogoDrawer logoDrawer, DrawContext context, int width, float alpha) {
+        Identifier logo = Identifier.of("alya", "icons/icon.png");
 
-        int tX = context.getScaledWindowWidth() / 2 - TextRendererUtility.getXlTextWidth(text) / 2;
-        int tY = Math.round(context.getScaledWindowHeight() / 4.5f);
+        int logoWidth = 64;
+        int logoHeight = 64;
+        int x = (context.getScaledWindowWidth() / 2) - (logoWidth / 2);
+        int y = (context.getScaledWindowHeight() / 2) - logoHeight - (context.getScaledWindowHeight() / 5);
 
-        int vX = tX + TextRendererUtility.getXlTextWidth(text);
-        int vY = tY - TextRendererUtility.getXlTextHeight() * 3;
-
-        TextRendererUtility.renderXlText(
-                context,
-                text,
-                ColorUtility.Colors.WHITE,
-                tX,
-                tY,
-                false
-        );
-
-        TextRendererUtility.renderText(
-                context,
-                versionText,
-                ColorUtility.Colors.WHITE,
-                vX,
-                vY,
-                false
-        );
+        RenderUtility.drawImage(logo, x, y, logoWidth, logoHeight, logoWidth, logoHeight, context);
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;III)V"))
