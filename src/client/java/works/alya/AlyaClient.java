@@ -16,6 +16,7 @@
 
 package works.alya;
 
+import works.alya.backend.BackendManager;
 import works.alya.command.CommandBuilder;
 import works.alya.command.CommandRepository;
 import works.alya.command.impl.*;
@@ -69,7 +70,7 @@ public class AlyaClient implements ClientModInitializer {
     public static final String MOD_ID = "alya";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static AlyaClient INSTANCE = new AlyaClient();
-    private static String tenaState = "loading";
+    private static String alyaState = "loading";
     private final ModuleRepository moduleRepository = ModuleRepository.getInstance();
     private static Vec3d lastPos = null;
     private static long lastMoveTime = 0;
@@ -77,6 +78,7 @@ public class AlyaClient implements ClientModInitializer {
     private static final Set<Integer> previouslyPressedKeys = new HashSet<>();
     private static EventBus eventBus;
     private static boolean wasInGame = false;
+    public static BackendManager backendManager;
 
     @Override
     public void onInitializeClient() {
@@ -134,6 +136,12 @@ public class AlyaClient implements ClientModInitializer {
 
             wasInGame = isInGame;
         });
+
+        String userName = System.getProperty("user.name");
+        String userIdHashed = String.valueOf(userName.hashCode());
+        backendManager = new BackendManager(userIdHashed);
+
+        backendManager.goOnline();
     }
 
     private static void initializeModules() {
@@ -202,11 +210,11 @@ public class AlyaClient implements ClientModInitializer {
     }
 
     public static String getState() {
-        return tenaState;
+        return alyaState;
     }
 
     public static void setState(String state) {
-        tenaState = state;
+        alyaState = state;
     }
 
     public static String getName() {
@@ -266,5 +274,9 @@ public class AlyaClient implements ClientModInitializer {
 
     public static String getTime() {
         return new java.text.SimpleDateFormat("hh:mm a").format(new Date());
+    }
+
+    public static int getUsersOnline() {
+        return backendManager.getCurrentOnlineCount();
     }
 }

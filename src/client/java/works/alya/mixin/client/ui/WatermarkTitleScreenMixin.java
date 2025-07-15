@@ -75,7 +75,9 @@ public class WatermarkTitleScreenMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTextWithShadow(Lnet/minecraft/client/font/TextRenderer;Ljava/lang/String;III)V"))
     private void replaceVersionText(DrawContext context, net.minecraft.client.font.TextRenderer textRenderer, String text, int x, int y, int color) {
-        // we ignore demo, modded and version
+        String usersOnline = String.format("%s online", AlyaClient.getUsersOnline());
+
+        TextRendererUtility.renderText(context, usersOnline, ColorUtility.Colors.WHITE, x, y, false);
     }
 
     @Inject(method = "init", at = @At("HEAD"))
