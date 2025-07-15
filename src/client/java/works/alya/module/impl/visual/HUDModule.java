@@ -23,6 +23,7 @@ import works.alya.event.IEventListener;
 import works.alya.event.impl.Render2DEvent;
 import works.alya.module.Module;
 import works.alya.module.ModuleCategory;
+import works.alya.utilities.misc.AlyaConstants;
 import works.alya.utilities.render.ColorUtility;
 import works.alya.utilities.render.RenderUtility;
 import works.alya.utilities.render.TextRendererUtility;
@@ -126,7 +127,7 @@ public class HUDModule extends Module {
         String fpsText = String.format("§7[§r%s FPS§7]§r", AlyaClient.getFps());
         String bpsText = String.format("§7[§r%s BPS§7]§r", AlyaClient.getBps());
         String timeText = String.format("§7[§r%s§7]§r", AlyaClient.getTime());
-        String hudText = AlyaClient.getName();
+        String hudText = AlyaConstants.CLIENT_NAME;
 
         if(showFPS.getValue())
             hudText += " " + fpsText;
