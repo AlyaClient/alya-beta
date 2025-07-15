@@ -20,6 +20,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWImage;
+import works.alya.AlyaClient;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -55,13 +56,10 @@ public class IconLoader {
 
             GLFW.glfwSetWindowIcon(windowHandle, iconImages);
             iconImages.free();
-
-            System.out.println("Custom icons loaded successfully!");
-
         } catch(IOException e) {
-            System.err.println("Failed to load custom icon: " + e.getMessage());
+            AlyaClient.LOGGER.error("Failed to load custom icon: {}", e.getMessage());
         } catch(NullPointerException e) {
-            System.err.println("Icon not found or path incorrect: " + e.getMessage());
+            AlyaClient.LOGGER.error("Icon not found or path incorrect: {}", e.getMessage());
         }
     }
 

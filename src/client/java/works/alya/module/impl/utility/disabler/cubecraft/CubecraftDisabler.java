@@ -20,6 +20,7 @@ import works.alya.event.IEventListener;
 import works.alya.event.impl.MotionEvent;
 import works.alya.module.Module;
 import works.alya.module.SubModule;
+import works.alya.utilities.misc.ChatUtility;
 
 public class CubecraftDisabler extends SubModule {
     public CubecraftDisabler(Module parent) {

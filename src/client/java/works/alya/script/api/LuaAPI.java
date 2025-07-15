@@ -22,7 +22,6 @@ import works.alya.AlyaClient;
 import works.alya.module.Module;
 import works.alya.module.ModuleRepository;
 import works.alya.script.core.Script;
-import works.alya.script.integration.ScriptModule;
 import works.alya.script.integration.ScriptRenderQueue;
 import works.alya.utilities.misc.ChatUtility;
 import works.alya.utilities.player.MoveUtility;
@@ -85,20 +84,6 @@ public class LuaAPI {
 
     public void updateCurrentScript(Script script) {
         currentScript = script;
-    }
-
-    private boolean isScriptEnabled() {
-        if(currentScript == null) return false;
-
-        for(Module module : AlyaClient.INSTANCE.getModuleRepository().getModules()) {
-            if(module instanceof ScriptModule scriptModule) {
-                if(scriptModule.getScript() == currentScript) {
-                    return module.isEnabled();
-                }
-            }
-        }
-
-        return false;
     }
 
     private void registerMinecraftAPI(Globals globals) {
@@ -312,10 +297,12 @@ public class LuaAPI {
                     String colorName = args.checkjstring(1);
                     try {
                         ColorUtility.Colors color = ColorUtility.Colors.valueOf(colorName.toUpperCase());
+
                         return LuaValue.valueOf(ColorUtility.getColor(color));
                     } catch(IllegalArgumentException e) {
                         ChatUtility.sendError("Invalid color name: " + colorName);
                         ChatUtility.sendScriptError(e);
+
                         return LuaValue.valueOf(0xFFFFFFFF);
                     }
                 } else if(args.narg() >= 3) {
@@ -326,6 +313,7 @@ public class LuaAPI {
                     Color color = new Color(r, g, b, a);
                     return LuaValue.valueOf(ColorUtility.getIntFromColor(color));
                 }
+
                 return LuaValue.valueOf(0xFFFFFFFF);
             }
         });
@@ -341,6 +329,7 @@ public class LuaAPI {
 
                 ScriptRenderQueue.setCurrentScript(currentScript);
                 ScriptRenderQueue.addTextRenderCommand(text, x, y, color, shadow);
+
                 return LuaValue.NIL;
             }
         });
@@ -356,6 +345,7 @@ public class LuaAPI {
 
                 ScriptRenderQueue.setCurrentScript(currentScript);
                 ScriptRenderQueue.addRectRenderCommand(x, y, width, height, color);
+
                 return LuaValue.NIL;
             }
         });
@@ -384,7 +374,7 @@ public class LuaAPI {
             @Override
             public LuaValue call(LuaValue arg) {
                 String message = arg.checkjstring();
-                System.out.println("[Script] " + message);
+                AlyaClient.LOGGER.info(message);
                 return LuaValue.NIL;
             }
         });
@@ -412,7 +402,9 @@ public class LuaAPI {
             public LuaValue call(LuaValue arg$1, LuaValue arg$2) {
                 double speed = arg$1.checkdouble();
                 boolean strafe = arg$2.checkboolean();
+
                 MoveUtility.setSpeed(speed, strafe);
+
                 return LuaValue.NIL;
             }
         });
@@ -433,6 +425,7 @@ public class LuaAPI {
                 } catch(InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
+
                 return LuaValue.NIL;
             }
         });
@@ -464,11 +457,14 @@ public class LuaAPI {
             @Override
             public Varargs invoke(Varargs args) {
                 if(mc.world == null) return LuaValue.NIL;
+
                 int x = args.checkint(1);
                 int y = args.checkint(2);
                 int z = args.checkint(3);
+
                 BlockPos pos = new BlockPos(x, y, z);
                 BlockState state = mc.world.getBlockState(pos);
+
                 return CoerceJavaToLua.coerce(state.getBlock());
             }
         });
@@ -477,11 +473,14 @@ public class LuaAPI {
             @Override
             public Varargs invoke(Varargs args) {
                 if(mc.world == null) return LuaValue.NIL;
+
                 int x = args.checkint(1);
                 int y = args.checkint(2);
                 int z = args.checkint(3);
+
                 BlockPos pos = new BlockPos(x, y, z);
                 BlockState state = mc.world.getBlockState(pos);
+
                 return CoerceJavaToLua.coerce(state);
             }
         });
@@ -490,10 +489,13 @@ public class LuaAPI {
             @Override
             public Varargs invoke(Varargs args) {
                 if(mc.world == null) return LuaValue.FALSE;
+
                 int x = args.checkint(1);
                 int y = args.checkint(2);
                 int z = args.checkint(3);
+
                 BlockPos pos = new BlockPos(x, y, z);
+
                 return LuaValue.valueOf(mc.world.getBlockState(pos).isAir());
             }
         });
@@ -502,10 +504,13 @@ public class LuaAPI {
             @Override
             public Varargs invoke(Varargs args) {
                 if(mc.world == null) return LuaValue.valueOf(0);
+
                 int x = args.checkint(1);
                 int y = args.checkint(2);
                 int z = args.checkint(3);
+
                 BlockPos pos = new BlockPos(x, y, z);
+
                 return LuaValue.valueOf(mc.world.getLightLevel(pos));
             }
         });
@@ -514,6 +519,7 @@ public class LuaAPI {
             @Override
             public Varargs invoke(Varargs args) {
                 if(mc.world == null) return LuaValue.NIL;
+
                 double x = args.checkdouble(1);
                 double y = args.checkdouble(2);
                 double z = args.checkdouble(3);

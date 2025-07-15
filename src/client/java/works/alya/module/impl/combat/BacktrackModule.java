@@ -44,15 +44,17 @@ public class BacktrackModule extends Module {
     private static final BooleanSetting playersOnly = new BooleanSetting("PlayersOnly", "Only track player entities", true);
     private static final NumberSetting<Double> maxDistance = new NumberSetting<>("MaxDistance", "Maximum distance to track entities", 15.0, 5.0, 30.0);
     private static final BooleanSetting attackAtBacktrack = new BooleanSetting("AttackAtBacktrack", "Attack entities at their backtracked positions", true);
+    private static final NumberSetting<Double> attackRange = new NumberSetting<>("AttackRange", "Maximum attack range for backtracked positions", 4.0, 3.0, 8.0);
     private final Map<Integer, List<PositionData>> positionHistory = new HashMap<>();
 
     public BacktrackModule() {
-        super("Backtrack", "Abuses lag to gain reach by attacking entities at their previous positions", ModuleCategory.COMBAT);
+        super("Backtrack", "Allows hitting players at their previous positions when they move out of range", ModuleCategory.COMBAT);
 
         addSetting(backtrackTime);
         addSetting(playersOnly);
         addSetting(maxDistance);
         addSetting(attackAtBacktrack);
+        addSetting(attackRange);
     }
 
     @Override
@@ -137,6 +139,7 @@ public class BacktrackModule extends Module {
 
         Vec3d eyePos = mc.player.getEyePos();
         Vec3d lookVec = mc.player.getRotationVec(1.0f);
+        double maxAttackRange = attackRange.getValue();
 
         Entity bestTarget = null;
         double bestScore = Double.MAX_VALUE;
@@ -149,25 +152,32 @@ public class BacktrackModule extends Module {
             Entity entity = mc.world.getEntityById(entityId);
             if(!(entity instanceof LivingEntity) || entity == mc.player) continue;
 
-            for(PositionData posData : positions) {
-                Vec3d pos = posData.position;
+            for(int i = positions.size() - 1; i >= 0; i--) {
+                PositionData posData = positions.get(i);
+                Vec3d historicalPos = posData.position;
 
-                Vec3d toEntity = pos.add(0, entity.getHeight() / 2, 0).subtract(eyePos).normalize();
-                double dot = lookVec.dotProduct(toEntity);
-                double distance = eyePos.distanceTo(pos);
+                double historicalDistance = eyePos.distanceTo(historicalPos.add(0, entity.getHeight() / 2, 0));
 
-                double score = distance * (1.0 - dot);
+                if(historicalDistance <= maxAttackRange) {
+                    Vec3d toEntity = historicalPos.add(0, entity.getHeight() / 2, 0).subtract(eyePos).normalize();
+                    double dot = lookVec.dotProduct(toEntity);
 
-                if(dot > 0.7 && score < bestScore) {
-                    bestScore = score;
-                    bestTarget = entity;
-                    bestPosition = pos;
+                    if(dot > 0.5) {
+                        long age = System.currentTimeMillis() - posData.timestamp;
+                        double score = historicalDistance * (1.0 - dot) + (age / 1000.0);
+
+                        if(score < bestScore) {
+                            bestScore = score;
+                            bestTarget = entity;
+                            bestPosition = historicalPos;
+                        }
+                    }
                 }
             }
         }
 
         if(bestTarget != null) {
-            double distance = mc.player.getPos().distanceTo(bestPosition);
+            double distance = eyePos.distanceTo(bestPosition);
             setPrefix(String.format("%.1f", distance));
         } else {
             setPrefix("");

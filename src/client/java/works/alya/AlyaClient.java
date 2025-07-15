@@ -30,6 +30,7 @@ import works.alya.module.impl.combat.AutoClickerModule;
 import works.alya.module.impl.combat.BacktrackModule;
 import works.alya.module.impl.combat.killaura.KillauraModule;
 import works.alya.module.impl.movement.*;
+import works.alya.module.impl.movement.step.StepModule;
 import works.alya.module.impl.utility.antivoid.AntiVoidModule;
 import works.alya.module.impl.utility.disabler.DisablerModule;
 import works.alya.module.impl.visual.*;
@@ -125,12 +126,10 @@ public class AlyaClient implements ClientModInitializer {
 
             if(isInGame && !wasInGame) {
                 VisualManager.getInstance().applyVisualData();
-                LOGGER.info("Applied visual module data after joining world");
             }
 
             if(!isInGame && wasInGame) {
                 VisualManager.getInstance().saveVisualData();
-                LOGGER.info("Saved visual module data after leaving world");
             }
 
             wasInGame = isInGame;
@@ -176,7 +175,8 @@ public class AlyaClient implements ClientModInitializer {
                         new SpeedMonitorModule(),
                         new AutoClickerModule(),
                         new AimAssistModule(),
-                        new BacktrackModule()
+                        new BacktrackModule(),
+                        new StepModule()
                 );
     }
 

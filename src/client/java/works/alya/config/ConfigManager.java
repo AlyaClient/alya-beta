@@ -45,16 +45,16 @@ public class ConfigManager {
         if(!folder.exists()) {
             boolean result = folder.mkdirs();
             if(!result) {
-                LOGGER.info("Bwoah! Failed to create config folder!");
+                LOGGER.error("Bwoah! Failed to create config folder!");
             }
         }
     }
 
     /**
-     * Saves the current configuration state of all modules, including their settings
-     * and keybinds, to a JSON file specified by the provided name.
+     * Saves the current configuration state of all modules, including their settings,
+     * to a JSON file specified by the provided name.
      * The configuration data includes whether the module is enabled, all associated
-     * module settings with their respective values and types, and any defined keybinds.
+     * module settings with their respective values and types.
      * If the file does not exist, it is created, and if it does exist, it is overwritten.
      *
      * @param name The name of the configuration file to save (excluding the file extension).
@@ -62,10 +62,8 @@ public class ConfigManager {
     public static void saveConfig(String name) {
         Map<String, Object> config = new LinkedHashMap<>();
         Map<String, Object> modulesConfig = new LinkedHashMap<>();
-        Map<String, Integer> keybinds = new LinkedHashMap<>();
 
         for(Module module : AlyaClient.INSTANCE.getModuleRepository().getModules()) {
-            // Skip visual modules (except for enabled state) as they are handled by VisualManager
             if (module.getCategory() == ModuleCategory.VISUAL) {
                 Map<String, Object> moduleConfig = new LinkedHashMap<>();
                 moduleConfig.put("enabled", module.isEnabled());
@@ -110,13 +108,9 @@ public class ConfigManager {
             modulesConfig.put(module.getName(), moduleConfig);
 
             Integer key = KeybindManager.getInstance().getKeyForModule(module);
-            if(key != null) {
-                keybinds.put(module.getName(), key);
-            }
         }
 
         config.put("modules", modulesConfig);
-        config.put("keybinds", keybinds);
 
         File configFile = new File(CONFIG_FOLDER + name + ".json");
         try(Writer writer = new FileWriter(configFile)) {
@@ -129,7 +123,7 @@ public class ConfigManager {
 
     /**
      * Loads a configuration file by its name, applies the settings to the respective
-     * modules and keybinds, and updates the client state. If the configuration file does
+     * modules, and updates the client state. If the configuration file does
      * not exist, an error message is displayed in chat.
      *
      * @param name The name of the configuration file to load, excluding the file extension.
@@ -178,18 +172,6 @@ public class ConfigManager {
                                     }
                                 }
                             }
-                        }
-                    }
-                }
-
-                @SuppressWarnings("unchecked")
-                Map<String, Double> keybinds = (Map<String, Double>) config.get("keybinds");
-                if(keybinds != null) {
-                    KeybindManager keybindManager = KeybindManager.getInstance();
-                    for(Map.Entry<String, Double> entry : keybinds.entrySet()) {
-                        Module module = AlyaClient.INSTANCE.getModuleRepository().getModuleByName(entry.getKey());
-                        if(module != null) {
-                            keybindManager.bind(module, entry.getValue().intValue());
                         }
                     }
                 }

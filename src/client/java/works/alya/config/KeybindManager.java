@@ -64,7 +64,7 @@ public class KeybindManager {
         if(!folder.exists()) {
             boolean result = folder.mkdirs();
             if(!result) {
-                LOGGER.info("Failed to create keybindings folder!");
+                LOGGER.error("Failed to create keybindings folder!");
             }
         }
     }
