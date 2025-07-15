@@ -48,11 +48,10 @@ public class ScriptManager {
 
     private ScriptManager() {
         scriptsDir = new File(mc.runDirectory, "Alya/scripts");
-        if(!scriptsDir.exists()) {
-            if(!scriptsDir.mkdirs()) {
-                System.err.println("Failed to create scripts directory: " + scriptsDir.getAbsolutePath());
-            }
-        }
+        if(scriptsDir.exists()) return;
+        if(scriptsDir.mkdirs()) return;
+
+        AlyaClient.LOGGER.error("Failed to create scripts directory: {}", scriptsDir.getAbsolutePath());
     }
 
     public static ScriptManager getInstance() {

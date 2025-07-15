@@ -76,4 +76,9 @@ public abstract class MinecraftClientMixin {
 
         AlyaClient.getEventBus().dispatch(event);
     }
+
+    @Inject(method = "close", at = @At("HEAD"))
+    public void close(CallbackInfo ci) {
+        AlyaClient.backendManager.goOffline();
+    }
 }

@@ -99,6 +99,9 @@ public class AutoClickerModule extends Module {
         updateMouseStates();
 
         if(randomizeCps.getValue() && System.currentTimeMillis() - Math.max(lastLeftClick, lastRightClick) > 1000) {
+            if(minCps.getValue() > maxCps.getValue()) {
+                minCps.setValue(maxCps.getValue());
+            }
             currentCps = random.nextInt(maxCps.getValue() - minCps.getValue() + 1) + minCps.getValue();
         } else {
             currentCps = cps.getValue();

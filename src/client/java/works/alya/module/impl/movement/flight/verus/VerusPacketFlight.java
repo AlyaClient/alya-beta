@@ -35,21 +35,22 @@ public class VerusPacketFlight extends SubModule {
         super("VerusPacket", parent);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> onMotion = event -> {
         if(!event.isPre()) return;
         if(mc.player == null || mc.getNetworkHandler() == null) return;
 
-        ChatUtility.sendDebug("Sending funny packets...");
         Vec3d playerPos = mc.player.getPos().add(0, -1, 0);
         BlockPos blockPos = new BlockPos((int) playerPos.x, (int) playerPos.y, (int) playerPos.z);
-        BlockHitResult hitResult = new BlockHitResult(playerPos, Direction.UP, blockPos, false);
+        BlockHitResult hitResult = new BlockHitResult(playerPos, Direction.DOWN, blockPos, false);
 
-        ChatUtility.sendDebug("RESULT: " + hitResult);
+        ChatUtility.sendDebug("BlockResult: " + hitResult);
 
         PlayerInteractBlockC2SPacket placePacket = new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, hitResult, 0);
 
         event.setPitch(90f);
 
+        ChatUtility.sendDebug("Sending funny packets...");
         mc.getNetworkHandler().sendPacket(placePacket);
 
         MoveUtility.setMotionY(0);
@@ -60,5 +61,4 @@ public class VerusPacketFlight extends SubModule {
             MoveUtility.setSpeed(0);
         }
     };
-
 }

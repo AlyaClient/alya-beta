@@ -16,6 +16,7 @@
 
 package works.alya;
 
+import works.alya.backend.BackendManager;
 import works.alya.command.CommandBuilder;
 import works.alya.command.CommandRepository;
 import works.alya.command.impl.*;
@@ -27,8 +28,10 @@ import works.alya.module.ModuleRepository;
 import works.alya.module.impl.combat.AimAssistModule;
 import works.alya.module.impl.combat.AttackDelayModule;
 import works.alya.module.impl.combat.AutoClickerModule;
+import works.alya.module.impl.combat.BacktrackModule;
 import works.alya.module.impl.combat.killaura.KillauraModule;
 import works.alya.module.impl.movement.*;
+import works.alya.module.impl.movement.step.StepModule;
 import works.alya.module.impl.utility.antivoid.AntiVoidModule;
 import works.alya.module.impl.utility.disabler.DisablerModule;
 import works.alya.module.impl.visual.*;
@@ -67,7 +70,7 @@ public class AlyaClient implements ClientModInitializer {
     public static final String MOD_ID = "alya";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static AlyaClient INSTANCE = new AlyaClient();
-    private static String tenaState = "loading";
+    private static String alyaState = "loading";
     private final ModuleRepository moduleRepository = ModuleRepository.getInstance();
     private static Vec3d lastPos = null;
     private static long lastMoveTime = 0;
@@ -75,6 +78,7 @@ public class AlyaClient implements ClientModInitializer {
     private static final Set<Integer> previouslyPressedKeys = new HashSet<>();
     private static EventBus eventBus;
     private static boolean wasInGame = false;
+    public static BackendManager backendManager;
 
     @Override
     public void onInitializeClient() {
@@ -124,16 +128,20 @@ public class AlyaClient implements ClientModInitializer {
 
             if(isInGame && !wasInGame) {
                 VisualManager.getInstance().applyVisualData();
-                LOGGER.info("Applied visual module data after joining world");
             }
 
             if(!isInGame && wasInGame) {
                 VisualManager.getInstance().saveVisualData();
-                LOGGER.info("Saved visual module data after leaving world");
             }
 
             wasInGame = isInGame;
         });
+
+        String userName = System.getProperty("user.name");
+        String userIdHashed = String.valueOf(userName.hashCode());
+        backendManager = new BackendManager(userIdHashed);
+
+        backendManager.goOnline();
     }
 
     private static void initializeModules() {
@@ -174,7 +182,9 @@ public class AlyaClient implements ClientModInitializer {
                         new TargetStrafeModule(),
                         new SpeedMonitorModule(),
                         new AutoClickerModule(),
-                        new AimAssistModule()
+                        new AimAssistModule(),
+                        new BacktrackModule(),
+                        new StepModule()
                 );
     }
 
@@ -200,11 +210,11 @@ public class AlyaClient implements ClientModInitializer {
     }
 
     public static String getState() {
-        return tenaState;
+        return alyaState;
     }
 
     public static void setState(String state) {
-        tenaState = state;
+        alyaState = state;
     }
 
     public static String getName() {
@@ -264,5 +274,9 @@ public class AlyaClient implements ClientModInitializer {
 
     public static String getTime() {
         return new java.text.SimpleDateFormat("hh:mm a").format(new Date());
+    }
+
+    public static int getUsersOnline() {
+        return backendManager.getCurrentOnlineCount();
     }
 }
