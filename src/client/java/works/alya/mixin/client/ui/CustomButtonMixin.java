@@ -60,10 +60,6 @@ public class CustomButtonMixin {
 
         RenderUtility.drawRoundedRect(context, x, y, width, height, radius, backgroundColor);
 
-        if(isHovered && isActive) {
-            RenderUtility.drawRoundedRectOutline(context, x, y, width, height, 6.0f, 1.0f, 0xFF7A7A7A);
-        }
-
         String buttonText = message.getString();
         int textWidth = TextRendererUtility.getTextWidth(buttonText);
         int textHeight = TextRendererUtility.getTextHeight();
