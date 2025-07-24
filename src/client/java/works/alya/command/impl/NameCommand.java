@@ -33,9 +33,9 @@ public class NameCommand extends AbstractCommand {
     @Override
     protected void build(LiteralArgumentBuilder<ServerCommandSource> builder) {
         builder
-                .then(CommandManager.argument("name", StringArgumentType.word())
+                .then(CommandManager.argument("name", StringArgumentType.greedyString())
                         .executes(context -> {
-                            AlyaConstants.NAME = StringArgumentType.getString(context, "name");
+                            AlyaConstants.CLIENT_NAME = StringArgumentType.getString(context, "name");
                             return 1;
                         }))
                 .executes(this::usage);
