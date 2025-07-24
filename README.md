@@ -1,4 +1,4 @@
-# Rye Client
+# Alya Client
 
 TODO: Write readme
 
@@ -7,7 +7,7 @@ Please read [Excellent mods](.github/ExcellentMods.md) before running,
 these are mods to improve your experience.
 
 These mods are guaranteed to work and if they do not,
-contact me on [Discord](https://discord.com) => `@thoq.1`
+please report the compatability error(s)
 
 # License
 This project falls under the [MIT](https://opensource.org/license/mit) license,
