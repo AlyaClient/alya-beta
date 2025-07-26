@@ -16,6 +16,7 @@
 
 package works.alya.module.impl.combat;
 
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import works.alya.config.setting.impl.ModeSetting;
 import works.alya.config.setting.impl.NumberSetting;
 import works.alya.event.IEventListener;
@@ -38,12 +39,13 @@ public class VelocityModule extends Module {
         addSetting(verticalVelocity.setVisibilityCondition(() -> "Standard".equals(mode.getValue())));
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<PacketReceiveEvent> onPacketReceiveEvent = event -> {
-        if(!isEnabled() || mc.player == null) return;
+        if(!isEnabled() || mc.player == null || !event.isPre()) return;
 
         String mode = ((ModeSetting) getSetting("Mode")).getValue();
 
-        if(mc.player.hurtTime > 0 && event.isPre()) {
+        if(event.getPacket() instanceof EntityVelocityUpdateS2CPacket) {
             switch(mode) {
                 case "Standard": {
                     float xz = ((NumberSetting<Float>) getSetting("Horizontal")).getValue();

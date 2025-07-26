@@ -32,25 +32,20 @@ public class VerusSpeed extends SubModule {
         this.addSettings(this.verusDamageBoost);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> onMotion = event -> {
         if(!event.isPre()) return;
         if(this.mc.player == null) return;
+
         boolean forwardOnly = this.mc.options.forwardKey.isPressed() && !this.mc.options.backKey.isPressed() && !this.mc.options.leftKey.isPressed() && !this.mc.options.rightKey.isPressed();
 
-        if(this.mc.options.jumpKey.isPressed())
-            return;
-
         if(forwardOnly)
-            MoveUtility.setSpeed(0.285f, true);
-        else
-            MoveUtility.setSpeed(0.26f, true);
+            MoveUtility.setSpeed(0.28f, true);
 
-        if(MoveUtility.isMoving() && this.mc.player.isOnGround())
-            this.mc.player.jump();
+        if(this.mc.player.isOnGround())
+            mc.player.jump();
 
-        if(this.verusDamageBoost.getValue() && this.mc.player.hurtTime > 0) {
+        if(this.verusDamageBoost.getValue() && this.mc.player.hurtTime > 0)
             MoveUtility.setSpeed((double) this.mc.player.hurtTime / 2, true);
-        }
     };
-
 }

@@ -32,6 +32,7 @@ import works.alya.module.impl.combat.BacktrackModule;
 import works.alya.module.impl.combat.killaura.KillauraModule;
 import works.alya.module.impl.movement.*;
 import works.alya.module.impl.movement.step.StepModule;
+import works.alya.module.impl.utility.AnticheatDetect;
 import works.alya.module.impl.utility.antivoid.AntiVoidModule;
 import works.alya.module.impl.utility.disabler.DisablerModule;
 import works.alya.module.impl.visual.*;
@@ -184,7 +185,8 @@ public class AlyaClient implements ClientModInitializer {
                         new AutoClickerModule(),
                         new AimAssistModule(),
                         new BacktrackModule(),
-                        new StepModule()
+                        new StepModule(),
+                        new AnticheatDetect()
                 );
     }
 

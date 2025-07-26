@@ -13,7 +13,6 @@
     "misc.WorldRendererMixin",
     "network.ClientConnectionMixin",
     "network.ClientPlayerEntityMixin",
-    "network.ClientPlayNetworkHandlerMixin",
     "performance.ChunkRenderingOptimizationMixin",
     "performance.EntityCullingOptimizationMixin",
     "ui.CustomButtonMixin",

@@ -51,14 +51,34 @@ public class ClientPlayerEntityMixin {
             ci.cancel();
     }
 
+    @Redirect(method = {"sendMovementPackets", "tick"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getX()D"))
+    private double getX(ClientPlayerEntity player) {
+        return motionEvent != null ? motionEvent.getX() : player.getX();
+    }
+
+    @Redirect(method = {"sendMovementPackets", "tick"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getY()D"))
+    private double getY(ClientPlayerEntity player) {
+        return motionEvent != null ? motionEvent.getY() : player.getY();
+    }
+
+    @Redirect(method = {"sendMovementPackets", "tick"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getZ()D"))
+    private double getZ(ClientPlayerEntity player) {
+        return motionEvent != null ? motionEvent.getZ() : player.getZ();
+    }
+
     @Redirect(method = {"sendMovementPackets", "tick"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getYaw()F"))
     private float getYaw(ClientPlayerEntity player) {
-        return motionEvent.getYaw();
+        return motionEvent != null ? motionEvent.getYaw() : player.getYaw();
     }
 
     @Redirect(method = {"sendMovementPackets", "tick"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getPitch()F"))
     private float getPitch(ClientPlayerEntity player) {
-        return motionEvent.getPitch();
+        return motionEvent != null ? motionEvent.getPitch() : player.getPitch();
+    }
+
+    @Redirect(method = {"sendMovementPackets", "tick"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isOnGround()Z"))
+    private boolean isOnGround(ClientPlayerEntity player) {
+        return motionEvent != null ? motionEvent.isOnGround() : player.isOnGround();
     }
 
     @Inject(method = "sendMovementPackets", at = @At("TAIL"))

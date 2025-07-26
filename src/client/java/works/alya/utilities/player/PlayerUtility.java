@@ -25,7 +25,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class PlayerUtility {
 
-    public void applyDamage(MinecraftClient mc, int height) {
+    public void applyDamage(MinecraftClient mc, float height) {
         if(mc.player == null || mc.getNetworkHandler() == null) return;
 
         double x = mc.player.getX();

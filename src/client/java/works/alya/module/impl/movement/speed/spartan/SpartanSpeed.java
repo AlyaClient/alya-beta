@@ -34,6 +34,10 @@ public class SpartanSpeed extends SubModule {
         if(!event.isPre()) return;
         if(this.mc.player == null) return;
 
+        if(MoveUtility.isMoving() && mc.player.isOnGround()) {
+            mc.player.jump();
+        }
+
         if(mc.player.isOnGround()) {
             ticks = 0;
         } else {

@@ -56,7 +56,7 @@ public class VerusDamageFly extends SubModule {
         float pitch = this.mc.player.getPitch();
 
         if(damage) {
-            MoveUtility.setSpeed(8f, true);
+            MoveUtility.setSpeed(2f, true);
         } else {
             MoveUtility.setSpeed(0f, true);
         }

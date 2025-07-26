@@ -17,9 +17,11 @@
 package works.alya.mixin.client.network;
 
 import works.alya.AlyaClient;
+import works.alya.event.impl.PacketReceiveEvent;
 import works.alya.event.impl.PacketSendEvent;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.packet.Packet;
+import io.netty.channel.ChannelHandlerContext;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -45,6 +47,25 @@ public class ClientConnectionMixin {
             at = @At("TAIL"), cancellable = true)
     private void onSendPost(Packet<?> packet, CallbackInfo ci) {
         PacketSendEvent event = new PacketSendEvent(packet, ci);
+        event.setPost();
+
+        AlyaClient.getEventBus().dispatch(event);
+    }
+
+    @Inject(method = "channelRead0*", at = @At("HEAD"), cancellable = true)
+    private void onPacketReceive(ChannelHandlerContext channelHandlerContext, Packet<?> packet, CallbackInfo ci) {
+        PacketReceiveEvent event = new PacketReceiveEvent(packet);
+
+        AlyaClient.getEventBus().dispatch(event);
+
+        if(event.isCanceled()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "channelRead0*", at = @At("TAIL"))
+    private void onPacketReceivePost(ChannelHandlerContext channelHandlerContext, Packet<?> packet, CallbackInfo ci) {
+        PacketReceiveEvent event = new PacketReceiveEvent(packet);
         event.setPost();
 
         AlyaClient.getEventBus().dispatch(event);
