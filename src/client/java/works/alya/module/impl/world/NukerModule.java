@@ -1,15 +1,15 @@
 /*
- * Copyright (c) Alya Beta 2024 - 2025
+ * Copyright (c) Alya Client 2024 - 2025.
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
  *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
- * This file is provided with a free license in hopes it will be useful.
+ * This file is provided with a free license in hopes that it will be useful.
  *
- * Alya (and subsequently, all its files) are all licensed under the MIT License.
- * Alya should have come with a copy of the MIT License.
+ * Alya Client is licensed under the MIT License.
+ * Alya Client should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  *     <https://opensource.org/license/mit>
  *
@@ -275,21 +275,7 @@ public final class NukerModule extends Module {
 
                             mc.getNetworkHandler().sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
 
-                            Direction face = Direction.UP;
-                            double relativeY = mc.player.getY() - blockPos.getY();
-                            if(relativeY > 0.5) {
-                                face = Direction.DOWN;
-                            } else if(Math.abs(dx) > Math.abs(dz)) {
-                                face = dx > 0 ? Direction.WEST : Direction.EAST;
-                            } else {
-                                face = dz > 0 ? Direction.NORTH : Direction.SOUTH;
-                            }
-
-                            PlayerActionC2SPacket startBreaking = new PlayerActionC2SPacket(
-                                    PlayerActionC2SPacket.Action.START_DESTROY_BLOCK,
-                                    blockPos,
-                                    face
-                                );
+                            final PlayerActionC2SPacket startBreaking = getPlayerActionC2SPacket(blockPos, dx, dz, PlayerActionC2SPacket.Action.START_DESTROY_BLOCK);
                             mc.getNetworkHandler().sendPacket(startBreaking);
 
                             return;
@@ -301,23 +287,27 @@ public final class NukerModule extends Module {
         }
     };
 
-    private @NotNull PlayerActionC2SPacket getPlayerActionC2SPacket(double dx, double dz) {
-        Direction face = Direction.UP;
-        double relativeY = mc.player.getY() - currentBedBreaking.getY();
-        if(relativeY > 0.5) {
+    private @NotNull PlayerActionC2SPacket getPlayerActionC2SPacket(final BlockPos blockPos, final double dx, final double dz, final PlayerActionC2SPacket.Action startDestroyBlock) {
+        Direction face;
+        assert mc.player != null;
+        double relativeY = mc.player.getY() - blockPos.getY();
+        if (relativeY > 0.5) {
             face = Direction.DOWN;
-        } else if(Math.abs(dx) > Math.abs(dz)) {
+        } else if (Math.abs(dx) > Math.abs(dz)) {
             face = dx > 0 ? Direction.WEST : Direction.EAST;
         } else {
             face = dz > 0 ? Direction.NORTH : Direction.SOUTH;
         }
 
-        PlayerActionC2SPacket stopBreaking = new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK,
-                currentBedBreaking,
+        return new PlayerActionC2SPacket(
+                startDestroyBlock,
+                blockPos,
                 face
         );
-        return stopBreaking;
+    }
+
+    private @NotNull PlayerActionC2SPacket getPlayerActionC2SPacket(double dx, double dz) {
+        return getPlayerActionC2SPacket(currentBedBreaking, dx, dz, PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK);
     }
 
     private boolean isNotBedBlock(Block block) {

@@ -1,15 +1,15 @@
 /*
- * Copyright (c) Alya Beta 2024 - 2025
+ * Copyright (c) Alya Client 2024 - 2025.
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
  *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
- * This file is provided with a free license in hopes it will be useful.
+ * This file is provided with a free license in hopes that it will be useful.
  *
- * Alya (and subsequently, all its files) are all licensed under the MIT License.
- * Alya should have come with a copy of the MIT License.
+ * Alya Client is licensed under the MIT License.
+ * Alya Client should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  *     <https://opensource.org/license/mit>
  *
@@ -43,13 +43,6 @@ public final class ScriptModule extends Module {
     private final Script script;
 
     /**
-     * Registers event listeners for the script.
-     */
-    private final IEventListener<Render2DEvent> render2DListener;
-    private final IEventListener<MotionEvent> motionListener;
-    private final IEventListener<TickEvent> tickListener;
-
-    /**
      * Creates a new ScriptModule instance.
      *
      * @param script The script to wrap as a module
@@ -58,20 +51,20 @@ public final class ScriptModule extends Module {
         super(script.getName(), script.getDescription(), ModuleCategory.SCRIPTS);
         this.script = script;
 
-        this.render2DListener = event -> {
-            if(isEnabled()) {
+        final IEventListener<Render2DEvent> render2DListener = event -> {
+            if (isEnabled()) {
                 script.callFunction("onRender2D", CoerceJavaToLua.coerce(event));
             }
         };
 
-        this.motionListener = event -> {
-            if(isEnabled()) {
+        final IEventListener<MotionEvent> motionListener = event -> {
+            if (isEnabled()) {
                 script.callFunction("onMotionEvent", CoerceJavaToLua.coerce(event));
             }
         };
 
-        this.tickListener = event -> {
-            if(isEnabled()) {
+        final IEventListener<TickEvent> tickListener = event -> {
+            if (isEnabled()) {
                 script.callFunction("onTickEvent", CoerceJavaToLua.coerce(event));
             }
         };

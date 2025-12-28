@@ -1,15 +1,15 @@
 /*
- * Copyright (c) Alya Beta 2024 - 2025
+ * Copyright (c) Alya Client 2024 - 2025.
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
  *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
- * This file is provided with a free license in hopes it will be useful.
+ * This file is provided with a free license in hopes that it will be useful.
  *
- * Alya (and subsequently, all its files) are all licensed under the MIT License.
- * Alya should have come with a copy of the MIT License.
+ * Alya Client is licensed under the MIT License.
+ * Alya Client should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  *     <https://opensource.org/license/mit>
  *
@@ -24,7 +24,7 @@ import works.alya.module.Module;
 import works.alya.module.ModuleCategory;
 
 public final class AttackDelayModule extends Module {
-    private final ModeSetting modeSetting = new ModeSetting("Delay", "The delay to use", "1.16.5", "1.7", "1.8", "1.16.5");
+    private final ModeSetting modeSetting = new ModeSetting("Delay", "The delay to use", "New", "1.7", "1.8", "New");
 
     public AttackDelayModule() {
         super("AttackDelay", "Attack Delay", "Change the attack delay", ModuleCategory.COMBAT);
@@ -48,19 +48,19 @@ public final class AttackDelayModule extends Module {
                 }
                 break;
             }
-            case "1.16.5": {
-                // Don't reset attack ticks - respect vanilla weapon cooldown
+            case "New": {
+                // respect vanilla weapon cooldown
                 break;
             }
         }
     };
 
-    public boolean canAttack() {
-        if(mc.player == null) return false;
+    public boolean cantAttack() {
+        if(mc.player == null) return true;
 
         String mode = modeSetting.getValue();
 
-        return switch(mode) {
+        return !switch (mode) {
             case "1.7" -> true; // no delay
             case "1.8" -> mc.player.getAttackCooldownProgress(0.0f) >= 0.1f; // Minimal delay
             case "1.16.5" -> mc.player.getAttackCooldownProgress(0.0f) >= 1.0f; // Full weapon cooldown

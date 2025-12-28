@@ -1,15 +1,15 @@
 /*
- * Copyright (c) Alya Beta 2024 - 2025
+ * Copyright (c) Alya Client 2024 - 2025.
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
  *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
- * This file is provided with a free license in hopes it will be useful.
+ * This file is provided with a free license in hopes that it will be useful.
  *
- * Alya (and subsequently, all its files) are all licensed under the MIT License.
- * Alya should have come with a copy of the MIT License.
+ * Alya Client is licensed under the MIT License.
+ * Alya Client should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  *     <https://opensource.org/license/mit>
  *
@@ -30,6 +30,7 @@ import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
 import net.minecraft.util.Hand;
 
 public final class VerusFireballLongJump extends SubModule {
+
     private static boolean hasThrown = false;
     private static int originalSlot = -1;
 
@@ -37,6 +38,7 @@ public final class VerusFireballLongJump extends SubModule {
         super("VerusFireball", parent);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<TickEvent> onTick = event -> {
         if (mc.player == null || mc.getNetworkHandler() == null) return;
 
@@ -93,8 +95,5 @@ public final class VerusFireballLongJump extends SubModule {
         originalSlot = -1;
     }
 
-    public boolean hasThrown() {
-        return hasThrown;
-    }
 
 }

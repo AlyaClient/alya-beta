@@ -1,15 +1,15 @@
 /*
- * Copyright (c) Alya Beta 2024 - 2025
+ * Copyright (c) Alya Client 2024 - 2025.
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
  *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
- * This file is provided with a free license in hopes it will be useful.
+ * This file is provided with a free license in hopes that it will be useful.
  *
- * Alya (and subsequently, all its files) are all licensed under the MIT License.
- * Alya should have come with a copy of the MIT License.
+ * Alya Client is licensed under the MIT License.
+ * Alya Client should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  *     <https://opensource.org/license/mit>
  *
@@ -17,14 +17,12 @@
 
 package works.alya.module.impl.movement.flight.ncp;
 
-import net.minecraft.network.packet.s2c.play.MoveMinecartAlongTrackS2CPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import works.alya.event.IEventListener;
 import works.alya.event.impl.MotionEvent;
 import works.alya.module.Module;
 import works.alya.module.SubModule;
-import works.alya.utilities.misc.ChatUtility;
 import works.alya.utilities.player.MoveUtility;
 
 public final class NCPFlight extends SubModule {
@@ -35,6 +33,7 @@ public final class NCPFlight extends SubModule {
         super("NCP", parent);
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<MotionEvent> motionEvent = event -> {
         if(mc.player == null) return;
         if(mc.world == null) return;
@@ -44,23 +43,14 @@ public final class NCPFlight extends SubModule {
         BlockPos blockAbovePlayer = new BlockPos((int)pos.x, (int)(pos.y + mc.player.getHeight() + 0.5), (int)pos.z);
         boolean isBlockAbovePlayer = !mc.world.getBlockState(blockAbovePlayer).isAir();
 
-        if(true) {
-            if(!clipped) {
-                mc.player.setPosition(pos.x, pos.y + 0.1, pos.z);
-                MoveUtility.setMotionY(0.2);
-                clipped = true;
-            }
-        } else {
-            if(!messageSent) {
-                ChatUtility.sendWarning("Please be under a block before enabling this fly!");
-                messageSent = true;
-            }
+        if(!clipped) {
+            mc.player.setPosition(pos.x, pos.y + 0.1, pos.z);
+            MoveUtility.setMotionY(0.2);
+            clipped = true;
         }
 
-        if(clipped) {
-            MoveUtility.setSpeed(2.0f, true);
-            MoveUtility.setMotionY(-0.2);
-        }
+        MoveUtility.setSpeed(2.0f, true);
+        MoveUtility.setMotionY(-0.2);
     };
 
     @Override

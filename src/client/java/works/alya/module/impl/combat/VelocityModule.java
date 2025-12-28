@@ -1,15 +1,15 @@
 /*
- * Copyright (c) Alya Beta 2024 - 2025
+ * Copyright (c) Alya Client 2024 - 2025.
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
  *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
- * This file is provided with a free license in hopes it will be useful.
+ * This file is provided with a free license in hopes that it will be useful.
  *
- * Alya (and subsequently, all its files) are all licensed under the MIT License.
- * Alya should have come with a copy of the MIT License.
+ * Alya Client is licensed under the MIT License.
+ * Alya Client should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  *     <https://opensource.org/license/mit>
  *
@@ -39,6 +39,7 @@ public final class VelocityModule extends Module {
         addSetting(verticalVelocity.setVisibilityCondition(() -> "Standard".equals(mode.getValue())));
     }
 
+    @SuppressWarnings("unused")
     private final IEventListener<PacketReceiveEvent> onPacketReceiveEvent = event -> {
         if(!isEnabled() || mc.player == null) return;
 
@@ -74,7 +75,7 @@ public final class VelocityModule extends Module {
                     double multiplierXZ = 0.6 / mc.player.hurtTime;
                     double multiplierY = 0.9 / mc.player.hurtTime;
 
-                    if(mc.player.hurtTime > 0) {
+                    if(mc.player.hurtTime > 1) {
                         ChatUtility.sendDebug("player velocity >modified<");
                         ChatUtility.sendDebug(String.format("[multiplierXZ: %f], [multiplierY: %f]", multiplierXZ, multiplierY));
                         mc.player.setVelocity(

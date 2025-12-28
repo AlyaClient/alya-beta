@@ -1,15 +1,15 @@
 /*
- * Copyright (c) Alya Beta 2024 - 2025
+ * Copyright (c) Alya Client 2024 - 2025.
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
  *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
- * This file is provided with a free license in hopes it will be useful.
+ * This file is provided with a free license in hopes that it will be useful.
  *
- * Alya (and subsequently, all its files) are all licensed under the MIT License.
- * Alya should have come with a copy of the MIT License.
+ * Alya Client is licensed under the MIT License.
+ * Alya Client should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  *     <https://opensource.org/license/mit>
  *
@@ -80,10 +80,11 @@ public final class TargetStrafeModule extends Module {
             String attackMode = killaura.getAttackMode();
             if (attackMode.equals("Single") || attackMode.equals("Switch")) {
                 Entity killauraTarget = killaura.getCurrentTarget();
-                
+
                 if (killauraTarget != null) {
                     currentTarget = killauraTarget;
-                } else if (currentTarget != null && isValidStrafeTarget(currentTarget)) {
+                } else //noinspection StatementWithEmptyBody
+                    if (currentTarget != null && isValidStrafeTarget(currentTarget)) {
                 } else {
                     currentTarget = null;
                 }
@@ -108,10 +109,10 @@ public final class TargetStrafeModule extends Module {
 
     private boolean isValidStrafeTarget(Entity entity) {
         if (mc.player == null || entity == null || !entity.isAlive()) return false;
-        
+
         double distance = mc.player.distanceTo(entity);
         if (distance > range.getValue() * 1.5) return false;
-        
+
         return isValidTarget(entity);
     }
 
@@ -238,10 +239,12 @@ public final class TargetStrafeModule extends Module {
         jumpTimer = 0;
     }
 
+    @SuppressWarnings("unused")
     public Entity getCurrentTarget() {
         return currentTarget;
     }
 
+    @SuppressWarnings("unused")
     public boolean isStrafing() {
         return isEnabled() && currentTarget != null;
     }

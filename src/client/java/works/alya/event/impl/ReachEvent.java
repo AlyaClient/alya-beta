@@ -1,15 +1,15 @@
 /*
- * Copyright (c) Alya Beta 2024 - 2025
+ * Copyright (c) Alya Client 2024 - 2025.
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
  *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
- * This file is provided with a free license in hopes it will be useful.
+ * This file is provided with a free license in hopes that it will be useful.
  *
- * Alya (and subsequently, all its files) are all licensed under the MIT License.
- * Alya should have come with a copy of the MIT License.
+ * Alya Client is licensed under the MIT License.
+ * Alya Client should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  *     <https://opensource.org/license/mit>
  *
@@ -25,6 +25,7 @@ import net.minecraft.entity.Entity;
  * Event fired when calculating reach distance for player interactions.
  * This allows modules to modify the reach distance.
  */
+@SuppressWarnings("unused")
 public final class ReachEvent extends Event {
     private double reachDistance;
     private Entity targetEntity;
@@ -42,7 +43,7 @@ public final class ReachEvent extends Event {
      * Creates a new ReachEvent with the specified reach distance and target entity.
      *
      * @param reachDistance The default reach distance
-     * @param targetEntity The entity being reached for, can be null
+     * @param targetEntity The entity being reached for can be null
      */
     public ReachEvent(final double reachDistance, final Entity targetEntity) {
         this.reachDistance = reachDistance;

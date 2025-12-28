@@ -1,15 +1,15 @@
 /*
- * Copyright (c) Alya Beta 2024 - 2025
+ * Copyright (c) Alya Client 2024 - 2025.
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
  *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
- * This file is provided with a free license in hopes it will be useful.
+ * This file is provided with a free license in hopes that it will be useful.
  *
- * Alya (and subsequently, all its files) are all licensed under the MIT License.
- * Alya should have come with a copy of the MIT License.
+ * Alya Client is licensed under the MIT License.
+ * Alya Client should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  *     <https://opensource.org/license/mit>
  *
@@ -66,13 +66,14 @@ public class TextRendererUtility {
      * @param posY The Y-coordinate where the text should be rendered.
      * @param shadow A boolean value indicating whether to render the text with a shadow effect.
      */
+    @SuppressWarnings("unused")
     public static void renderXlText(
-            DrawContext context,
-            String text,
-            Colors color,
-            int posX,
-            int posY,
-            boolean shadow
+            final DrawContext context,
+            final String text,
+            final Colors color,
+            final int posX,
+            final int posY,
+            final boolean shadow
     ) {
         context.drawText(
                 rendererXl,
@@ -94,13 +95,14 @@ public class TextRendererUtility {
      * @param posY The Y-coordinate where the text should be rendered.
      * @param shadow A boolean value indicating whether to render the text with a shadow effect.
      */
+    @SuppressWarnings("unused")
     public static void renderMdText(
-            DrawContext context,
-            String text,
-            Colors color,
-            int posX,
-            int posY,
-            boolean shadow
+            final DrawContext context,
+            final String text,
+            final Colors color,
+            final int posX,
+            final int posY,
+            final boolean shadow
     ) {
         context.drawText(
                 rendererMd,
@@ -186,7 +188,8 @@ public class TextRendererUtility {
      * @param text The text whose width is to be measured.
      * @return The width of the text in pixels.
      */
-    public static int getXlTextWidth(String text) {
+    @SuppressWarnings("unused")
+    public static int getXlTextWidth(final String text) {
         return rendererXl.getWidth(text);
     }
 
@@ -204,6 +207,7 @@ public class TextRendererUtility {
      *
      * @return The height of the extra-large font in pixels.
      */
+    @SuppressWarnings("unused")
     public static int getXlTextHeight() {
         return rendererXl.fontHeight;
     }
@@ -213,6 +217,7 @@ public class TextRendererUtility {
      *
      * @return The height of the medium font in pixels.
      */
+    @SuppressWarnings("unused")
     public static int getMdTextHeight() {
         return rendererMd.fontHeight;
     }

@@ -1,15 +1,15 @@
 /*
- * Copyright (c) Alya Beta 2024 - 2025
+ * Copyright (c) Alya Client 2024 - 2025.
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
  *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
- * This file is provided with a free license in hopes it will be useful.
+ * This file is provided with a free license in hopes that it will be useful.
  *
- * Alya (and subsequently, all its files) are all licensed under the MIT License.
- * Alya should have come with a copy of the MIT License.
+ * Alya Client is licensed under the MIT License.
+ * Alya Client should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
  *     <https://opensource.org/license/mit>
  *
@@ -184,6 +184,8 @@ public final class ScaffoldModule extends Module {
 
         ((MinecraftClientAccessor) mc).setItemUseCooldown(0);
 
+        //todo: fix deprecation
+        assert mc.player != null;
         ItemStack heldItem = mc.player.getInventory().getStack(slot);
         if(heldItem.isEmpty() || !(heldItem.getItem() instanceof BlockItem)) {
             return;
@@ -191,8 +193,8 @@ public final class ScaffoldModule extends Module {
 
         BlockHitResult hitResult = new BlockHitResult(
                 getHitVec(),
-                lastBlockCache.getEnumFacing(),
-                lastBlockCache.getBlockPos(),
+                lastBlockCache.enumFacing(),
+                lastBlockCache.blockPos(),
                 false
         );
 
@@ -214,7 +216,7 @@ public final class ScaffoldModule extends Module {
     private void updateRotations() {
         switch(rotationMode.getValue()) {
             case "Enum":
-                this.yaw = getDirectionYaw(lastBlockCache.getEnumFacing()) - 180;
+                this.yaw = getDirectionYaw(lastBlockCache.enumFacing()) - 180;
                 this.pitch = 77;
                 break;
             case "Brute Force RayCast":
@@ -242,9 +244,10 @@ public final class ScaffoldModule extends Module {
                                 mc.player
                         );
 
+                        assert mc.world != null;
                         BlockHitResult result = mc.world.raycast(context);
 
-                        if(result != null && result.getBlockPos().equals(lastBlockCache.getBlockPos())) {
+                        if(result != null && result.getBlockPos().equals(lastBlockCache.blockPos())) {
                             bestYaw = testYaw;
                             bestPitch = testPitch;
                             break;
@@ -259,36 +262,31 @@ public final class ScaffoldModule extends Module {
     }
 
     private float getDirectionYaw(Direction direction) {
-        switch(direction) {
-            case NORTH:
-                return 0;
-            case SOUTH:
-                return 180;
-            case WEST:
-                return 90;
-            case EAST:
-                return 270;
-            default:
-                return getYaw();
-        }
+        return switch (direction) {
+            case NORTH -> 0;
+            case SOUTH -> 180;
+            case WEST -> 90;
+            case EAST -> 270;
+            default -> getYaw();
+        };
     }
 
     private Vec3d getHitVec() {
-        double x = lastBlockCache.getBlockPos().getX() + 0.5;
-        double y = lastBlockCache.getBlockPos().getY() + 0.5;
-        double z = lastBlockCache.getBlockPos().getZ() + 0.5;
+        double x = lastBlockCache.blockPos().getX() + 0.5;
+        double y = lastBlockCache.blockPos().getY() + 0.5;
+        double z = lastBlockCache.blockPos().getZ() + 0.5;
 
-        if(lastBlockCache.getEnumFacing() != Direction.UP && lastBlockCache.getEnumFacing() != Direction.DOWN) {
+        if(lastBlockCache.enumFacing() != Direction.UP && lastBlockCache.enumFacing() != Direction.DOWN) {
             y += 0.5;
         } else {
             x += 0.3;
             z += 0.3;
         }
 
-        if(lastBlockCache.getEnumFacing() == Direction.SOUTH || lastBlockCache.getEnumFacing() == Direction.NORTH) {
+        if(lastBlockCache.enumFacing() == Direction.SOUTH || lastBlockCache.enumFacing() == Direction.NORTH) {
             x += 0.15;
         }
-        if(lastBlockCache.getEnumFacing() == Direction.EAST || lastBlockCache.getEnumFacing() == Direction.WEST) {
+        if(lastBlockCache.enumFacing() == Direction.EAST || lastBlockCache.enumFacing() == Direction.WEST) {
             z += 0.15;
         }
 
@@ -347,6 +345,7 @@ public final class ScaffoldModule extends Module {
     private BlockCache findBlockCacheAtPosition(BlockPos belowBlockPos, int x, int z) {
         for(int i = 1; i > -3; i -= 2) {
             final BlockPos blockPos = belowBlockPos.add(x * i, 0, z * i);
+            assert mc.world != null;
             if(mc.world.getBlockState(blockPos).isAir()) {
                 BlockCache blockCache = checkSurroundingBlocks(blockPos);
                 if(blockCache != null) return blockCache;
@@ -358,8 +357,10 @@ public final class ScaffoldModule extends Module {
     private BlockCache checkSurroundingBlocks(BlockPos blockPos) {
         for(final Direction direction : Direction.values()) {
             final BlockPos neighborPos = blockPos.offset(direction);
+            assert mc.world != null;
             final BlockState blockState = mc.world.getBlockState(neighborPos);
 
+            //todo: fix deprecation
             if(!blockState.isAir() && !blockState.isLiquid() && blockState.isSolidBlock(mc.world, neighborPos)) {
                 return new BlockCache(neighborPos, direction.getOpposite());
             }
@@ -373,6 +374,7 @@ public final class ScaffoldModule extends Module {
         for(int i = 0; i < 9; i++) {
             ItemStack stack = mc.player.getInventory().getStack(i);
             if(!stack.isEmpty() && stack.getItem() instanceof BlockItem blockItem) {
+                //todo: fix deprecation
                 if(blockItem.getBlock() != Blocks.AIR &&
                         !blockItem.getBlock().getDefaultState().isLiquid()) {
                     return i;
@@ -386,21 +388,6 @@ public final class ScaffoldModule extends Module {
         return mc.player != null ? mc.player.getYaw() : 0;
     }
 
-    public static final class BlockCache {
-        private final BlockPos blockPos;
-        private final Direction enumFacing;
-
-        public BlockCache(final BlockPos blockPos, final Direction enumFacing) {
-            this.blockPos = blockPos;
-            this.enumFacing = enumFacing;
-        }
-
-        public BlockPos getBlockPos() {
-            return blockPos;
-        }
-
-        public Direction getEnumFacing() {
-            return enumFacing;
-        }
+    public record BlockCache(BlockPos blockPos, Direction enumFacing) {
     }
 }
