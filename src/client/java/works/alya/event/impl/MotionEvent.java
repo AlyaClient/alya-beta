@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -22,7 +23,7 @@ import net.minecraft.entity.Entity;
 public final class MotionEvent extends Event {
     private boolean canceled = false;
 
-    public void setCanceled(boolean canceled) {
+    public void setCanceled(final boolean canceled) {
         this.canceled = canceled;
     }
 
@@ -93,7 +94,7 @@ public final class MotionEvent extends Event {
 
     private Entity player;
 
-    public MotionEvent(Entity player, double x, double y, double z, float yaw, float pitch, boolean onGround) {
+    public MotionEvent(final Entity player, final double x, final double y, final double z, final float yaw, final float pitch, final boolean onGround) {
         this.player = player;
         this.x = x;
         this.y = y;

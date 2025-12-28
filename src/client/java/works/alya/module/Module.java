@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -40,14 +41,14 @@ public abstract class Module {
     private final HashMap<String, SubModule> submodules = new HashMap<>();
     protected final ModeSetting mode = new ModeSetting("Mode", "Da mode", "");
 
-    protected Module(String name, String displayName, String description, ModuleCategory category) {
+    protected Module(final String name, final String displayName, final String description, final ModuleCategory category) {
         this.name = name;
         this.displayName = displayName;
         this.description = description;
         this.category = category;
     }
 
-    protected Module(String name, String description, ModuleCategory category) {
+    protected Module(final String name, final String description, final ModuleCategory category) {
         this.name = name;
         this.displayName = name;
         this.description = description;
@@ -57,7 +58,7 @@ public abstract class Module {
     protected void addSubmodules(final SubModule... modules) {
         this.addSetting(this.mode);
 
-        this.mode.addCallback((Boolean before) -> {
+        this.mode.addCallback((final Boolean before) -> {
             if(this.isEnabled()) {
                 if(before) {
                     this.submodules.get(this.mode.getValue()).onDisable();
@@ -81,12 +82,12 @@ public abstract class Module {
     }
 
     public Map<String, Object> saveState() {
-        Map<String, Object> state = new HashMap<>();
+        final Map<String, Object> state = new HashMap<>();
         state.put("enabled", this.enabled);
         return state;
     }
 
-    public void loadState(Map<String, Object> state) {
+    public void loadState(final Map<String, Object> state) {
         if(state.containsKey("enabled")) {
             setEnabled((Boolean) state.get("enabled"));
         }
@@ -112,7 +113,7 @@ public abstract class Module {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(final boolean enabled) {
         this.enabled = enabled;
         if(enabled) {
             AlyaClient.getEventBus().subscribe(this);
@@ -132,7 +133,7 @@ public abstract class Module {
         setEnabled(!enabled);
     }
 
-    protected <T> void addSetting(Setting<T> setting) {
+    protected <T> void addSetting(final Setting<T> setting) {
         settings.put(setting.getName().toLowerCase(), setting);
 
         // For visual modules, add a callback to save settings when they change
@@ -146,7 +147,7 @@ public abstract class Module {
         }
     }
 
-    public Setting<?> getSetting(String name) {
+    public Setting<?> getSetting(final String name) {
         return settings.get(name.toLowerCase());
     }
 
@@ -173,7 +174,7 @@ public abstract class Module {
      *
      * @param prefix The prefix to display before the module name
      */
-    public void setPrefix(String prefix) {
+    public void setPrefix(final String prefix) {
         this.prefix = prefix != null ? prefix : "";
     }
 

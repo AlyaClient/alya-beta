@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -19,7 +20,7 @@ package works.alya.module;
 import java.util.*;
 
 @SuppressWarnings("unchecked")
-public class ModuleRepository {
+public final class ModuleRepository {
     private static final ModuleRepository INSTANCE = new ModuleRepository();
     private final Map<String, Module> modules = new HashMap<>();
 
@@ -41,7 +42,7 @@ public class ModuleRepository {
      *
      * @param module the module to register in the repository
      */
-    public void registerModule(Module module) {
+    public void registerModule(final Module module) {
         modules.put(module.getName().toLowerCase(), module);
     }
 
@@ -52,7 +53,7 @@ public class ModuleRepository {
      * @param <T>         the type of the module extending the {@link java.lang.Module} class
      * @return the module instance of the specified class type if found, or {@code null} if no such module exists
      */
-    public <T extends Module> T getModule(Class<T> moduleClass) {
+    public <T extends Module> T getModule(final Class<T> moduleClass) {
         return (T) modules.values()
                 .stream()
                 .filter(module -> module.getClass().equals(moduleClass))
@@ -67,7 +68,7 @@ public class ModuleRepository {
      * @param name the name of the module to retrieve
      * @return the {@link java.lang.Module} instance with the specified name, or {@code null} if no module is found
      */
-    public Module getModuleByName(String name) {
+    public Module getModuleByName(final String name) {
         return modules.get(name.toLowerCase());
     }
 

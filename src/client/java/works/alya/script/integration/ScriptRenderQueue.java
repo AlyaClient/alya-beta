@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -34,7 +35,7 @@ import java.util.Map;
  * Manages rendering commands from scripts.
  * Stores rendering commands and executes them during render events.
  */
-public class ScriptRenderQueue {
+public final class ScriptRenderQueue {
     private static final List<IRenderCommand> renderCommands = new ArrayList<>();
     private static final Map<Script, List<IRenderCommand>> scriptCommandMap = new HashMap<>();
     private static Script currentScript = null;
@@ -53,7 +54,7 @@ public class ScriptRenderQueue {
      *
      * @param script The current script
      */
-    public static void setCurrentScript(Script script) {
+    public static void setCurrentScript(final Script script) {
         currentScript = script;
     }
 
@@ -62,11 +63,11 @@ public class ScriptRenderQueue {
      *
      * @param script The script to clear commands for
      */
-    public static void clearCommandsForScript(Script script) {
+    public static void clearCommandsForScript(final Script script) {
         if (script == null) return;
 
         synchronized(renderCommands) {
-            List<IRenderCommand> commands = scriptCommandMap.get(script);
+            final List<IRenderCommand> commands = scriptCommandMap.get(script);
             if (commands != null) {
                 renderCommands.removeAll(commands);
                 commands.clear();
@@ -83,8 +84,8 @@ public class ScriptRenderQueue {
      * @param color  The text color
      * @param shadow Whether to render with shadow
      */
-    public static void addTextRenderCommand(String text, int x, int y, int color, boolean shadow) {
-        TextRenderCommand command = new TextRenderCommand(text, x, y, color, shadow);
+    public static void addTextRenderCommand(final String text, final int x, final int y, final int color, final boolean shadow) {
+        final TextRenderCommand command = new TextRenderCommand(text, x, y, color, shadow);
         addCommandToScript(command);
     }
 
@@ -97,8 +98,8 @@ public class ScriptRenderQueue {
      * @param height The height of the rectangle
      * @param color  The rectangle color
      */
-    public static void addRectRenderCommand(float x, float y, float width, float height, int color) {
-        RectRenderCommand command = new RectRenderCommand(x, y, width, height, color);
+    public static void addRectRenderCommand(final float x, final float y, final float width, final float height, final int color) {
+        final RectRenderCommand command = new RectRenderCommand(x, y, width, height, color);
         addCommandToScript(command);
     }
 
@@ -107,7 +108,7 @@ public class ScriptRenderQueue {
      *
      * @param command The command to add
      */
-    private static void addCommandToScript(IRenderCommand command) {
+    private static void addCommandToScript(final IRenderCommand command) {
         synchronized(renderCommands) {
             renderCommands.add(command);
 
@@ -122,9 +123,9 @@ public class ScriptRenderQueue {
      *
      * @param context The draw context
      */
-    private static void processRenderQueue(DrawContext context) {
+    private static void processRenderQueue(final DrawContext context) {
         synchronized(renderCommands) {
-            for(IRenderCommand command : renderCommands) {
+            for(final IRenderCommand command : renderCommands) {
                 command.execute(context);
             }
             renderCommands.clear();

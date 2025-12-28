@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -26,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import works.alya.AlyaClient;
 
-public class BackendAPI {
+public final class BackendAPI {
     private static final String BASE_URL = "https://rye.thoq.dev/api/v1/users";
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
@@ -38,8 +39,8 @@ public class BackendAPI {
         this.objectMapper = new ObjectMapper();
     }
 
-    public void joinOnline(String userId, String sessionId) throws Exception {
-        String requestBody = """
+    public void joinOnline(final String userId, final String sessionId) throws Exception {
+        final String requestBody = """
                 {
                     "userId": "%s",
                     "sessionId": "%s",
@@ -47,14 +48,14 @@ public class BackendAPI {
                 }
                 """.formatted(userId, sessionId);
 
-        HttpRequest request = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .timeout(Duration.ofSeconds(30))
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request,
+        final HttpResponse<String> response = httpClient.send(request,
                 HttpResponse.BodyHandlers.ofString());
 
         if(response.statusCode() != 200) {
@@ -62,8 +63,8 @@ public class BackendAPI {
         }
     }
 
-    public void sendHeartbeat(String userId, String sessionId) throws Exception {
-        String requestBody = """
+    public void sendHeartbeat(final String userId, final String sessionId) throws Exception {
+        final String requestBody = """
                 {
                     "userId": "%s",
                     "sessionId": "%s",
@@ -71,7 +72,7 @@ public class BackendAPI {
                 }
                 """.formatted(userId, sessionId);
 
-        HttpRequest request = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -81,8 +82,8 @@ public class BackendAPI {
         httpClient.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    public void leaveOnline(String userId, String sessionId) throws Exception {
-        String requestBody = """
+    public void leaveOnline(final String userId, final String sessionId) throws Exception {
+        final String requestBody = """
                 {
                     "userId": "%s",
                     "sessionId": "%s",
@@ -90,7 +91,7 @@ public class BackendAPI {
                 }
                 """.formatted(userId, sessionId);
 
-        HttpRequest request = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
@@ -101,18 +102,18 @@ public class BackendAPI {
     }
 
     public int getOnlineCount() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder()
+        final HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL))
                 .header("Content-Type", "application/json")
                 .GET()
                 .timeout(Duration.ofSeconds(30))
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request,
+        final HttpResponse<String> response = httpClient.send(request,
                 HttpResponse.BodyHandlers.ofString());
 
         if(response.statusCode() == 200) {
-            JsonNode jsonResponse = objectMapper.readTree(response.body());
+            final JsonNode jsonResponse = objectMapper.readTree(response.body());
             return jsonResponse.get("onlineUsers").asInt();
         }
         return -1;

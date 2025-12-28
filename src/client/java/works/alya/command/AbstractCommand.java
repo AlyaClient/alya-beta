@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -26,12 +27,12 @@ public abstract class AbstractCommand {
     private final int permissionLevel;
     protected final MinecraftClient mc = MinecraftClient.getInstance();
 
-    protected AbstractCommand(String name, int permissionLevel) {
+    protected AbstractCommand(final String name, final int permissionLevel) {
         this.name = name;
         this.permissionLevel = permissionLevel;
     }
 
-    protected AbstractCommand(String name) {
+    protected AbstractCommand(final String name) {
         this(name, 0);
     }
 
@@ -55,14 +56,14 @@ public abstract class AbstractCommand {
      * Build the command logic
      * @param builder The command builder
      */
-    protected abstract void build(LiteralArgumentBuilder<ServerCommandSource> builder);
+    protected abstract void build(final LiteralArgumentBuilder<ServerCommandSource> builder);
 
     /**
      * Registers the command
      * @param dispatcher Command dispatcher
      */
-    public void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        LiteralArgumentBuilder<ServerCommandSource> builder = LiteralArgumentBuilder
+    public void register(final CommandDispatcher<ServerCommandSource> dispatcher) {
+        final LiteralArgumentBuilder<ServerCommandSource> builder = LiteralArgumentBuilder
                 .<ServerCommandSource>literal(getName())
                 .requires(source -> source.hasPermissionLevel(getPermissionLevel()));
 

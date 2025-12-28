@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -22,15 +23,15 @@ import net.minecraft.server.command.ServerCommandSource;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandRepository {
+public final class CommandRepository {
     private static final List<AbstractCommand> commands = new ArrayList<>();
 
-    public static void registerCommand(AbstractCommand command) {
+    public static void registerCommand(final AbstractCommand command) {
         commands.add(command);
     }
 
-    public static void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher) {
-        for(AbstractCommand command : commands) {
+    public static void registerCommands(final CommandDispatcher<ServerCommandSource> dispatcher) {
+        for(final AbstractCommand command : commands) {
             command.register(dispatcher);
         }
     }

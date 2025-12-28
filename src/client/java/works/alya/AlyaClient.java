@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -66,7 +67,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class AlyaClient implements ClientModInitializer {
+public final class AlyaClient implements ClientModInitializer {
     public static final String MOD_ID = "alya";
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static AlyaClient INSTANCE = new AlyaClient();
@@ -107,8 +108,8 @@ public class AlyaClient implements ClientModInitializer {
                 return;
             }
 
-            long handle = client.getWindow().getHandle();
-            Set<Integer> currentlyPressed = new HashSet<>();
+            final long handle = client.getWindow().getHandle();
+            final Set<Integer> currentlyPressed = new HashSet<>();
 
             for(int key = GLFW.GLFW_KEY_SPACE; key <= GLFW.GLFW_KEY_LAST; key++) {
                 if(InputUtil.isKeyPressed(handle, key)) {
@@ -124,7 +125,7 @@ public class AlyaClient implements ClientModInitializer {
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            boolean isInGame = client.player != null && client.world != null;
+            final boolean isInGame = client.player != null && client.world != null;
 
             if(isInGame && !wasInGame) {
                 VisualManager.getInstance().applyVisualData();
@@ -137,8 +138,8 @@ public class AlyaClient implements ClientModInitializer {
             wasInGame = isInGame;
         });
 
-        String userName = System.getProperty("user.name");
-        String userIdHashed = String.valueOf(userName.hashCode());
+        final String userName = System.getProperty("user.name");
+        final String userIdHashed = String.valueOf(userName.hashCode());
         backendManager = new BackendManager(userIdHashed);
 
         backendManager.goOnline();
@@ -213,7 +214,7 @@ public class AlyaClient implements ClientModInitializer {
         return alyaState;
     }
 
-    public static void setState(String state) {
+    public static void setState(final String state) {
         alyaState = state;
     }
 
@@ -243,15 +244,15 @@ public class AlyaClient implements ClientModInitializer {
         double bps = 0.0;
 
         if(mc.player != null) {
-            Vec3d currentPos = mc.player.getPos();
-            long currentTime = System.currentTimeMillis();
+            final Vec3d currentPos = mc.player.getPos();
+            final long currentTime = System.currentTimeMillis();
 
             if(lastPos != null) {
-                double distance = Math.sqrt(
+                final double distance = Math.sqrt(
                         Math.pow(currentPos.x - lastPos.x, 2) +
                                 Math.pow(currentPos.z - lastPos.z, 2)
                 );
-                double timeElapsed = (currentTime - lastMoveTime) / 1000.0;
+                final double timeElapsed = (currentTime - lastMoveTime) / 1000.0;
 
                 if(timeElapsed >= 0.1) {
                     bps = distance / timeElapsed;

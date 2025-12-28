@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -38,28 +39,60 @@ import java.util.Map;
  * Handles script execution and integration with the module system.
  */
 @SuppressWarnings("unused")
-public class ScriptModule extends Module {
-    private Script script = null;
+public final class ScriptModule extends Module {
+    private final Script script;
+
+    /**
+     * Registers event listeners for the script.
+     */
+    private final IEventListener<Render2DEvent> render2DListener;
+    private final IEventListener<MotionEvent> motionListener;
+    private final IEventListener<TickEvent> tickListener;
 
     /**
      * Creates a new ScriptModule instance.
      *
      * @param script The script to wrap as a module
      */
-    public ScriptModule(Script script) {
+    public ScriptModule(final Script script) {
         super(script.getName(), script.getDescription(), ModuleCategory.SCRIPTS);
         this.script = script;
 
+        this.render2DListener = event -> {
+            if(isEnabled()) {
+                script.callFunction("onRender2D", CoerceJavaToLua.coerce(event));
+            }
+        };
+
+        this.motionListener = event -> {
+            if(isEnabled()) {
+                script.callFunction("onMotionEvent", CoerceJavaToLua.coerce(event));
+            }
+        };
+
+        this.tickListener = event -> {
+            if(isEnabled()) {
+                script.callFunction("onTickEvent", CoerceJavaToLua.coerce(event));
+            }
+        };
+
         createSettings();
+    }
+
+    @Override
+    protected void onEnable() {
+        super.onEnable();
+
+        script.callFunction("onEnable");
     }
 
     /**
      * Creates settings from script settings.
      */
     private void createSettings() {
-        for(Map.Entry<String, Object> entry : script.getSettings().entrySet()) {
-            String name = entry.getKey();
-            Object value = entry.getValue();
+        for(final Map.Entry<String, Object> entry : script.getSettings().entrySet()) {
+            final String name = entry.getKey();
+            final Object value = entry.getValue();
 
             if(value instanceof Boolean) {
                 addSetting(new BooleanSetting(name, name, (Boolean) value));
@@ -80,39 +113,11 @@ public class ScriptModule extends Module {
             } else if(value instanceof Double) {
                 addSetting(new NumberSetting<>(name, name, (Double) value, 0.0, 100.0));
             } else if(value instanceof String) {
-                ModeSetting modeSetting = new ModeSetting(name, name, (String) value);
+                final ModeSetting modeSetting = new ModeSetting(name, name, (String) value);
                 modeSetting.add((String) value);
                 addSetting(modeSetting);
             }
         }
-    }
-
-    /**
-     * Registers event listeners for the script.
-     */
-    private final IEventListener<Render2DEvent> render2DListener = event -> {
-        if(isEnabled()) {
-            script.callFunction("onRender2D", CoerceJavaToLua.coerce(event));
-        }
-    };
-
-    private final IEventListener<MotionEvent> motionListener = event -> {
-        if(isEnabled()) {
-            script.callFunction("onMotionEvent", CoerceJavaToLua.coerce(event));
-        }
-    };
-
-    private final IEventListener<TickEvent> tickListener = event -> {
-        if(isEnabled()) {
-            script.callFunction("onTickEvent", CoerceJavaToLua.coerce(event));
-        }
-    };
-
-    @Override
-    protected void onEnable() {
-        super.onEnable();
-
-        script.callFunction("onEnable");
     }
 
     @Override
@@ -138,11 +143,11 @@ public class ScriptModule extends Module {
      * Updates settings in the script based on module settings.
      */
     public void updateScriptSettings() {
-        for(Setting<?> setting : getSettings()) {
-            String name = setting.getName();
-            Object value = setting.getValue();
+        for(final Setting<?> setting : getSettings()) {
+            final String name = setting.getName();
+            final Object value = setting.getValue();
 
-            LuaValue settingsTable = script.getGlobals().get("settings");
+            final LuaValue settingsTable = script.getGlobals().get("settings");
             if(!settingsTable.isnil() && settingsTable.istable()) {
                 settingsTable.set(name, CoerceJavaToLua.coerce(value));
             }

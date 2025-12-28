@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -38,7 +39,7 @@ import java.util.Map;
  * Handles loading, execution, and management of scripts.
  */
 @SuppressWarnings({"CallToPrintStackTrace", "unused", "FieldCanBeLocal"})
-public class ScriptManager {
+public final class ScriptManager {
     private static final ScriptManager INSTANCE = new ScriptManager();
     private final MinecraftClient mc = MinecraftClient.getInstance();
     private final List<Script> scripts = new ArrayList<>();
@@ -77,21 +78,21 @@ public class ScriptManager {
             return;
         }
 
-        File[] scriptFiles = scriptsDir.listFiles((dir, name) -> name.endsWith(".lua"));
+        final File[] scriptFiles = scriptsDir.listFiles((dir, name) -> name.endsWith(".lua"));
         if(scriptFiles == null) {
             return;
         }
 
-        for(File scriptFile : scriptFiles) {
+        for(final File scriptFile : scriptFiles) {
             try {
-                Script script = loadScript(scriptFile);
+                final Script script = loadScript(scriptFile);
                 scripts.add(script);
 
-                ScriptModule module = new ScriptModule(script);
+                final ScriptModule module = new ScriptModule(script);
                 scriptModules.put(script.getName(), module);
 
                 AlyaClient.INSTANCE.getModuleRepository().registerModule(module);
-            } catch(Exception ex) {
+            } catch(final Exception ex) {
                 ChatUtility.sendError("Failed to load script: " + scriptFile.getName());
                 ex.printStackTrace();
             }
@@ -105,18 +106,18 @@ public class ScriptManager {
      * @return The loaded Script object
      * @throws IOException If the script cannot be read
      */
-    private Script loadScript(File file) throws IOException {
-        try(FileReader reader = new FileReader(file)) {
-            Globals globals = JsePlatform.standardGlobals();
+    private Script loadScript(final File file) throws IOException {
+        try(final FileReader reader = new FileReader(file)) {
+            final Globals globals = JsePlatform.standardGlobals();
 
-            Script tempScript = new Script(file, file.getName().replace(".lua", ""), "", globals);
+            final Script tempScript = new Script(file, file.getName().replace(".lua", ""), "", globals);
             luaAPI.register(globals, tempScript);
-            LuaValue chunk = globals.load(reader, file.getName());
+            final LuaValue chunk = globals.load(reader, file.getName());
             chunk.call();
-            String name = globals.get("name").optjstring(file.getName().replace(".lua", ""));
-            String description = globals.get("description").optjstring("No description provided");
+            final String name = globals.get("name").optjstring(file.getName().replace(".lua", ""));
+            final String description = globals.get("description").optjstring("No description provided");
 
-            Script finalScript = new Script(file, name, description, globals);
+            final Script finalScript = new Script(file, name, description, globals);
 
             luaAPI.updateCurrentScript(finalScript);
 

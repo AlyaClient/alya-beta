@@ -9,7 +9,7 @@
 	],
 	"contact": {
 		"homepage": "https://rye.thoq.dev",
-		"sources": "https://github.com/ryeclient/rye-v1"
+		"sources": "https://github.com/AlyaClient/alya-beta"
 	},
 	"license": "MIT",
 	"icon": "assets/alya/icon.png",

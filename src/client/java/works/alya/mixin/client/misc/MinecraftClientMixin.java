@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -36,8 +37,8 @@ public abstract class MinecraftClientMixin {
     public abstract Window getWindow();
 
     @Inject(at = @At("HEAD"), method = "render")
-    public void getWindowTitle(boolean tick, CallbackInfo ci) {
-        String ryeState = AlyaClient.getState();
+    public void getWindowTitle(final boolean tick, final CallbackInfo ci) {
+        final String clientState = AlyaClient.getState();
 
         String title = String.format(
                 "%s %s %s (%s)",
@@ -47,7 +48,7 @@ public abstract class MinecraftClientMixin {
                 AlyaClient.getBuildNumber()
         );
 
-        title += switch(ryeState) {
+        title += switch(clientState) {
             case "loading" -> " - Injecting...";
             case "mainMenu" -> " - Main Menu";
             case "inGame" -> " - In Game";
@@ -58,8 +59,8 @@ public abstract class MinecraftClientMixin {
     }
 
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-    private void onPreTick(CallbackInfo ci) {
-        TickEvent event = new TickEvent(ci);
+    private void onPreTick(final CallbackInfo ci) {
+        final TickEvent event = new TickEvent(ci);
 
         AlyaClient.getEventBus().dispatch(event);
 
@@ -69,8 +70,8 @@ public abstract class MinecraftClientMixin {
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private void onPostTick(CallbackInfo ci) {
-        TickEvent event = new TickEvent(ci);
+    private void onPostTick(final CallbackInfo ci) {
+        final TickEvent event = new TickEvent(ci);
 
         event.setPost();
 
@@ -78,7 +79,7 @@ public abstract class MinecraftClientMixin {
     }
 
     @Inject(method = "close", at = @At("HEAD"))
-    public void close(CallbackInfo ci) {
+    public void close(final CallbackInfo ci) {
         AlyaClient.backendManager.goOffline();
     }
 }

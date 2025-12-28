@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -28,7 +29,7 @@ import works.alya.utilities.player.PlayerUtility;
  * @author slqnt
  * @since 0.1
  */
-public class PositionAntiVoid extends SubModule {
+public final class PositionAntiVoid extends SubModule {
     private final PlayerUtility playerUtility = new PlayerUtility();
     private final NumberSetting<Integer> distance = new NumberSetting<>("Distance", "Distance to check for void", 4, 1, 10);
 

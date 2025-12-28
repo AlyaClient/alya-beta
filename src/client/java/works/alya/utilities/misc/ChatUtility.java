@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -27,9 +28,9 @@ import net.minecraft.util.Formatting;
 import javax.swing.tree.ExpandVetoException;
 
 @SuppressWarnings("unused")
-public class ChatUtility {
+public final class ChatUtility {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
-    private static final String RYE = "§5Rye§r";
+    private static final String RYE = "§5Alya§r";
 
     /**
      * Sends a formatted message to the player
@@ -37,19 +38,19 @@ public class ChatUtility {
      * @param message    The message to send
      * @param formatting The color/formatting to apply
      */
-    public static void sendMessage(String message, Formatting formatting) {
+    public static void sendMessage(final String message, final Formatting formatting) {
         if(mc.player != null) {
-            String newMessage = String.format("%s %s", RYE, message.replace("»", "§0»"));
-            MutableText text = Text.literal(message).setStyle(Style.EMPTY.withColor(formatting));
+            final String newMessage = String.format("%s %s", RYE, message.replace("»", "§0»"));
+            final MutableText text = Text.literal(message).setStyle(Style.EMPTY.withColor(formatting));
             mc.player.sendMessage(text, false);
         }
     }
 
-    public static void sendDebug(String message) {
-        boolean debug = AlyaClient.INSTANCE.getModuleRepository().getModule(DebugModule.class).isEnabled();
+    public static void sendDebug(final String message) {
+        final boolean debug = AlyaClient.INSTANCE.getModuleRepository().getModule(DebugModule.class).isEnabled();
 
         if(mc.player != null && debug) {
-            MutableText text = Text.literal("Debug » " + message);
+            final MutableText text = Text.literal("Debug » " + message);
             mc.player.sendMessage(text, false);
         }
     }
@@ -59,7 +60,7 @@ public class ChatUtility {
      *
      * @param message The message to send
      */
-    public static void sendMessage(String message) {
+    public static void sendMessage(final String message) {
         sendMessage(message, Formatting.WHITE);
     }
 
@@ -68,11 +69,11 @@ public class ChatUtility {
      *
      * @param message The error message
      */
-    public static void sendError(String message) {
+    public static void sendError(final String message) {
         sendMessage("Error » " + message, Formatting.RED);
     }
 
-    public static void sendScriptError(Exception error) {
+    public static void sendScriptError(final Exception error) {
         sendMessage(String.format(
                 "Alya Scripting: %s",
                 error.getMessage() != null ? error.getMessage() : error.toString()
@@ -83,7 +84,7 @@ public class ChatUtility {
      *
      * @param message The success message
      */
-    public static void sendSuccess(String message) {
+    public static void sendSuccess(final String message) {
         sendMessage(message, Formatting.GREEN);
     }
 
@@ -92,7 +93,7 @@ public class ChatUtility {
      *
      * @param message The info message
      */
-    public static void sendInfo(String message) {
+    public static void sendInfo(final String message) {
         sendMessage(message, Formatting.LIGHT_PURPLE);
     }
 
@@ -101,7 +102,7 @@ public class ChatUtility {
      *
      * @param message The warning message
      */
-    public static void sendWarning(String message) {
+    public static void sendWarning(final String message) {
         sendMessage(message, Formatting.YELLOW);
     }
 
@@ -113,11 +114,11 @@ public class ChatUtility {
      * @param prefixFormatting  The formatting for the prefix
      * @param messageFormatting The formatting for the message
      */
-    public static void sendPrefixedMessage(String prefix, String message, Formatting prefixFormatting, Formatting messageFormatting) {
+    public static void sendPrefixedMessage(final String prefix, final String message, final Formatting prefixFormatting, final Formatting messageFormatting) {
         if(mc.player == null) return;
 
-        MutableText prefixText = Text.literal(RYE + " " + prefix + " » ").setStyle(Style.EMPTY.withColor(prefixFormatting));
-        MutableText messageText = Text.literal(message).setStyle(Style.EMPTY.withColor(messageFormatting));
+        final MutableText prefixText = Text.literal(RYE + " " + prefix + " » ").setStyle(Style.EMPTY.withColor(prefixFormatting));
+        final MutableText messageText = Text.literal(message).setStyle(Style.EMPTY.withColor(messageFormatting));
         mc.player.sendMessage(prefixText.append(messageText), false);
     }
 }

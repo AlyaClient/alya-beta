@@ -1,16 +1,17 @@
 /*
- * Copyright (c) Alya Client 2024-2025.
+ * Copyright (c) Alya Beta 2024 - 2025
  *
  * This file belongs to Alya Client,
  * an open-source Fabric injection client.
- * Rye GitHub: https://github.com/AlyaClient/alya-beta.git
+ *     <https://github.com/AlyaClient/alya-beta.git>
  *
  * THIS PROJECT DOES NOT HAVE A WARRANTY.
+ * This file is provided with a free license in hopes it will be useful.
  *
- * Alya (and subsequently, its files) are all licensed under the MIT License.
+ * Alya (and subsequently, all its files) are all licensed under the MIT License.
  * Alya should have come with a copy of the MIT License.
  * If it did not, you may obtain a copy here:
- * MIT License: https://opensource.org/license/mit
+ *     <https://opensource.org/license/mit>
  *
  */
 
@@ -24,7 +25,7 @@ import works.alya.module.ModuleCategory;
 import works.alya.utilities.render.ColorUtility;
 import net.minecraft.client.util.InputUtil;
 
-public class KeyStrokesModule extends Module {
+public final class KeyStrokesModule extends Module {
     private final BooleanSetting spaceBar = new BooleanSetting("Spacebar", "Draw Spacebar?", true);
 
     public KeyStrokesModule() {
